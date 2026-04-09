@@ -148,11 +148,18 @@
     .install-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; }
     .install-close { background: none; border: none; color: #444; font-size: 22px; cursor: pointer; line-height: 1; padding: 0; }
     .install-note { font-size: 11px; color: #444; line-height: 1.6; }
+    .install-row { display: flex; gap: 8px; align-items: stretch; }
     .install-btn {
-      display: block; background: var(--accent); color: #000; text-decoration: none;
+      flex: 1; display: block; background: var(--accent); color: #000; text-decoration: none;
       border-radius: 10px; padding: 13px 16px; text-align: center;
       font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
     }
+    .copy-btn {
+      background: none; border: 1px solid #1e1e1e; color: #555; border-radius: 10px;
+      padding: 13px 14px; font-family: 'DM Mono', monospace; font-size: 11px;
+      cursor: pointer; white-space: nowrap; transition: all 0.2s;
+    }
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
     .install-trigger {
       position: fixed; bottom: 20px; right: 20px; background: none;
       border: 1px solid #1e1e1e; border-radius: 50%; width: 34px; height: 34px;
@@ -252,9 +259,15 @@
         <span class="install-title">Widgets installieren</span>
         <button class="install-close" onclick="toggleInstall()">&#215;</button>
       </div>
-      <p class="install-note">Scriptable muss installiert sein. Tippe auf einen Button &#8212; das Widget installiert sich direkt, kein Copy-Paste.</p>
-      <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FCalorieWidget.js&name=CalorieWidget">Kalorien Widget</a>
-      <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FWeightWidget.js&name=WeightWidget">Gewicht Widget</a>
+      <p class="install-note">Scriptable muss installiert sein. Tippe auf &#8222;Installieren&#8220; &#8212; oder kopiere den Code manuell und f&#252;ge ihn in Scriptable ein.</p>
+      <div class="install-row">
+        <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FCalorieWidget.js&name=CalorieWidget">Kalorien Widget</a>
+        <button class="copy-btn" onclick="copyWidget('CalorieWidget')">&#10697; Code</button>
+      </div>
+      <div class="install-row">
+        <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FWeightWidget.js&name=WeightWidget">Gewicht Widget</a>
+        <button class="copy-btn" onclick="copyWidget('WeightWidget')">&#10697; Code</button>
+      </div>
     </div>
   </div>
   <button class="install-trigger" onclick="toggleInstall()" title="Widgets installieren">&#8984;</button>
@@ -266,6 +279,17 @@
 
     function toggleInstall() {
       document.getElementById('installOverlay').classList.toggle('open')
+    }
+
+    async function copyWidget(name) {
+      try {
+        var r = await fetch('/' + name + '.js')
+        var code = await r.text()
+        await navigator.clipboard.writeText(code)
+        showToast(name + ' Code kopiert!')
+      } catch(e) {
+        showToast('Kopieren fehlgeschlagen', true)
+      }
     }
 
     function navigate(page) {

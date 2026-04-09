@@ -6,33 +6,45 @@ var C_UP = new Color("#ff6b35")
 var C_DOWN = new Color("#4ade80")
 var C_MUTED = new Color("#555555")
 var C_WHITE = new Color("#f0f0f0")
+
 function loadCache() {
   try {
     if (Keychain.contains("ht_weight")) return JSON.parse(Keychain.get("ht_weight"))
   } catch(e) {}
   return {current: null, change: 0, changePercent: 0, trend: "stable"}
 }
+
 function saveCache(d) {
   try { Keychain.set("ht_weight", JSON.stringify(d)) } catch(e) {}
 }
-async function sendWeight(kg) {
-  var r = new Request(WT_URL)
-  r.method = "POST"
-  r.headers = {"Content-Type": "application/json"}
-  r.body = JSON.stringify({weight: kg})
-  r.timeoutInterval = 10
-  var res = await r.loadJSON()
-  if (res.success) saveCache({current: res.current, change: res.change, changePercent: res.changePercent, trend: res.trend})
-  return res
+
+async function fetchLatestWeight() {
+  try {
+    var r = new Request(WT_URL)
+    r.method = "POST"
+    r.headers = {"Content-Type": "application/json"}
+    r.body = JSON.stringify({type: "status"})
+    r.timeoutInterval = 8
+    var d = await r.loadJSON()
+    if (d && d.current != null) {
+      var data = {current: d.current, change: d.change||0, changePercent: d.changePercent||0, trend: d.trend||"stable"}
+      saveCache(data)
+      return data
+    }
+  } catch(e) {}
+  return loadCache()
 }
+
 function makeWidget(d) {
   var trend = d.trend || "stable"
   var tc = trend === "up" ? C_UP : trend === "down" ? C_DOWN : C_MUTED
-  var arrow = trend === "up" ? "^" : trend === "down" ? "v" : "-"
+  var arrow = trend === "up" ? "↑" : trend === "down" ? "↓" : "—"
   var w = new ListWidget()
   w.backgroundColor = C_BG
   w.url = SITE_URL
   w.setPadding(14, 14, 14, 14)
+
+  // Header
   var top = w.addStack()
   top.layoutHorizontally()
   top.centerAlignContent()
@@ -43,15 +55,29 @@ function makeWidget(d) {
   var arr = top.addText(arrow)
   arr.font = Font.boldSystemFont(10)
   arr.textColor = tc
+
   w.addSpacer(6)
+
+  // Current weight (big)
   var num = w.addText(d.current != null ? Number(d.current).toFixed(1) : "--")
   num.font = Font.boldSystemFont(30)
   num.textColor = C_WHITE
   num.minimumScaleFactor = 0.6
+
   var unit = w.addText("kg")
   unit.font = Font.mediumSystemFont(11)
   unit.textColor = C_MUTED
+
   w.addSpacer()
+
+  // Tap hint
+  var hint = w.addText("Tippen zum Eintragen")
+  hint.font = Font.mediumSystemFont(8)
+  hint.textColor = C_MUTED
+
+  w.addSpacer(4)
+
+  // Change stats
   var bot = w.addStack()
   bot.layoutHorizontally()
   bot.centerAlignContent()
@@ -64,26 +90,14 @@ function makeWidget(d) {
   var pt = bot.addText((pc>=0?"+":"")+pc.toFixed(1)+"%")
   pt.font = Font.boldMonospacedSystemFont(9)
   pt.textColor = tc
+
   return w
 }
-async function askWeight() {
-  var a = new Alert()
-  a.title = "Gewicht eingeben"
-  a.message = "kg"
-  a.addTextField("78.5", "")
-  a.addAction("Speichern")
-  a.addCancelAction("Abbrechen")
-  var i = await a.presentAlert()
-  if (i === -1) return null
-  var v = parseFloat(a.textFieldValue(0))
-  if (!v || v < 20 || v > 300) return null
-  return v
-}
+
 if (config.runsInWidget) {
-  Script.setWidget(makeWidget(loadCache()))
+  var data = await fetchLatestWeight()
+  Script.setWidget(makeWidget(data))
 } else {
-  var kg = await askWeight()
-  if (kg) { await sendWeight(kg) }
   await makeWidget(loadCache()).presentSmall()
 }
 Script.complete()
