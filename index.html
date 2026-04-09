@@ -161,13 +161,7 @@
     .cam-overlay-hint{font-size:13px;color:#666;letter-spacing:0.05em;}
     .cam-overlay-close{position:absolute;top:24px;right:20px;background:none;border:none;color:#444;font-size:28px;cursor:pointer;}
 
-    /* ── Code overlay ── */
-    #codeOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:300;flex-direction:column;padding:20px;gap:12px;}
-    #codeOverlay.show{display:flex;animation:slideUp 0.2s ease;}
-    .code-overlay-header{display:flex;align-items:center;justify-content:space-between;}
-    .code-overlay-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;}
-    .code-overlay-hint{font-size:11px;color:#666;line-height:1.6;}
-    #codeTa{flex:1;background:#111;border:1px solid #2a2a2a;border-radius:12px;color:var(--accent);font-family:'DM Mono',monospace;font-size:11px;padding:14px;resize:none;outline:none;line-height:1.5;}
+
   </style>
 </head>
 <body>
@@ -351,25 +345,18 @@
     <div class="cam-overlay-hint">Tippen zum Fotografieren</div>
   </div>
 
-  <!-- CODE COPY OVERLAY -->
-  <div id="codeOverlay">
-    <div class="code-overlay-header">
-      <span class="code-overlay-title">Code kopieren</span>
-      <button onclick="closeCodeOverlay()" style="background:none;border:none;color:#666;font-size:24px;cursor:pointer;padding:0;line-height:1;">&#215;</button>
-    </div>
-    <p class="code-overlay-hint">Select All, dann kopieren und in Scriptable einf&#252;gen.</p>
-    <textarea id="codeTa" readonly></textarea>
-    <button onclick="doCopy()" style="background:var(--accent);color:#000;border:none;border-radius:12px;padding:15px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;">&#10003; Kopieren</button>
-  </div>
+
 
   <script>
-    // ── Settings (localStorage) ──
+    // ── Settings ──
     var SETTINGS = { calGoal: 2700, wtGoal: 85 };
+    function lsGet(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
+    function lsSet(k,v) { try { localStorage.setItem(k,v); } catch(e) {} }
     (function() {
       try {
-        var s = JSON.parse(localStorage.getItem("ht_settings") || "{}");
-        if (s.calGoal) SETTINGS.calGoal = s.calGoal;
-        if (s.wtGoal)  SETTINGS.wtGoal  = s.wtGoal;
+        var s = JSON.parse(lsGet("ht_settings") || "{}");
+        if (s.calGoal && s.calGoal > 0) SETTINGS.calGoal = s.calGoal;
+        if (s.wtGoal  && s.wtGoal  > 0) SETTINGS.wtGoal  = s.wtGoal;
       } catch(e) {}
       document.getElementById("settingCalGoal").value = SETTINGS.calGoal;
       document.getElementById("settingWtGoal").value  = SETTINGS.wtGoal;
@@ -378,7 +365,7 @@
     function saveSettings() {
       SETTINGS.calGoal = parseInt(document.getElementById("settingCalGoal").value) || 2700;
       SETTINGS.wtGoal  = parseFloat(document.getElementById("settingWtGoal").value) || 85;
-      try { localStorage.setItem("ht_settings", JSON.stringify(SETTINGS)); } catch(e) {}
+      lsSet("ht_settings", JSON.stringify(SETTINGS));
       // Update UI labels
       document.getElementById("heroGoalDisplay").textContent = SETTINGS.calGoal.toLocaleString("de-DE");
       document.getElementById("heroOf").textContent = "of " + SETTINGS.calGoal.toLocaleString("de-DE") + " kcal";
@@ -396,13 +383,12 @@ var CAL_URL  = "https://meshminds.app.n8n.cloud/webhook/log-calories"
 var SITE_URL = "https://daemien-calories.vercel.app/#calories"
 var GOAL     = 2700
 
-var C_BG    = new Color("#0f0f0f")
-var C_TRACK = new Color("#1e1e1e")
+var C_BG     = new Color("#0f0f0f")
+var C_TRACK  = new Color("#1e1e1e")
 var C_ORANGE = new Color("#e85d00")
 var C_GREEN  = new Color("#4ade80")
 var C_WHITE  = new Color("#f0f0f0")
-var C_DIM    = new Color("#999999")
-var C_MUTED  = new Color("#555555")
+var C_MUTED  = new Color("#666666")
 
 async function getToday() {
   try {
@@ -419,32 +405,32 @@ async function getToday() {
 }
 
 function makeDonut(total, pct, done) {
-  // Fill the full widget square
-  var S = 155
-  var dc = new DrawContext()
+  var S   = 155
+  var dc  = new DrawContext()
   dc.size = new Size(S, S)
   dc.opaque = false
   dc.respectScreenScale = true
 
-  var cx = S/2, cy = S/2
-  var R = 68   // outer radius — nearly fills the square
-  var lw = 14  // ring thickness
+  var cx  = S / 2
+  var cy  = S / 2
+  var R   = 64
+  var lw  = 13
 
-  // Track ring
+  // Track
   dc.setLineWidth(lw)
   dc.setStrokeColor(C_TRACK)
   dc.strokeEllipse(new Rect(cx-R, cy-R, R*2, R*2))
 
-  // Progress arc
-  var filled = Math.min(pct/100, 1)
+  // Arc
+  var filled = Math.min(pct / 100, 1)
   if (filled > 0) {
-    var steps = 100
-    var startA = -Math.PI/2
+    var steps  = 100
+    var startA = -Math.PI / 2
     var sweep  = filled * Math.PI * 2
-    var arc = new Path()
+    var arc    = new Path()
     for (var i = 0; i <= steps; i++) {
-      var a  = startA + (i/steps)*sweep
-      var pt = new Point(cx + R*Math.cos(a), cy + R*Math.sin(a))
+      var a  = startA + (i / steps) * sweep
+      var pt = new Point(cx + R * Math.cos(a), cy + R * Math.sin(a))
       if (i === 0) arc.move(pt); else arc.addLine(pt)
     }
     dc.addPath(arc)
@@ -453,26 +439,25 @@ function makeDonut(total, pct, done) {
     dc.strokePath()
   }
 
-  // ── Text inside the ring ──
-  var accent = done ? C_GREEN : C_ORANGE
+  // ── Centered text inside ring ──
+  // Use drawTextInRect with centered alignment via DrawContext
+  dc.setTextAlignedCenter()
 
-  // Big calorie number — centered, large
-  dc.setFont(Font.boldSystemFont(32))
-  dc.setTextColor(C_WHITE)
+  // Big calorie number — vertically offset above center
+  dc.setFont(Font.boldSystemFont(28))
+  dc.setTextColor(done ? C_GREEN : C_WHITE)
   var totalStr = total.toLocaleString("de-DE")
-  dc.drawTextInRect(totalStr, new Rect(cx-60, cy-34, 120, 38))
+  dc.drawTextInRect(totalStr, new Rect(cx - 55, cy - 32, 110, 34))
 
-  // "X von 2700" subline
-  dc.setFont(Font.mediumSystemFont(10))
+  // "von 2700 kcal" line
+  dc.setFont(Font.mediumSystemFont(9))
   dc.setTextColor(C_MUTED)
-  var ofStr = total + " von " + GOAL
-  dc.drawTextInRect(ofStr, new Rect(cx-50, cy+6, 100, 14))
+  dc.drawTextInRect("von " + GOAL.toLocaleString("de-DE"), new Rect(cx - 50, cy + 4, 100, 14))
 
-  // Percentage — bottom of ring interior
-  dc.setFont(Font.boldMonospacedSystemFont(11))
-  dc.setTextColor(accent)
-  var pctStr = Math.round(pct) + "%"
-  dc.drawTextInRect(pctStr, new Rect(cx-24, cy+22, 48, 14))
+  // Percentage
+  dc.setFont(Font.boldSystemFont(12))
+  dc.setTextColor(done ? C_GREEN : C_ORANGE)
+  dc.drawTextInRect(Math.round(pct) + "%", new Rect(cx - 30, cy + 20, 60, 16))
 
   return dc.getImage()
 }
@@ -487,20 +472,22 @@ async function build() {
   w.url = SITE_URL
   w.setPadding(0, 0, 0, 0)
 
-  var stack = w.addStack()
-  stack.layoutVertically()
-  stack.centerAlignContent()
+  // Center the donut in the widget
+  var outer = w.addStack()
+  outer.layoutVertically()
+  outer.centerAlignContent()
+  outer.addSpacer()
 
-  stack.addSpacer()
+  var row = outer.addStack()
+  row.layoutHorizontally()
+  row.centerAlignContent()
+  row.addSpacer()
 
-  var imgStack = stack.addStack()
-  imgStack.centerAlignContent()
-  imgStack.addSpacer()
-  var donut = imgStack.addImage(makeDonut(data.total, pct, done))
-  donut.imageSize = new Size(155, 155)
-  imgStack.addSpacer()
+  var img = row.addImage(makeDonut(data.total, pct, done))
+  img.imageSize = new Size(155, 155)
 
-  stack.addSpacer()
+  row.addSpacer()
+  outer.addSpacer()
 
   return w
 }
@@ -664,23 +651,19 @@ Script.complete()
 
     function copyWidget(key) {
       var code = WIDGET_CODES[key];
-      document.getElementById("codeTa").value = code;
-      document.getElementById("codeOverlay").classList.add("show");
-      setTimeout(function() {
-        var ta = document.getElementById("codeTa");
-        ta.focus(); ta.select(); ta.setSelectionRange(0, 99999);
-      }, 100);
-    }
-    function closeCodeOverlay() { document.getElementById("codeOverlay").classList.remove("show"); }
-    function doCopy() {
-      var ta = document.getElementById("codeTa");
-      ta.select(); ta.setSelectionRange(0,99999);
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(ta.value).then(function() { showToast("Code kopiert!"); closeCodeOverlay(); });
-      } else {
-        try { document.execCommand("copy"); showToast("Code kopiert!"); closeCodeOverlay(); } catch(e) {}
-      }
+        navigator.clipboard.writeText(code).then(function() { showToast("\u2705 Code kopiert!"); }).catch(function() { fallbackCopy(code); });
+      } else { fallbackCopy(code); }
     }
+    function fallbackCopy(text) {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.cssText = "position:fixed;top:0;left:0;opacity:0;";
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand("copy"); showToast("\u2705 Code kopiert!"); } catch(e) { showToast("Kopieren fehlgeschlagen", true); }
+      document.body.removeChild(ta);
+    }
+    function closeCodeOverlay() {}
+    function doCopy() {}
     function copyText(txt) {
       if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function(){ showToast("Link kopiert!"); });
       else { var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); showToast("Link kopiert!"); }
