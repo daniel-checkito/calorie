@@ -2,6 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Health Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -211,20 +212,36 @@
     </div>
 
     <div class="entry-card" id="entryForm">
-      <div class="cal-row">
-        <div class="field" style="flex:1">
-          <label>Kalorien (kcal)</label>
-          <input type="number" id="manualCal" placeholder="z.B. 650" inputmode="numeric">
+      <div class="field">
+        <label>Essen suchen</label>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="foodLookup" placeholder="z.B. D&#246;ner, Skyr, Protein Shake..." autocomplete="off" style="flex:1">
+          <button id="lookupBtn" onclick="lookupFood()" style="flex-shrink:0;width:52px;height:52px;border-radius:10px;background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;">&#128269;</button>
         </div>
-        <button class="cam-btn" onclick="document.getElementById('fileInput').click()">&#128247;</button>
       </div>
-      <div class="field" style="margin-top:10px">
-        <label>Beschreibung (optional)</label>
-        <input type="text" id="manualDesc" placeholder="z.B. Pasta mit Tomatensauce">
+      <div id="lookupResult" style="display:none;margin-top:10px;padding:12px;background:var(--card2);border-radius:12px;border:1px solid var(--border);">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Gefunden &#8212; bitte pr&#252;fen</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input type="number" id="lookupCal" inputmode="numeric" style="font-family:Syne,sans-serif;font-size:28px;font-weight:800;color:var(--accent);background:transparent;border:none;outline:none;width:90px;-webkit-appearance:none;">
+          <div>
+            <div style="font-size:11px;color:var(--muted);">kcal</div>
+            <div id="lookupDesc" style="font-size:12px;color:var(--text);margin-top:2px;"></div>
+          </div>
+        </div>
+        <button class="btn" style="margin-top:10px" onclick="saveLookupResult()">&#10003; Eintragen</button>
       </div>
-      <button class="btn" id="manualBtn" style="margin-top:12px" onclick="submitManual()">Eintragen</button>
-      <div class="gallery-link">
-        <button onclick="document.getElementById('galleryInput').click()">&#128444; Aus Galerie w&#228;hlen</button>
+      <div id="manualEntry" style="margin-top:10px">
+        <div class="cal-row">
+          <div class="field" style="flex:1">
+            <label>Oder manuell eingeben</label>
+            <input type="number" id="manualCal" placeholder="z.B. 650" inputmode="numeric">
+          </div>
+          <button class="cam-btn" onclick="document.getElementById('fileInput').click()">&#128247;</button>
+        </div>
+        <button class="btn" id="manualBtn" style="margin-top:10px" onclick="submitManual()">Eintragen</button>
+        <div class="gallery-link">
+          <button onclick="document.getElementById('galleryInput').click()">&#128444; Aus Galerie w&#228;hlen</button>
+        </div>
       </div>
     </div>
 
@@ -358,8 +375,7 @@
         if (s.calGoal && s.calGoal > 0) SETTINGS.calGoal = s.calGoal;
         if (s.wtGoal  && s.wtGoal  > 0) SETTINGS.wtGoal  = s.wtGoal;
       } catch(e) {}
-      document.getElementById("settingCalGoal").value = SETTINGS.calGoal;
-      document.getElementById("settingWtGoal").value  = SETTINGS.wtGoal;
+      var _cg=document.getElementById("settingCalGoal"),_wg=document.getElementById("settingWtGoal"); if(_cg)_cg.value=SETTINGS.calGoal; if(_wg)_wg.value=SETTINGS.wtGoal;
     })();
 
     function saveSettings() {
@@ -827,6 +843,39 @@ Script.complete()
         .finally(function(){ setBtn(btn, false, "Eintragen"); });
     }
 
+
+    async function lookupFood() {
+      var food = document.getElementById("foodLookup").value.trim();
+      if (!food) { document.getElementById("foodLookup").focus(); return; }
+      var btn = document.getElementById("lookupBtn");
+      btn.textContent = "⏳"; btn.disabled = true;
+      try {
+        var r = await fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"lookup", food:food})});
+        var d = await r.json();
+        if (d.calories && d.calories > 0) {
+          document.getElementById("lookupCal").value = d.calories;
+          document.getElementById("lookupDesc").textContent = d.description || food;
+          document.getElementById("lookupResult").style.display = "block";
+          document.getElementById("manualEntry").style.display = "none";
+        } else {
+          showToast("Nichts gefunden — bitte manuell eingeben", true);
+        }
+      } catch(e) { showToast("Fehler bei der Suche", true); }
+      finally { btn.textContent = "🔍"; btn.disabled = false; }
+    }
+    function saveLookupResult() {
+      var cal = parseInt(document.getElementById("lookupCal").value);
+      var desc = document.getElementById("lookupDesc").textContent || document.getElementById("foodLookup").value.trim() || "Eintrag";
+      if (!cal || cal <= 0) { showToast("Kalorien prüfen", true); return; }
+      addOptimisticEntry(cal, desc);
+      document.getElementById("lookupResult").style.display = "none";
+      document.getElementById("manualEntry").style.display = "block";
+      document.getElementById("foodLookup").value = "";
+      fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc})})
+        .then(function(r){return r.json();})
+        .then(function(d){if(d.total!==undefined)updateRing(d.total);if(d.entries!==undefined)renderLog(d.entries);})
+        .catch(function(){showToast("Fehler",true);});
+    }
     // ── Delete entry ──
     async function deleteEntry(row, el) {
       if (!row) return;
@@ -909,8 +958,8 @@ Script.complete()
     function cancelError()   { document.getElementById("photoError").classList.remove("show"); document.getElementById("photoBtn").style.display = "block"; }
     function resetPhotoFlow(){ pendingPhotoData = null; document.getElementById("photoConfirm").classList.remove("show"); document.getElementById("photoError").classList.remove("show"); removePhoto(); }
 
-    document.getElementById("manualCal").addEventListener("keydown", function(e){ if(e.key==="Enter") submitManual(); });
-    document.getElementById("manualDesc").addEventListener("keydown", function(e){ if(e.key==="Enter") submitManual(); });
+    (function(){ var fl=document.getElementById("foodLookup"); if(fl)fl.addEventListener("keydown",function(e){if(e.key==="Enter")lookupFood();}); })();
+    (function(){ var a=document.getElementById("manualCal"),b=document.getElementById("manualDesc"); if(a)a.addEventListener("keydown",function(e){if(e.key==="Enter")submitManual();}); if(b)b.addEventListener("keydown",function(e){if(e.key==="Enter")submitManual();}); })();
 
     // ── Weight ──
     async function loadWeight() {
@@ -967,7 +1016,7 @@ Script.complete()
         .catch(function(){ showToast("Fehler beim Speichern", true); })
         .finally(function(){ setBtn(btn, false, "Gewicht speichern"); });
     }
-    document.getElementById("weightInput").addEventListener("keydown", function(e){ if(e.key==="Enter") saveWeight(); });
+    (function(){ var w=document.getElementById("weightInput"); if(w)w.addEventListener("keydown",function(e){if(e.key==="Enter")saveWeight();}); })();
     loadWeight();
 
     function drawSparkline(points) {
@@ -992,12 +1041,14 @@ Script.complete()
       var fill = document.getElementById("goalBarFill");
       var label = document.getElementById("goalDistLabel");
       var status = document.getElementById("goalStatus");
-      document.getElementById("goalLabelRight").textContent = "Ziel: " + goal + " kg";
+      var lr = document.getElementById("goalLabelRight");
+      if (lr) lr.textContent = "Ziel: " + goal + " kg";
+      if (!fill || !label || !status) return;
       if (isReached) {
         fill.style.width="100%"; fill.classList.add("reached");
         label.textContent="Ziel erreicht!"; status.textContent="";
       } else {
-        var baseline = Math.max(current - 10, 0);
+        var baseline = Math.max(current - 10, 40);
         var pct = Math.min(100, Math.max(0, Math.round(((current - baseline) / (goal - baseline)) * 100)));
         fill.style.width=pct+"%"; fill.classList.remove("reached");
         label.textContent="Noch " + dist.toFixed(1) + " kg bis Ziel";
