@@ -125,6 +125,26 @@
     .cam-big-btn:active{transform:scale(0.93);}
     .cam-overlay-hint{font-size:13px;color:#666;letter-spacing:0.05em;}
     .cam-overlay-close{position:absolute;top:24px;right:20px;background:none;border:none;color:#444;font-size:28px;cursor:pointer;}
+
+    .photo-confirm { display:none; flex-direction:column; gap:10px; margin-bottom:12px; }
+    .photo-confirm.show { display:flex; }
+    .confirm-label { font-size:10px; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; }
+    .confirm-cal-input {
+      background:var(--card2); border:2px solid var(--accent); border-radius:12px;
+      color:var(--accent); font-family:'Syne',sans-serif; font-size:40px; font-weight:800;
+      padding:14px 20px; width:100%; outline:none; letter-spacing:-1px;
+      -webkit-appearance:none; text-align:center;
+    }
+    .confirm-desc { font-size:12px; color:var(--muted); text-align:center; }
+    .confirm-actions { display:flex; gap:8px; }
+    .confirm-actions .btn-secondary {
+      flex:1; background:var(--card2); color:var(--text); border:1px solid var(--border);
+      border-radius:12px; padding:14px; font-family:'Syne',sans-serif; font-size:14px;
+      font-weight:700; cursor:pointer; transition:all 0.15s;
+    }
+    .photo-error { display:none; flex-direction:column; gap:10px; margin-bottom:12px; }
+    .photo-error.show { display:flex; }
+    .error-msg { background:var(--card2); border:1px solid var(--accent2); border-radius:12px; padding:14px 16px; font-size:13px; color:var(--accent2); text-align:center; line-height:1.5; }
   </style>
 </head>
 <body>
@@ -191,7 +211,24 @@
       <div class="dot-pulse"><span></span><span></span><span></span></div>
       Claude analysiert das Bild...
     </div>
-    <button class="btn" id="photoBtn" onclick="submitPhoto()" style="display:none;margin-bottom:14px">Kalorien sch&#228;tzen &amp; speichern</button>
+    <button class="btn" id="photoBtn" onclick="submitPhoto()" style="display:none;margin-bottom:14px">Kalorien sch&#228;tzen</button>
+
+    <!-- Confirm state: edit & save -->
+    <div class="photo-confirm" id="photoConfirm">
+      <div class="confirm-label">Erkannte Kalorien &#8212; bitte pr&#252;fen</div>
+      <input class="confirm-cal-input" type="number" id="confirmCal" inputmode="numeric">
+      <div class="confirm-desc" id="confirmDesc"></div>
+      <div class="confirm-actions">
+        <button class="btn-secondary" onclick="cancelConfirm()">&#10005; Abbrechen</button>
+        <button class="btn" style="flex:1" onclick="saveConfirmed()">&#10003; Speichern</button>
+      </div>
+    </div>
+
+    <!-- Error state: detection failed -->
+    <div class="photo-error" id="photoError">
+      <div class="error-msg">&#128247; Konnte Kalorien nicht erkennen.<br>Bitte manuell eingeben.</div>
+      <button class="btn-secondary" onclick="cancelError()" style="width:100%">Zur&#252;ck</button>
+    </div>
     <div class="log-section">
       <div class="log-header">Heute gegessen</div>
       <div id="logList"><div class="log-empty">Noch nichts eingetragen</div></div>
@@ -697,23 +734,74 @@ Script.complete()
       document.getElementById("fileInput").value = "";
       document.getElementById("galleryInput").value = "";
     }
+    var pendingPhotoData = null;
+
     async function submitPhoto() {
       if (!b64) return;
       var btn = document.getElementById("photoBtn");
       setBtn(btn, true, "Analysiere...");
       document.getElementById("analyzing").classList.add("show");
       try {
-        var r = await fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"photo", image:b64})});
+        var r = await fetch(N8N_CAL, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({type: "photo_detect", image: b64})
+        });
         var d = await r.json();
-        showToast((d.calories || "?") + " kcal erkannt & gespeichert");
-        if (d.total !== undefined) updateRing(d.total);
-        if (d.entries !== undefined) renderLog(d.entries);
-        removePhoto();
-      } catch(e) { showToast("Fehler bei der Analyse", true); }
+        var calories = d.calories || 0;
+        var description = d.description || "Foto Eintrag";
+        if (!calories || calories <= 0) {
+          // Detection failed — show error
+          document.getElementById("photoBtn").style.display = "none";
+          document.getElementById("photoError").classList.add("show");
+        } else {
+          // Show confirm with editable value
+          pendingPhotoData = { description: description };
+          document.getElementById("confirmCal").value = calories;
+          document.getElementById("confirmDesc").textContent = description;
+          document.getElementById("photoBtn").style.display = "none";
+          document.getElementById("photoConfirm").classList.add("show");
+        }
+      } catch(e) {
+        document.getElementById("photoBtn").style.display = "none";
+        document.getElementById("photoError").classList.add("show");
+      }
       finally {
         document.getElementById("analyzing").classList.remove("show");
-        setBtn(btn, false, "Kalorien sch\u00e4tzen & speichern");
+        setBtn(btn, false, "Kalorien sch\u00e4tzen");
       }
+    }
+
+    async function saveConfirmed() {
+      var cal = parseInt(document.getElementById("confirmCal").value);
+      if (!cal || cal <= 0) { showToast("Bitte Kalorien eingeben", true); return; }
+      var desc = pendingPhotoData ? pendingPhotoData.description : "Foto Eintrag";
+      try {
+        var r = await fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc})});
+        var d = await r.json();
+        showToast(cal + " kcal gespeichert");
+        if (d.total !== undefined) updateRing(d.total);
+        if (d.entries !== undefined) renderLog(d.entries);
+        resetPhotoFlow();
+      } catch(e) { showToast("Fehler beim Speichern", true); }
+    }
+
+    function cancelConfirm() {
+      document.getElementById("photoConfirm").classList.remove("show");
+      document.getElementById("photoBtn").style.display = "block";
+      pendingPhotoData = null;
+    }
+
+    function cancelError() {
+      document.getElementById("photoError").classList.remove("show");
+      document.getElementById("photoBtn").style.display = "block";
+    }
+
+    function resetPhotoFlow() {
+      pendingPhotoData = null;
+      document.getElementById("photoConfirm").classList.remove("show");
+      document.getElementById("photoError").classList.remove("show");
+      removePhoto();
     }
 
     document.getElementById("manualCal").addEventListener("keydown", function(e) { if (e.key === "Enter") submitManual(); });
