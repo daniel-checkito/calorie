@@ -403,7 +403,7 @@ function loadCache() {
   try {
     if (Keychain.contains("ht_weight")) return JSON.parse(Keychain.get("ht_weight"))
   } catch(e) {}
-  return {current: null, change: 0, changePercent: 0, trend: "stable", distanceToGoal: null}
+  return {current: null, change: 0, changePercent: 0, trend: "stable", distanceToGoal: null, history: []}
 }
 
 function saveCache(d) {
@@ -419,7 +419,7 @@ async function fetchWeight() {
     r.timeoutInterval = 8
     var d = await r.loadJSON()
     if (d && d.current != null) {
-      var data = {current: d.current, change: d.change||0, changePercent: d.changePercent||0, trend: d.trend||"stable", distanceToGoal: d.distanceToGoal}
+      var data = {current: d.current, change: d.change||0, changePercent: d.changePercent||0, trend: d.trend||"stable", distanceToGoal: d.distanceToGoal, history: d.history||[]}
       saveCache(data)
       return data
     }
@@ -434,7 +434,7 @@ function makeSparkline(history) {
   dc.opaque = false
   dc.respectScreenScale = true
 
-  if (!history || history.length < 2) return dc.getImage()
+  if (!history || history.length < 2) return null
 
   var vals = history.map(function(v) { return Number(v) })
   var min = Math.min.apply(null, vals)
@@ -496,10 +496,12 @@ function makeWidget(d) {
   lbl.textColor = C_MUTED
   w.addSpacer(6)
 
-  // ── Sparkline ──
-  // Placeholder — real sparkline needs history array from webhook
-  var spark = w.addImage(makeSparkline([]))
-  spark.imageSize = new Size(160, 40)
+  // ── Sparkline ── (only render if we have history)
+  var sparkImg = (d.history && d.history.length > 1) ? makeSparkline(d.history) : null
+  if (sparkImg) {
+    var spark = w.addImage(sparkImg)
+    spark.imageSize = new Size(160, 40)
+  }
   w.addSpacer(6)
 
   // ── Big weight ──
