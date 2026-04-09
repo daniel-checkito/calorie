@@ -47,19 +47,24 @@ function makeDonut(pct, done) {
   dc.respectScreenScale = true
   var cx = s / 2, cy = s / 2, r = 44, lw = 11
 
-  // Background ring
-  var bgPath = new Path()
-  bgPath.addArc(new Point(cx, cy), r, 0, Math.PI * 2, false)
-  dc.addPath(bgPath)
+  // Background ring — strokeEllipse draws a full circle outline
   dc.setLineWidth(lw)
   dc.setStrokeColor(new Color("#1e1e1e"))
-  dc.strokePath()
+  dc.strokeEllipse(new Rect(cx - r, cy - r, r * 2, r * 2))
 
-  // Progress arc — 12 o'clock, clockwise
+  // Progress arc — approximate with line segments (Path.addArc not available)
   var filled = Math.min(pct / 100, 1)
   if (filled > 0) {
+    var steps = 60
+    var startA = -Math.PI / 2
+    var sweep = filled * Math.PI * 2
     var arc = new Path()
-    arc.addArc(new Point(cx, cy), r, -Math.PI / 2, -Math.PI / 2 + filled * Math.PI * 2, false)
+    for (var i = 0; i <= steps; i++) {
+      var a = startA + (i / steps) * sweep
+      var pt = new Point(cx + r * Math.cos(a), cy + r * Math.sin(a))
+      if (i === 0) arc.move(pt)
+      else arc.addLine(pt)
+    }
     dc.addPath(arc)
     dc.setLineWidth(lw)
     dc.setStrokeColor(new Color(done ? "#4ade80" : "#c8f55a"))
