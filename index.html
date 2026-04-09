@@ -143,6 +143,12 @@
       border-radius: 10px; padding: 13px 16px; text-align: center;
       font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
     }
+    .copy-btn {
+      background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 10px;
+      padding: 13px 14px; font-family: 'DM Mono', monospace; font-size: 11px;
+      cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0;
+    }
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
     .install-trigger {
       position: fixed; bottom: 20px; right: 20px; background: none;
       border: 1px solid var(--border); border-radius: 50%; width: 34px; height: 34px;
@@ -300,8 +306,145 @@
         <button class="install-close" onclick="toggleInstall()">&#215;</button>
       </div>
       <p class="install-note">Scriptable muss installiert sein. Tippe auf einen Button &#8212; das Widget installiert sich direkt, kein Copy-Paste.</p>
-      <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FCalorieWidget.js&name=CalorieWidget">Kalorien Widget</a>
-      <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FWeightWidget.js&name=WeightWidget">Gewicht Widget</a>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+        <a class="install-btn" style="flex:1" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FCalorieWidget.js&name=CalorieWidget">Kalorien Widget</a>
+        <button class="copy-btn" onclick="copyCode('cal-code-el')">&#10697; Code</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <a class="install-btn" style="flex:1" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FWeightWidget.js&name=WeightWidget">Gewicht Widget</a>
+      </div>
+      <textarea id="cal-code-el" style="position:fixed;top:-9999px;left:-9999px;" readonly>// Calorie Widget - Health Tracker
+var CAL_URL = "https://meshminds.app.n8n.cloud/webhook/log-calories"
+var SITE_URL = "https://daemien-calories.vercel.app/#calories"
+var GOAL = 2700
+
+async function getToday() {
+  try {
+    var r = new Request(CAL_URL)
+    r.method = "POST"
+    r.headers = {"Content-Type": "application/json"}
+    r.body = JSON.stringify({type: "status"})
+    r.timeoutInterval = 8
+    var d = await r.loadJSON()
+    return {total: d.total||0, remaining: d.remaining||GOAL, percentage: d.percentage||0, goalReached: d.goalReached||false}
+  } catch(e) {
+    return {total: 0, remaining: GOAL, percentage: 0, goalReached: false}
+  }
+}
+
+function makeRing(pct, done) {
+  var s = 76
+  var dc = new DrawContext()
+  dc.size = new Size(s, s)
+  dc.opaque = false
+  dc.respectScreenScale = true
+  var cx = s/2, cy = s/2, r = 30, lw = 7
+
+  // Track
+  dc.setLineWidth(lw)
+  dc.setStrokeColor(new Color("#222222"))
+  dc.strokeEllipse(new Rect(cx-r, cy-r, r*2, r*2))
+
+  // Fill
+  var filled = Math.min(pct/100, 1)
+  if (filled > 0) {
+    var steps = 80
+    var startA = -Math.PI/2
+    var sweep = filled * Math.PI * 2
+    var arc = new Path()
+    for (var i = 0; i <= steps; i++) {
+      var a = startA + (i/steps) * sweep
+      var pt = new Point(cx + r*Math.cos(a), cy + r*Math.sin(a))
+      if (i === 0) arc.move(pt)
+      else arc.addLine(pt)
+    }
+    dc.addPath(arc)
+    dc.setLineWidth(lw)
+    dc.setStrokeColor(new Color(done ? "#4ade80" : "#e85d00"))
+    dc.strokePath()
+  }
+  return dc.getImage()
+}
+
+async function build() {
+  var data = await getToday()
+  var pct = Math.min(data.percentage, 100)
+  var done = data.goalReached
+
+  var w = new ListWidget()
+  w.backgroundColor = new Color("#0f0f0f")
+  w.url = SITE_URL
+  w.setPadding(14, 14, 14, 14)
+
+  // ── Row 1: label + status dot ──
+  var row1 = w.addStack()
+  row1.layoutHorizontally()
+  var lbl = row1.addText("KALORIEN")
+  lbl.font = Font.boldMonospacedSystemFont(8)
+  lbl.textColor = new Color("#444444")
+  row1.addSpacer()
+  var dot = row1.addText(done ? "✓ Ziel" : pct + "%")
+  dot.font = Font.mediumMonospacedSystemFont(8)
+  dot.textColor = new Color(done ? "#4ade80" : "#555555")
+
+  w.addSpacer(8)
+
+  // ── Row 2: big number + ring ──
+  var row2 = w.addStack()
+  row2.layoutHorizontally()
+  row2.centerAlignContent()
+
+  var numStack = row2.addStack()
+  numStack.layoutVertically()
+
+  var num = numStack.addText(data.total.toLocaleString("de-DE"))
+  num.font = Font.boldSystemFont(32)
+  num.textColor = new Color(done ? "#4ade80" : "#ffffff")
+  num.minimumScaleFactor = 0.6
+
+  var unit = numStack.addText("kcal heute")
+  unit.font = Font.mediumSystemFont(9)
+  unit.textColor = new Color("#444444")
+
+  row2.addSpacer()
+
+  var ringImg = row2.addImage(makeRing(pct, done))
+  ringImg.imageSize = new Size(56, 56)
+
+  w.addSpacer()
+
+  // ── Row 3: goal / remaining ──
+  var row3 = w.addStack()
+  row3.layoutHorizontally()
+
+  var goalStack = row3.addStack()
+  goalStack.layoutVertically()
+  var goalLbl = goalStack.addText("ZIEL")
+  goalLbl.font = Font.mediumMonospacedSystemFont(7)
+  goalLbl.textColor = new Color("#333333")
+  var goalVal = goalStack.addText(GOAL.toLocaleString("de-DE"))
+  goalVal.font = Font.boldMonospacedSystemFont(10)
+  goalVal.textColor = new Color("#555555")
+
+  row3.addSpacer()
+
+  var remStack = row3.addStack()
+  remStack.layoutVertically()
+  remStack.bottomAlignContent()
+  var remLbl = remStack.addText("NOCH")
+  remLbl.font = Font.mediumMonospacedSystemFont(7)
+  remLbl.textColor = new Color("#333333")
+  var remVal = remStack.addText(done ? "—" : data.remaining.toLocaleString("de-DE"))
+  remVal.font = Font.boldMonospacedSystemFont(10)
+  remVal.textColor = new Color(done ? "#4ade80" : "#e85d00")
+
+  return w
+}
+
+var widget = await build()
+if (config.runsInWidget) { Script.setWidget(widget) } else { widget.presentSmall() }
+Script.complete()
+</textarea>
     </div>
   </div>
   <button class="install-trigger" onclick="toggleInstall()" title="Widgets installieren">&#8984;</button>
@@ -593,6 +736,19 @@
       t.className = 'toast' + (isError ? ' error' : '')
       t.classList.add('show')
       setTimeout(function() { t.classList.remove('show') }, 3000)
+    }
+
+    function copyCode(id) {
+      var el = document.getElementById(id)
+      if (!el) return
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(el.value).then(function() { showToast('Code kopiert!') })
+        return
+      }
+      el.style.position = 'fixed'; el.style.top = '0'
+      el.select()
+      try { document.execCommand('copy'); showToast('Code kopiert!') } catch(e) {}
+      el.style.position = 'fixed'; el.style.top = '-9999px'
     }
   </script>
 </body>
