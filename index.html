@@ -8,73 +8,61 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0f0f0f;
-      --card: #1a1a1a;
-      --card2: #222222;
-      --border: #2a2a2a;
-      --accent: #e85d00;
-      --accent2: #c0392b;
-      --text: #f0f0f0;
-      --muted: #666666;
-      --success: #4ade80;
-      --blue: #38bdf8;
-      --up: #e85d00;
-      --down: #4ade80;
+      --bg: #0f0f0f; --card: #1a1a1a; --card2: #222;
+      --border: #2a2a2a; --accent: #4ade80; --accent2: #c0392b;
+      --text: #f0f0f0; --muted: #666; --success: #4ade80;
+      --orange: #e85d00; --blue: #38bdf8;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #0f0f0f; }
     body {
       background: var(--bg); color: var(--text);
       font-family: 'DM Mono', monospace;
-      min-height: 100vh; display: flex; flex-direction: column;
-      align-items: stretch; padding: 0;
+      min-height: 100vh; display: flex; flex-direction: column; align-items: stretch;
     }
-    .page { display: none; width: 100%; flex-direction: column; align-items: stretch; padding: 20px 16px 60px; }
+    .page { display: none; width: 100%; flex-direction: column; align-items: stretch; padding: 20px 16px 80px; }
     .page.active { display: flex; }
-    header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-top: 4px; }
+    header { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; padding-top: 4px; }
     .logo { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: var(--accent); }
-    .logo span { color: var(--text); opacity: 0.4; }
-    .date-label { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+    .logo span { color: var(--text); opacity: 0.35; }
+    .date-label { font-size: 11px; color: var(--muted); }
     .nav-link {
       margin-left: auto; font-size: 11px; color: var(--muted); text-decoration: none;
       border: 1px solid var(--border); padding: 6px 14px; border-radius: 99px;
-      transition: all 0.2s; cursor: pointer; background: none; font-family: 'DM Mono', monospace;
+      cursor: pointer; background: none; font-family: 'DM Mono', monospace; transition: all 0.2s;
     }
     .nav-link:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* ── Calorie hero card ── */
-    .hero-card {
-      background: var(--card); border-radius: 20px; padding: 22px 20px 18px;
-      margin-bottom: 14px; position: relative; overflow: hidden;
-    }
-    .hero-label { font-size: 10px; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 14px; text-transform: uppercase; }
+    /* Hero card */
+    .hero-card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 12px; }
+    .hero-label { font-size: 10px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 14px; }
     .hero-main { display: flex; align-items: center; gap: 16px; }
     .ring-wrap { position: relative; flex-shrink: 0; }
-    .ring-wrap svg { display: block; }
     .ring-bg { fill: none; stroke: #2a2a2a; stroke-width: 8; }
     .ring-fill {
-      fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round;
+      fill: none; stroke: var(--orange); stroke-width: 8; stroke-linecap: round;
       stroke-dasharray: 220; stroke-dashoffset: 220;
       transform: rotate(-90deg); transform-origin: 50% 50%;
       transition: stroke-dashoffset 0.8s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .ring-fill.done { stroke: var(--success); }
+    .ring-fill.done { stroke: var(--accent); }
     .ring-pct {
       position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
       font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; color: var(--text);
     }
     .hero-nums { flex: 1; }
-    .hero-total { font-family: 'Syne', sans-serif; font-size: 44px; font-weight: 800; letter-spacing: -2px; line-height: 1; color: var(--text); }
-    .hero-total.done { color: var(--success); }
-    .hero-of { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .hero-total { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; letter-spacing: -2px; line-height: 1; color: var(--text); }
+    .hero-total.done { color: var(--accent); }
+    .hero-of { font-size: 11px; color: var(--muted); margin-top: 4px; }
     .hero-footer { display: flex; justify-content: space-between; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
     .hero-stat { display: flex; flex-direction: column; gap: 3px; }
     .hero-stat-label { font-size: 9px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
-    .hero-stat-val { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
-    .hero-stat-val.remaining { color: var(--accent); }
-    .hero-stat-val.done { color: var(--success); }
+    .hero-stat-val { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); }
+    .hero-stat-val.remaining { color: var(--orange); }
+    .hero-stat-val.done { color: var(--accent); }
 
-    /* ── Entry form ── */
-    .entry-card { background: var(--card); border-radius: 20px; padding: 18px 16px; margin-bottom: 14px; }
+    /* Entry */
+    .entry-card { background: var(--card); border-radius: 20px; padding: 16px; margin-bottom: 12px; }
     .field { display: flex; flex-direction: column; gap: 6px; }
     label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
     input[type="number"], input[type="text"] {
@@ -86,18 +74,15 @@
     .cal-row { display: flex; align-items: flex-end; gap: 10px; }
     .cam-btn {
       flex-shrink: 0; width: 52px; height: 52px; border-radius: 10px;
-      background: var(--accent); color: #fff; border: none; font-size: 22px;
+      background: var(--orange); color: #fff; border: none; font-size: 22px;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: filter 0.2s;
     }
-    .cam-btn:hover { filter: brightness(1.1); }
     .btn {
-      background: var(--accent); color: #fff; border: none; border-radius: 12px;
+      background: var(--accent); color: #000; border: none; border-radius: 12px;
       padding: 15px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
       cursor: pointer; width: 100%; letter-spacing: 0.02em; transition: all 0.15s;
       position: relative; overflow: hidden;
     }
-    .btn:hover { filter: brightness(1.08); }
     .btn:disabled { opacity: 0.45; cursor: not-allowed; }
     .btn.loading::after {
       content: ''; position: absolute; inset: 0;
@@ -108,8 +93,9 @@
     .gallery-link { text-align: center; margin-top: 10px; }
     .gallery-link button { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; font-family: inherit; }
 
-    /* ── Photo ── */
-    .preview-wrap { display: none; border-radius: 14px; overflow: hidden; margin-bottom: 12px; }
+    /* Photo */
+    .preview-outer { position: relative; margin-bottom: 12px; }
+    .preview-wrap { display: none; border-radius: 14px; overflow: hidden; }
     .preview-wrap.show { display: block; }
     .preview-wrap img { width: 100%; max-height: 200px; object-fit: cover; display: block; }
     .preview-remove {
@@ -129,24 +115,19 @@
     .dot-pulse span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes dpulse { 0%,80%,100%{opacity:.2;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }
 
-    /* ── Log ── */
+    /* Log */
     .log-section { margin-top: 6px; }
     .log-header { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
     .log-empty { font-size: 12px; color: var(--muted); padding: 12px 0; text-align: center; }
-    .log-entry {
-      display: flex; align-items: center; gap: 10px;
-      background: var(--card); border-radius: 12px; padding: 12px 14px; margin-bottom: 6px;
-    }
-    .log-cal { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--accent); min-width: 52px; }
+    .log-entry { display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: 12px; padding: 12px 14px; margin-bottom: 6px; }
+    .log-cal { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--orange); min-width: 52px; }
     .log-desc { font-size: 12px; color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .log-time { font-size: 10px; color: var(--muted); min-width: 36px; text-align: right; }
-    .log-del { background: none; border: none; color: #333; cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 4px; transition: color 0.2s; flex-shrink: 0; }
+    .log-del { background: none; border: none; color: #444; cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 4px; transition: color 0.2s; flex-shrink: 0; }
     .log-del:hover { color: var(--accent2); }
 
-    /* ── Weight page ── */
-    .weight-hero {
-      background: var(--card); border-radius: 20px; padding: 22px 20px 18px; margin-bottom: 14px;
-    }
+    /* Weight page */
+    .weight-hero { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 12px; }
     .weight-hero-label { font-size: 10px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
     .sparkline { width: 100%; height: 52px; margin-bottom: 14px; }
     .weight-main-row { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 14px; }
@@ -154,15 +135,15 @@
     .weight-unit { font-size: 16px; color: var(--muted); margin-bottom: 8px; }
     .weight-change { margin-left: auto; text-align: right; }
     .weight-pct { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; }
-    .weight-pct.up { color: var(--up); } .weight-pct.down { color: var(--down); } .weight-pct.stable { color: var(--muted); }
+    .weight-pct.up { color: var(--orange); } .weight-pct.down { color: var(--accent); } .weight-pct.stable { color: var(--muted); }
     .weight-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .goal-bar-wrap { border-top: 1px solid var(--border); padding-top: 14px; margin-top: 4px; }
+    .goal-bar-wrap { border-top: 1px solid var(--border); padding-top: 14px; }
     .goal-bar-labels { display: flex; justify-content: space-between; margin-bottom: 8px; }
     .goal-bar-label-left { font-size: 12px; color: var(--text); font-weight: 500; }
     .goal-bar-label-right { font-size: 11px; color: var(--muted); }
     .goal-bar-track { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
-    .goal-bar-fill { height: 100%; border-radius: 99px; background: var(--accent); transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); width: 0%; }
-    .goal-bar-fill.reached { background: var(--success); }
+    .goal-bar-fill { height: 100%; border-radius: 99px; background: var(--orange); transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); width: 0%; }
+    .goal-bar-fill.reached { background: var(--accent); }
     .goal-status { font-size: 11px; color: var(--muted); margin-top: 6px; text-align: right; }
     .weight-input {
       background: var(--card2); border: 1px solid var(--border); border-radius: 10px;
@@ -171,9 +152,8 @@
       -webkit-appearance: none; letter-spacing: -1px;
     }
     .weight-input:focus { border-color: var(--accent); }
-    .weight-form { display: flex; flex-direction: column; gap: 10px; }
 
-    /* ── Toast ── */
+    /* Toast */
     .toast {
       position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px);
       background: var(--card); border: 1px solid var(--border); color: var(--text);
@@ -183,38 +163,39 @@
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.error { border-color: var(--accent2); }
 
-    /* ── Install overlay ── */
+    /* Install */
     .install-overlay {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
-      z-index: 200; align-items: center; justify-content: center; padding: 24px;
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+      z-index: 200; align-items: flex-end; justify-content: center; padding: 0;
     }
     .install-overlay.open { display: flex; }
     .install-box {
-      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
-      padding: 24px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px 20px 0 0; padding: 24px 20px 40px;
+      width: 100%; display: flex; flex-direction: column; gap: 12px;
     }
-    .install-header { display: flex; align-items: center; justify-content: space-between; }
-    .install-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; }
-    .install-close { background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; padding: 0; }
+    .install-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+    .install-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; }
+    .install-close { background: none; border: none; color: var(--muted); font-size: 24px; cursor: pointer; padding: 0; line-height: 1; }
     .install-note { font-size: 11px; color: var(--muted); line-height: 1.6; }
+    .install-row { display: flex; gap: 8px; align-items: stretch; }
     .install-btn {
-      flex: 1; display: block; background: var(--accent); color: #fff; text-decoration: none;
-      border-radius: 10px; padding: 13px 16px; text-align: center;
-      font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+      flex: 1; background: var(--accent); color: #000; text-decoration: none;
+      border-radius: 12px; padding: 14px 16px; text-align: center;
+      font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; display: block;
     }
     .copy-btn {
-      background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 10px;
-      padding: 13px 14px; font-family: 'DM Mono', monospace; font-size: 11px;
+      background: var(--card2); border: 1px solid var(--border); color: var(--muted);
+      border-radius: 12px; padding: 14px 16px; font-family: 'DM Mono', monospace; font-size: 12px;
       cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0;
     }
     .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
     .install-trigger {
       position: fixed; bottom: 20px; right: 20px; background: var(--card);
-      border: 1px solid var(--border); border-radius: 50%; width: 36px; height: 36px;
+      border: 1px solid var(--border); border-radius: 50%; width: 38px; height: 38px;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 15px; color: var(--muted); z-index: 100;
+      cursor: pointer; font-size: 16px; color: var(--muted); z-index: 100;
     }
-    .install-trigger:hover { border-color: var(--accent); color: var(--accent); }
   </style>
 </head>
 <body>
@@ -227,7 +208,6 @@
       <button class="nav-link" onclick="navigate('weight')">Gewicht &#8594;</button>
     </header>
 
-    <!-- Hero ring card -->
     <div class="hero-card">
       <div class="hero-label">Calories Today</div>
       <div class="hero-main">
@@ -240,7 +220,7 @@
         </div>
         <div class="hero-nums">
           <div class="hero-total" id="ringTotal">0</div>
-          <div class="hero-of" id="heroOf">of 2.700 kcal</div>
+          <div class="hero-of">of 2.700 kcal</div>
         </div>
       </div>
       <div class="hero-footer">
@@ -255,11 +235,10 @@
       </div>
     </div>
 
-    <!-- Entry form -->
     <input type="file" accept="image/*" capture="environment" id="fileInput" onchange="handleFile(this)" style="display:none">
     <input type="file" accept="image/*" id="galleryInput" onchange="handleFile(this)" style="display:none">
 
-    <div style="position:relative">
+    <div class="preview-outer">
       <div class="preview-wrap" id="previewWrap">
         <img id="previewImg" src="" alt="">
         <button class="preview-remove" onclick="removePhoto()">&#10005;</button>
@@ -272,7 +251,7 @@
           <label>Kalorien (kcal)</label>
           <input type="number" id="manualCal" placeholder="z.B. 650" inputmode="numeric">
         </div>
-        <button class="cam-btn" onclick="document.getElementById('fileInput').click()" title="Kamera">&#128247;</button>
+        <button class="cam-btn" onclick="document.getElementById('fileInput').click()">&#128247;</button>
       </div>
       <div class="field" style="margin-top:10px">
         <label>Beschreibung (optional)</label>
@@ -303,7 +282,7 @@
       <button class="nav-link" onclick="navigate('calories')">&#8592; Kalorien</button>
     </header>
     <div class="weight-hero">
-      <div class="weight-hero-label">Weight — 30 Days</div>
+      <div class="weight-hero-label">Weight &#8212; 30 Days</div>
       <svg class="sparkline" id="sparkline" viewBox="0 0 380 52" preserveAspectRatio="none"></svg>
       <div class="weight-main-row">
         <div>
@@ -320,13 +299,11 @@
           <span class="goal-bar-label-left" id="goalDistLabel">&#8212;</span>
           <span class="goal-bar-label-right">Ziel: 85 kg</span>
         </div>
-        <div class="goal-bar-track">
-          <div class="goal-bar-fill" id="goalBarFill"></div>
-        </div>
+        <div class="goal-bar-track"><div class="goal-bar-fill" id="goalBarFill"></div></div>
         <div class="goal-status" id="goalStatus"></div>
       </div>
     </div>
-    <div class="weight-form">
+    <div style="display:flex;flex-direction:column;gap:10px;">
       <div class="field">
         <label>Aktuelles Gewicht (kg)</label>
         <input class="weight-input" type="number" id="weightInput" placeholder="78.5" step="0.1" inputmode="decimal">
@@ -344,15 +321,26 @@
         <span class="install-title">Widgets installieren</span>
         <button class="install-close" onclick="toggleInstall()">&#215;</button>
       </div>
-      <p class="install-note">Scriptable muss installiert sein. Tippe auf einen Button &#8212; das Widget installiert sich direkt, kein Copy-Paste.</p>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-        <a class="install-btn" style="flex:1" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FCalorieWidget.js&name=CalorieWidget">Kalorien Widget</a>
-        <button class="copy-btn" onclick="copyCode('cal-code-el')">&#10697; Code</button>
+      <p class="install-note">Scriptable installieren, dann auf den Button tippen. Oder Code kopieren und manuell in Scriptable einf&#252;gen.</p>
+      <div class="install-row">
+        <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FCalorieWidget.js&name=CalorieWidget">Kalorien Widget</a>
+        <button class="copy-btn" onclick="copyWidgetCode('cal')">&#10697; Code</button>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <a class="install-btn" style="flex:1" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FWeightWidget.js&name=WeightWidget">Gewicht Widget</a>
+      <div class="install-row">
+        <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FWeightWidget.js&name=WeightWidget">Gewicht Widget</a>
+        <button class="copy-btn" onclick="copyWidgetCode('wt')">&#10697; Code</button>
       </div>
-      <textarea id="cal-code-el" style="position:fixed;top:-9999px;left:-9999px;" readonly>// Calorie Widget - Health Tracker
+    </div>
+  </div>
+  <button class="install-trigger" onclick="toggleInstall()">&#8984;</button>
+
+  <script>
+    var N8N_CAL    = 'https://meshminds.app.n8n.cloud/webhook/log-calories'
+    var N8N_WEIGHT = 'https://meshminds.app.n8n.cloud/webhook/log-weight'
+    var GOAL = 2700
+
+    var WIDGET_CODES = {
+      cal: `// Calorie Widget - Health Tracker
 var CAL_URL = "https://meshminds.app.n8n.cloud/webhook/log-calories"
 var SITE_URL = "https://daemien-calories.vercel.app/#calories"
 var GOAL = 2700
@@ -474,19 +462,174 @@ async function build() {
 var widget = await build()
 if (config.runsInWidget) { Script.setWidget(widget) } else { widget.presentSmall() }
 Script.complete()
-</textarea>
-    </div>
-  </div>
-  <button class="install-trigger" onclick="toggleInstall()" title="Widgets installieren">&#8984;</button>
+`,
+      wt:  `// Weight Widget - Health Tracker
+var WT_URL   = "https://meshminds.app.n8n.cloud/webhook/log-weight"
+var SITE_URL = "https://daemien-calories.vercel.app/#weight"
+var GOAL     = 85
 
-  <script>
-    var N8N_CAL    = 'https://meshminds.app.n8n.cloud/webhook/log-calories'
-    var N8N_WEIGHT = 'https://meshminds.app.n8n.cloud/webhook/log-weight'
-    var GOAL = 2700
+var C_BG    = new Color("#111111")
+var C_GREEN = new Color("#4ade80")
+var C_BLUE  = new Color("#38bdf8")
+var C_GOAL  = new Color("#4ade80")
+var C_WHITE = new Color("#f0f0f0")
+var C_MUTED = new Color("#666666")
+var C_UP    = new Color("#e85d00")
 
-    function toggleInstall() {
-      document.getElementById('installOverlay').classList.toggle('open')
+function loadCache() {
+  try {
+    if (Keychain.contains("ht_weight")) return JSON.parse(Keychain.get("ht_weight"))
+  } catch(e) {}
+  return {current: null, change: 0, changePercent: 0, trend: "stable", distanceToGoal: null}
+}
+
+function saveCache(d) {
+  try { Keychain.set("ht_weight", JSON.stringify(d)) } catch(e) {}
+}
+
+async function fetchWeight() {
+  try {
+    var r = new Request(WT_URL)
+    r.method = "POST"
+    r.headers = {"Content-Type": "application/json"}
+    r.body = JSON.stringify({type: "status"})
+    r.timeoutInterval = 8
+    var d = await r.loadJSON()
+    if (d && d.current != null) {
+      var data = {current: d.current, change: d.change||0, changePercent: d.changePercent||0, trend: d.trend||"stable", distanceToGoal: d.distanceToGoal}
+      saveCache(data)
+      return data
     }
+  } catch(e) {}
+  return loadCache()
+}
+
+function makeSparkline(history) {
+  var W = 160, H = 50
+  var dc = new DrawContext()
+  dc.size = new Size(W, H)
+  dc.opaque = false
+  dc.respectScreenScale = true
+
+  if (!history || history.length < 2) return dc.getImage()
+
+  var vals = history.map(function(v) { return Number(v) })
+  var min = Math.min.apply(null, vals)
+  var max = Math.max.apply(null, vals)
+  var range = max - min || 1
+
+  // Goal line
+  if (GOAL >= min && GOAL <= max + 2) {
+    var goalY = H - ((GOAL - min) / range) * (H - 8) - 4
+    dc.setLineWidth(1)
+    dc.setStrokeColor(C_GOAL)
+    // Dashed goal line via segments
+    for (var x = 0; x < W; x += 12) {
+      var seg = new Path()
+      seg.move(new Point(x, goalY))
+      seg.addLine(new Point(Math.min(x+7, W), goalY))
+      dc.addPath(seg)
+      dc.strokePath()
+    }
+  }
+
+  // Line
+  var path = new Path()
+  for (var i = 0; i < vals.length; i++) {
+    var px = (i / (vals.length - 1)) * (W - 4) + 2
+    var py = H - ((vals[i] - min) / range) * (H - 8) - 4
+    if (i === 0) path.move(new Point(px, py))
+    else path.addLine(new Point(px, py))
+  }
+  dc.addPath(path)
+  dc.setLineWidth(2)
+  dc.setStrokeColor(C_BLUE)
+  dc.strokePath()
+
+  // Dot at end
+  var lx = (W - 4) + 2
+  var ly = H - ((vals[vals.length-1] - min) / range) * (H - 8) - 4
+  dc.setFillColor(C_BLUE)
+  dc.fillEllipse(new Rect(lx-4, ly-4, 8, 8))
+
+  return dc.getImage()
+}
+
+function makeWidget(d) {
+  var trend = d.trend || "stable"
+  var dist  = d.distanceToGoal != null ? d.distanceToGoal : (d.current != null ? Math.round((d.current - GOAL)*10)/10 : null)
+  var atGoal = dist != null && dist <= 0
+
+  var w = new ListWidget()
+  w.backgroundColor = C_BG
+  w.url = SITE_URL
+  w.setPadding(14, 14, 14, 14)
+
+  // ── Label ──
+  var r1 = w.addStack()
+  r1.layoutHorizontally()
+  var lbl = r1.addText("WEIGHT — 30 DAYS")
+  lbl.font = Font.boldMonospacedSystemFont(8)
+  lbl.textColor = C_MUTED
+  w.addSpacer(6)
+
+  // ── Sparkline ──
+  // Placeholder — real sparkline needs history array from webhook
+  var spark = w.addImage(makeSparkline([]))
+  spark.imageSize = new Size(160, 40)
+  w.addSpacer(6)
+
+  // ── Big weight ──
+  var num = w.addText(d.current != null ? Number(d.current).toFixed(1) : "--")
+  num.font = Font.boldSystemFont(28)
+  num.textColor = C_WHITE
+  num.minimumScaleFactor = 0.6
+
+  var unit = w.addText("kg")
+  unit.font = Font.mediumSystemFont(10)
+  unit.textColor = C_MUTED
+  w.addSpacer(4)
+
+  // ── Goal distance ──
+  if (dist != null) {
+    var arrow = trend === "down" ? "▼ " : trend === "up" ? "▲ " : "— "
+    var goalLine = atGoal
+      ? "Goal reached!"
+      : arrow + Math.abs(dist).toFixed(1) + " kg to goal"
+    var gl = w.addText(goalLine)
+    gl.font = Font.boldSystemFont(10)
+    gl.textColor = atGoal ? C_GREEN : (trend === "down" ? C_GREEN : C_UP)
+  }
+
+  return w
+}
+
+if (config.runsInWidget) {
+  var data = await fetchWeight()
+  Script.setWidget(makeWidget(data))
+} else {
+  Script.setWidget(makeWidget(loadCache()))
+}
+Script.complete()
+`
+    }
+
+    function copyWidgetCode(key) {
+      var code = WIDGET_CODES[key]
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(function() { showToast('Code kopiert!') })
+      } else {
+        var ta = document.createElement('textarea')
+        ta.value = code
+        ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0'
+        document.body.appendChild(ta)
+        ta.focus(); ta.select()
+        try { document.execCommand('copy'); showToast('Code kopiert!') } catch(e) {}
+        document.body.removeChild(ta)
+      }
+    }
+
+    function toggleInstall() { document.getElementById('installOverlay').classList.toggle('open') }
 
     function navigate(page) {
       document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active') })
@@ -499,18 +642,12 @@ Script.complete()
       var hash = window.location.hash.replace('#', '') || 'calories'
       document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active') })
       document.getElementById('page-' + (hash === 'weight' ? 'weight' : 'calories')).classList.add('active')
-      if (hash === 'camera') {
-        switchTab('photo')
-        setTimeout(function() { document.getElementById('fileInput').click() }, 300)
-      }
+      if (hash === 'camera') setTimeout(function() { document.getElementById('fileInput').click() }, 300)
     }
-
     window.addEventListener('hashchange', initRoute)
     initRoute()
 
-    document.getElementById('dateLabel').textContent = new Date().toLocaleDateString('de-DE', {
-      weekday: 'short', day: 'numeric', month: 'short'
-    })
+    document.getElementById('dateLabel').textContent = new Date().toLocaleDateString('de-DE', {weekday:'short', day:'numeric', month:'short'})
 
     function updateRing(total) {
       var pct = Math.min(total / GOAL, 1)
@@ -523,100 +660,39 @@ Script.complete()
       if (pctEl) pctEl.textContent = Math.round(pct * 100) + '%'
       if (total >= GOAL) {
         fill.classList.add('done'); totalEl.classList.add('done')
-        rem.textContent = 'Erreicht!'
-        rem.classList.add('done')
+        rem.textContent = 'Erreicht!'; rem.classList.add('done')
       } else {
         fill.classList.remove('done'); totalEl.classList.remove('done')
-        rem.textContent = (GOAL - total).toLocaleString('de-DE')
-        rem.classList.remove('done')
+        rem.textContent = (GOAL - total).toLocaleString('de-DE'); rem.classList.remove('done')
       }
     }
 
-
-    function updateTheme(total, goal) {
-      // Progress 0..1 based on calories logged vs goal
-      var progress = Math.min(1, (total || 0) / (goal || 2700))
-      // Time-of-day factor: how far through the eating day are we (07:00–22:00)
-      var now = new Date()
-      var h = now.getHours() + now.getMinutes() / 60
-      var timeFactor = Math.max(0, Math.min(1, (h - 7) / 15))
-      // Blend: start red-ish, go green as progress increases
-      // bg: interpolate from warm red-tinted to warm green-tinted
-      // At 0%: hue ~15 (orange-red warm), at 100%: hue ~120 (green)
-      var hue = Math.round(15 + progress * 105)
-      var sat = Math.round(60 + progress * 20)
-      var bgL = 97  // keep it light
-      var surfL = 100
-      // accent: orange at 0%, green at 100%
-      var accentHue = Math.round(20 + progress * 110)
-      var bg = 'hsl(' + hue + ',' + sat + '%,' + bgL + '%)'
-      var surface = 'hsl(' + hue + ',20%,' + surfL + '%)'
-      var border = 'hsl(' + hue + ',25%,88%)'
-      var accent = 'hsl(' + accentHue + ',85%,40%)'
-      var success = 'hsl(120,50%,35%)'
-      var r = document.documentElement
-      r.style.setProperty('--bg', bg)
-      r.style.setProperty('--surface', surface)
-      r.style.setProperty('--border', border)
-      r.style.setProperty('--accent', accent)
-      r.style.setProperty('--success', progress >= 1 ? success : accent)
-    }
-
-
     async function loadToday() {
       try {
-        var r = await fetch(N8N_CAL, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'status' })
-        })
+        var r = await fetch(N8N_CAL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'status'})})
         var d = await r.json()
         updateRing(d.total || 0)
         renderLog(d.entries || [])
-        updateTheme(d.total || 0, d.goal || 2700)
-      } catch(e) { updateRing(0); }
+      } catch(e) { updateRing(0) }
     }
     loadToday()
 
     function renderLog(entries) {
       var list = document.getElementById('logList')
-      if (!entries || entries.length === 0) {
-        list.innerHTML = '<div class="log-empty">Noch nichts eingetragen</div>'
-        return
-      }
-      var reversed = entries.slice().reverse()
-      list.innerHTML = reversed.map(function(e) {
-        var time = ''
-        if (e.timestamp) {
-          var d = new Date(e.timestamp)
-          time = d.getHours() + ':' + ('0' + d.getMinutes()).slice(-2)
-        }
-        return '<div class="log-entry">'
-          + '<span class="log-cal">' + e.calories + '</span>'
-          + '<span class="log-desc">' + (e.description || '') + '</span>'
-          + '<span class="log-time">' + time + '</span>'
-          + '<button class="log-del" onclick="deleteEntry(' + e.row + ')" title="Loeschen">&#10005;</button>'
-          + '</div>'
+      if (!entries || entries.length === 0) { list.innerHTML = '<div class="log-empty">Noch nichts eingetragen</div>'; return }
+      list.innerHTML = entries.slice().reverse().map(function(e) {
+        var time = e.timestamp ? (function(d){ return d.getHours()+':'+('0'+d.getMinutes()).slice(-2) })(new Date(e.timestamp)) : ''
+        return '<div class="log-entry"><span class="log-cal">'+e.calories+'</span><span class="log-desc">'+(e.description||'')+'</span><span class="log-time">'+time+'</span><button class="log-del" onclick="deleteEntry('+e.row+')">&#10005;</button></div>'
       }).join('')
     }
 
     async function deleteEntry(row) {
       if (!row) return
       try {
-        var r = await fetch(N8N_CAL, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'delete', row: row })
-        })
-        var d = await r.json()
-        showToast('Eintrag geloescht')
+        await fetch(N8N_CAL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'delete', row:row})})
+        showToast('Eintrag gel\u00f6scht')
         await loadToday()
-      } catch(e) { showToast('Fehler beim Loeschen', true) }
-    }
-
-    function switchTab(tab) {
-      document.querySelectorAll('.tab').forEach(function(t, i) { t.classList.toggle('active', (i === 0) === (tab === 'manual')) })
-      document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active') })
-      document.getElementById('panel-' + tab).classList.add('active')
-
+      } catch(e) { showToast('Fehler', true) }
     }
 
     async function submitManual() {
@@ -626,13 +702,10 @@ Script.complete()
       var btn = document.getElementById('manualBtn')
       setBtn(btn, true, 'Wird gespeichert...')
       try {
-        var r = await fetch(N8N_CAL, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'manual', calories: cal, description: desc || 'Manueller Eintrag' })
-        })
+        var r = await fetch(N8N_CAL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'manual', calories:cal, description:desc||'Manueller Eintrag'})})
         var d = await r.json()
         showToast(cal + ' kcal gespeichert')
-        if (d.total !== undefined) { updateRing(d.total); updateTheme(d.total, d.goal || 2700); }
+        if (d.total !== undefined) updateRing(d.total)
         if (d.entries !== undefined) renderLog(d.entries)
         document.getElementById('manualCal').value = ''
         document.getElementById('manualDesc').value = ''
@@ -641,7 +714,6 @@ Script.complete()
     }
 
     var b64 = null
-
     function handleFile(input) {
       var file = input.files[0]; if (!file) return
       var reader = new FileReader()
@@ -654,7 +726,6 @@ Script.complete()
       }
       reader.readAsDataURL(file)
     }
-
     function removePhoto() {
       b64 = null
       document.getElementById('previewWrap').classList.remove('show')
@@ -663,49 +734,39 @@ Script.complete()
       document.getElementById('fileInput').value = ''
       document.getElementById('galleryInput').value = ''
     }
-
     async function submitPhoto() {
       if (!b64) return
       var btn = document.getElementById('photoBtn')
       setBtn(btn, true, 'Analysiere...')
       document.getElementById('analyzing').classList.add('show')
       try {
-        var r = await fetch(N8N_CAL, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'photo', image: b64 })
-        })
+        var r = await fetch(N8N_CAL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'photo', image:b64})})
         var d = await r.json()
-        showToast((d.calories || '?') + ' kcal erkannt & gespeichert')
-        if (d.total !== undefined) { updateRing(d.total); updateTheme(d.total, d.goal || 2700); }
+        showToast((d.calories||'?') + ' kcal erkannt & gespeichert')
+        if (d.total !== undefined) updateRing(d.total)
         if (d.entries !== undefined) renderLog(d.entries)
         removePhoto()
       } catch(e) { showToast('Fehler bei der Analyse', true) }
-      finally {
-        document.getElementById('analyzing').classList.remove('show')
-        setBtn(btn, false, 'Kalorien sch\u00e4tzen & speichern')
-      }
+      finally { document.getElementById('analyzing').classList.remove('show'); setBtn(btn, false, 'Kalorien sch\u00e4tzen & speichern') }
     }
 
-    document.getElementById('manualCal').addEventListener('keydown', function(e) { if (e.key === 'Enter') submitManual() })
-    document.getElementById('manualDesc').addEventListener('keydown', function(e) { if (e.key === 'Enter') submitManual() })
+    document.getElementById('manualCal').addEventListener('keydown', function(e) { if (e.key==='Enter') submitManual() })
+    document.getElementById('manualDesc').addEventListener('keydown', function(e) { if (e.key==='Enter') submitManual() })
 
     function drawSparkline(points) {
       var svg = document.getElementById('sparkline')
       if (!points || points.length < 2) { svg.innerHTML = ''; return }
-      var min = Math.min.apply(null, points), max = Math.max.apply(null, points), range = max - min || 1
-      var W = 380, H = 44, P = 2
-      var coords = points.map(function(v, i) {
-        return [(i / (points.length - 1)) * (W - P*2) + P, H - ((v - min) / range) * (H - P*2) - P]
-      })
-      var path = coords.map(function(c, i) { return (i === 0 ? 'M' : 'L') + c[0] + ',' + c[1] }).join(' ')
+      var min = Math.min.apply(null, points), max = Math.max.apply(null, points), range = max-min||1
+      var W = 380, H = 48, P = 2
+      var coords = points.map(function(v,i){ return [(i/(points.length-1))*(W-P*2)+P, H-((v-min)/range)*(H-P*2)-P] })
+      var path = coords.map(function(c,i){ return (i===0?'M':'L')+c[0]+','+c[1] }).join(' ')
       var color = points[points.length-1] > points[0] ? '#e85d00' : '#4ade80'
       var last = coords[coords.length-1]
-      svg.innerHTML = '<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="' + color + '" stop-opacity="0.25"/><stop offset="100%" stop-color="' + color + '" stop-opacity="0"/></linearGradient></defs>'
-        + '<path d="' + path + ' L' + last[0] + ',' + H + ' L' + coords[0][0] + ',' + H + ' Z" fill="url(#sg)"/>'
-        + '<path d="' + path + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
-        + '<circle cx="' + last[0] + '" cy="' + last[1] + '" r="3" fill="' + color + '"/>'
+      svg.innerHTML = '<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+color+'" stop-opacity="0.2"/><stop offset="100%" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs>'
+        + '<path d="'+path+' L'+last[0]+','+H+' L'+coords[0][0]+','+H+' Z" fill="url(#sg)"/>'
+        + '<path d="'+path+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+        + '<circle cx="'+last[0]+'" cy="'+last[1]+'" r="3" fill="'+color+'"/>'
     }
-    drawSparkline([78.5,78.3,78.6,78.1,77.9,78.0,77.7,77.5])
 
     async function saveWeight() {
       var val = parseFloat(document.getElementById('weightInput').value)
@@ -713,44 +774,35 @@ Script.complete()
       var btn = document.getElementById('saveBtn')
       setBtn(btn, true, 'Wird gespeichert...')
       try {
-        var r = await fetch(N8N_WEIGHT, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ weight: val })
-        })
+        var r = await fetch(N8N_WEIGHT, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({weight:val})})
         var d = await r.json()
         document.getElementById('trendCurrent').textContent = val.toFixed(1)
-        var pct = d.changePercent || 0, change = d.change || 0, trend = d.trend || 'stable'
+        var pct = d.changePercent||0, change = d.change||0, trend = d.trend||'stable'
         var pctEl = document.getElementById('trendPct')
-        pctEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%'
-        pctEl.className = 'trend-pct ' + trend
-        document.getElementById('trendSub').textContent = (change >= 0 ? '+' : '') + change.toFixed(1) + ' kg (30 Tage)'
-        updateGoalBar(val, d.goal || 85, d.distanceToGoal)
+        pctEl.textContent = (pct>=0?'+':'') + pct.toFixed(1) + '%'
+        pctEl.className = 'weight-pct ' + trend
+        document.getElementById('trendSub').textContent = (change>=0?'+':'') + change.toFixed(1) + ' kg (30 Tage)'
+        updateGoalBar(val, d.goal||85, d.distanceToGoal)
         showToast(val + ' kg gespeichert')
         document.getElementById('weightInput').value = ''
       } catch(e) { showToast('Fehler beim Speichern', true) }
       finally { setBtn(btn, false, 'Gewicht speichern') }
     }
-
-    document.getElementById('weightInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') saveWeight() })
+    document.getElementById('weightInput').addEventListener('keydown', function(e){ if(e.key==='Enter') saveWeight() })
 
     function updateGoalBar(current, goal, distance) {
-      var WEIGHT_START = 120  // assumed max for bar scale
+      var dist = distance != null ? distance : Math.round((current - goal)*10)/10
       var reached = current <= goal
-      var dist = distance != null ? distance : Math.round((current - goal) * 10) / 10
       var fill = document.getElementById('goalBarFill')
       var label = document.getElementById('goalDistLabel')
       var status = document.getElementById('goalStatus')
       if (reached) {
-        fill.style.width = '100%'
-        fill.classList.add('reached')
-        label.textContent = 'Ziel erreicht!'
-        status.textContent = ''
+        fill.style.width = '100%'; fill.classList.add('reached')
+        label.textContent = 'Ziel erreicht!'; status.textContent = ''
       } else {
-        // progress = how far along from start toward goal
-        var pct = Math.min(100, Math.max(0, Math.round((1 - (dist / (WEIGHT_START - goal))) * 100)))
-        fill.style.width = pct + '%'
-        fill.classList.remove('reached')
-        label.textContent = dist > 0 ? 'Noch ' + dist.toFixed(1) + ' kg bis Ziel' : 'Ziel erreicht!'
+        var pct = Math.min(100, Math.max(0, Math.round((1 - dist/(120-goal))*100)))
+        fill.style.width = pct + '%'; fill.classList.remove('reached')
+        label.textContent = 'Noch ' + dist.toFixed(1) + ' kg bis Ziel'
         status.textContent = current.toFixed(1) + ' kg von 85 kg'
       }
     }
@@ -759,26 +811,12 @@ Script.complete()
       btn.disabled = loading; btn.textContent = text
       btn.classList.toggle('loading', loading)
     }
-
     function showToast(msg, isError) {
       var t = document.getElementById('toast')
       t.textContent = msg
       t.className = 'toast' + (isError ? ' error' : '')
       t.classList.add('show')
-      setTimeout(function() { t.classList.remove('show') }, 3000)
-    }
-
-    function copyCode(id) {
-      var el = document.getElementById(id)
-      if (!el) return
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(el.value).then(function() { showToast('Code kopiert!') })
-        return
-      }
-      el.style.position = 'fixed'; el.style.top = '0'
-      el.select()
-      try { document.execCommand('copy'); showToast('Code kopiert!') } catch(e) {}
-      el.style.position = 'fixed'; el.style.top = '-9999px'
+      setTimeout(function(){ t.classList.remove('show') }, 3000)
     }
   </script>
 </body>
