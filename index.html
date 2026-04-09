@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Health Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #1e1e1e;
+      --accent: #c8f55a;
+      --accent2: #ff6b35;
+      --text: #f0f0f0;
+      --muted: #555;
+      --success: #4ade80;
+      --up: #ff6b35;
+      --down: #4ade80;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+
+    .page { display: none; width: 100%; max-width: 420px; flex-direction: column; align-items: center; }
+    .page.active { display: flex; }
+
+    header {
+      width: 100%;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 32px;
+      padding-top: 8px;
+    }
+
+    .logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--accent); }
+    .logo span { color: var(--text); }
+    .date-label { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
+
+    .nav-link {
+      margin-left: auto; font-size: 12px; color: var(--muted); text-decoration: none;
+      border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px;
+      transition: all 0.2s; cursor: pointer; background: none; font-family: 'DM Mono', monospace;
+    }
+    .nav-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* RING */
+    .goal-ring-wrap {
+      width: 100%; display: flex; align-items: center; gap: 24px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px 24px; margin-bottom: 24px;
+    }
+    .ring-bg { fill: none; stroke: #1e1e1e; stroke-width: 6; }
+    .ring-fill {
+      fill: none; stroke: var(--accent); stroke-width: 6; stroke-linecap: round;
+      stroke-dasharray: 220; stroke-dashoffset: 220;
+      transform: rotate(-90deg); transform-origin: 50% 50%;
+      transition: stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .ring-fill.done { stroke: var(--success); }
+    .ring-total { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; line-height: 1; color: var(--accent); letter-spacing: -1px; }
+    .ring-total.done { color: var(--success); }
+    .ring-unit { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .ring-remaining { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.6; }
+    .ring-remaining strong { color: var(--text); }
+
+    /* TABS */
+    .tabs {
+      width: 100%; display: flex; gap: 4px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 4px; margin-bottom: 20px;
+    }
+    .tab {
+      flex: 1; padding: 10px; border-radius: 8px; border: none;
+      background: transparent; color: var(--muted); font-family: 'DM Mono', monospace;
+      font-size: 12px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.03em;
+    }
+    .tab.active { background: var(--accent); color: #000; font-weight: 500; }
+
+    .panel { width: 100%; display: none; flex-direction: column; gap: 12px; }
+    .panel.active { display: flex; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    label { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+
+    input[type="number"], input[type="text"] {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-family: 'DM Mono', monospace;
+      font-size: 16px; padding: 14px 16px; width: 100%; outline: none;
+      transition: border-color 0.2s; -webkit-appearance: none;
+    }
+    input:focus { border-color: var(--accent); }
+
+    .upload-zone {
+      border: 2px dashed var(--border); border-radius: 12px; padding: 32px 20px;
+      text-align: center; cursor: pointer; transition: all 0.2s; position: relative;
+    }
+    .upload-zone:hover, .upload-zone.dragover { border-color: var(--accent); background: rgba(200,245,90,0.04); }
+    .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .upload-icon { font-size: 32px; margin-bottom: 8px; }
+    .upload-text { font-size: 13px; color: var(--muted); }
+    .upload-text strong { color: var(--accent); }
+
+    .preview-wrap { position: relative; border-radius: 12px; overflow: hidden; display: none; }
+    .preview-wrap.show { display: block; }
+    .preview-wrap img { width: 100%; max-height: 220px; object-fit: cover; display: block; border-radius: 12px; }
+    .preview-remove {
+      position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7);
+      border: 1px solid var(--border); color: var(--text); border-radius: 8px;
+      padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: 'DM Mono', monospace;
+    }
+
+    .btn {
+      background: var(--accent); color: #000; border: none; border-radius: 12px;
+      padding: 16px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+      cursor: pointer; width: 100%; letter-spacing: 0.02em; transition: all 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    .btn:active { transform: translateY(0); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn.loading::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      animation: shimmer 1.2s infinite;
+    }
+    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+    .analyzing {
+      display: none; align-items: center; gap: 10px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px;
+      font-size: 12px; color: var(--muted);
+    }
+    .analyzing.show { display: flex; }
+    .dot-pulse { display: flex; gap: 4px; }
+    .dot-pulse span { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; animation: dpulse 1.2s infinite; }
+    .dot-pulse span:nth-child(2) { animation-delay: 0.2s; }
+    .dot-pulse span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dpulse { 0%,80%,100%{ opacity:.2; transform:scale(.8); } 40%{ opacity:1; transform:scale(1); } }
+
+    /* WEIGHT */
+    .trend-card {
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; margin-bottom: 20px;
+    }
+    .trend-label { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
+    .trend-row { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 16px; }
+    .trend-current { font-family: 'Syne', sans-serif; font-size: 52px; font-weight: 800; letter-spacing: -2px; line-height: 1; color: var(--text); }
+    .trend-unit { font-size: 18px; color: var(--muted); margin-bottom: 8px; }
+    .trend-change { margin-left: auto; text-align: right; }
+    .trend-pct { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; }
+    .trend-pct.up { color: var(--up); }
+    .trend-pct.down { color: var(--down); }
+    .trend-pct.stable { color: var(--muted); }
+    .trend-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .sparkline { width: 100%; height: 48px; margin-top: 4px; }
+
+    .weight-input {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700;
+      padding: 16px 20px; width: 100%; outline: none; transition: border-color 0.2s;
+      -webkit-appearance: none; letter-spacing: -1px;
+    }
+    .weight-input:focus { border-color: var(--accent); }
+
+    .toast {
+      position: fixed; bottom: 32px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface); border: 1px solid var(--accent);
+      color: var(--text); padding: 14px 24px; border-radius: 12px;
+      font-size: 13px; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 100; white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error { border-color: var(--accent2); }
+  </style>
+</head>
+<body>
+
+  <!-- ════════ CALORIES PAGE ════════ -->
+  <div class="page" id="page-calories">
+    <header>
+      <div class="logo">health<span>.</span></div>
+      <div class="date-label" id="dateLabel"></div>
+      <button class="nav-link" onclick="navigate('weight')">Gewicht →</button>
+    </header>
+
+    <div class="goal-ring-wrap">
+      <svg width="80" height="80" viewBox="0 0 80 80">
+        <circle class="ring-bg" cx="40" cy="40" r="35"/>
+        <circle class="ring-fill" id="ringFill" cx="40" cy="40" r="35"/>
+      </svg>
+      <div>
+        <div class="ring-total" id="ringTotal">0</div>
+        <div class="ring-unit">kcal heute</div>
+        <div class="ring-remaining" id="ringRemaining">Lade...</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('manual')">Manuell</button>
+      <button class="tab" onclick="switchTab('photo')">Foto</button>
+    </div>
+
+    <div class="panel active" id="panel-manual">
+      <div class="field">
+        <label>Kalorien (kcal)</label>
+        <input type="number" id="manualCal" placeholder="z.B. 650" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label>Beschreibung (optional)</label>
+        <input type="text" id="manualDesc" placeholder="z.B. Pasta mit Tomatensoße">
+      </div>
+      <button class="btn" id="manualBtn" onclick="submitManual()">Eintragen</button>
+    </div>
+
+    <div class="panel" id="panel-photo">
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" accept="image/*" capture="environment" id="fileInput" onchange="handleFile(this)">
+        <div class="upload-icon">📸</div>
+        <div class="upload-text"><strong>Foto auswählen</strong><br>oder Kamera öffnen</div>
+      </div>
+      <div class="preview-wrap" id="previewWrap">
+        <img id="previewImg" src="" alt="">
+        <button class="preview-remove" onclick="removePhoto()">✕</button>
+      </div>
+      <div class="analyzing" id="analyzing">
+        <div class="dot-pulse"><span></span><span></span><span></span></div>
+        Claude analysiert das Bild...
+      </div>
+      <button class="btn" id="photoBtn" onclick="submitPhoto()" disabled>Kalorien schätzen & speichern</button>
+    </div>
+  </div>
+
+  <!-- ════════ WEIGHT PAGE ════════ -->
+  <div class="page" id="page-weight">
+    <header>
+      <div class="logo">weight<span>.</span></div>
+      <button class="nav-link" onclick="navigate('calories')">← Kalorien</button>
+    </header>
+
+    <div class="trend-card">
+      <div class="trend-label">30-Tage Trend</div>
+      <div class="trend-row">
+        <div>
+          <div class="trend-current" id="trendCurrent">—</div>
+          <div class="trend-unit">kg</div>
+        </div>
+        <div class="trend-change">
+          <div class="trend-pct stable" id="trendPct">—</div>
+          <div class="trend-sub" id="trendSub">30 Tage</div>
+        </div>
+      </div>
+      <svg class="sparkline" id="sparkline" viewBox="0 0 380 48" preserveAspectRatio="none"></svg>
+    </div>
+
+    <div style="width:100%;display:flex;flex-direction:column;gap:12px;">
+      <div class="field">
+        <label>Aktuelles Gewicht (kg)</label>
+        <input class="weight-input" type="number" id="weightInput" placeholder="78.5" step="0.1" inputmode="decimal">
+      </div>
+      <button class="btn" id="saveBtn" onclick="saveWeight()">Gewicht speichern</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ── CONFIG — edit these two lines ──────────────────────
+    const N8N_CAL    = 'https://meshminds.app.n8n.cloud/webhook/log-calories'
+    const N8N_WEIGHT = 'https://meshminds.app.n8n.cloud/webhook/log-weight'
+    const GOAL = 2700
+    // ───────────────────────────────────────────────────────
+
+    // Routing via hash: / = calories, /#weight = weight
+    function navigate(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+      document.getElementById('page-' + page).classList.add('active')
+      window.location.hash = page === 'calories' ? '' : page
+      window.scrollTo(0, 0)
+    }
+
+    function initRoute() {
+      const hash = window.location.hash.replace('#', '') || 'calories'
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+      document.getElementById('page-' + (hash === 'weight' ? 'weight' : 'calories')).classList.add('active')
+    }
+
+    window.addEventListener('hashchange', initRoute)
+    initRoute()
+
+    // Date
+    document.getElementById('dateLabel').textContent = new Date().toLocaleDateString('de-DE', {
+      weekday: 'short', day: 'numeric', month: 'short'
+    })
+
+    // ── RING ───────────────────────────────────────────────
+    function updateRing(total) {
+      const pct = Math.min(total / GOAL, 1)
+      const fill = document.getElementById('ringFill')
+      const totalEl = document.getElementById('ringTotal')
+      const rem = document.getElementById('ringRemaining')
+      fill.style.strokeDashoffset = 220 - pct * 220
+      totalEl.textContent = total.toLocaleString('de-DE')
+      if (total >= GOAL) {
+        fill.classList.add('done'); totalEl.classList.add('done')
+        rem.innerHTML = '🎯 Tagesziel erreicht!'
+      } else {
+        fill.classList.remove('done'); totalEl.classList.remove('done')
+        rem.innerHTML = `Noch <strong>${(GOAL - total).toLocaleString('de-DE')} kcal</strong> bis Ziel`
+      }
+    }
+
+    async function loadToday() {
+      try {
+        const r = await fetch(N8N_CAL, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'status' })
+        })
+        const d = await r.json()
+        updateRing(d.total ?? 0)
+      } catch { updateRing(0); document.getElementById('ringRemaining').textContent = 'Ersten Eintrag machen' }
+    }
+    loadToday()
+
+    // ── TABS ───────────────────────────────────────────────
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (i === 0) === (tab === 'manual')))
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+      document.getElementById('panel-' + tab).classList.add('active')
+    }
+
+    // ── MANUAL ─────────────────────────────────────────────
+    async function submitManual() {
+      const cal = parseInt(document.getElementById('manualCal').value)
+      const desc = document.getElementById('manualDesc').value.trim()
+      if (!cal || cal <= 0) { showToast('Bitte Kalorien eingeben', true); return }
+      const btn = document.getElementById('manualBtn')
+      setBtn(btn, true, 'Wird gespeichert...')
+      try {
+        const r = await fetch(N8N_CAL, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'manual', calories: cal, description: desc || 'Manueller Eintrag' })
+        })
+        const d = await r.json()
+        showToast(`✓ ${cal} kcal gespeichert`)
+        if (d.total !== undefined) updateRing(d.total)
+        document.getElementById('manualCal').value = ''
+        document.getElementById('manualDesc').value = ''
+      } catch { showToast('Fehler beim Speichern', true) }
+      finally { setBtn(btn, false, 'Eintragen') }
+    }
+
+    // ── PHOTO ──────────────────────────────────────────────
+    let b64 = null
+
+    function handleFile(input) {
+      const file = input.files[0]; if (!file) return
+      const reader = new FileReader()
+      reader.onload = e => {
+        b64 = e.target.result.split(',')[1]
+        document.getElementById('previewImg').src = e.target.result
+        document.getElementById('previewWrap').classList.add('show')
+        document.getElementById('uploadZone').style.display = 'none'
+        document.getElementById('photoBtn').disabled = false
+      }
+      reader.readAsDataURL(file)
+    }
+
+    function removePhoto() {
+      b64 = null
+      document.getElementById('previewWrap').classList.remove('show')
+      document.getElementById('uploadZone').style.display = 'block'
+      document.getElementById('photoBtn').disabled = true
+      document.getElementById('fileInput').value = ''
+    }
+
+    async function submitPhoto() {
+      if (!b64) return
+      const btn = document.getElementById('photoBtn')
+      setBtn(btn, true, 'Analysiere...')
+      document.getElementById('analyzing').classList.add('show')
+      try {
+        const r = await fetch(N8N_CAL, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'photo', image: b64 })
+        })
+        const d = await r.json()
+        showToast(`✓ ${d.calories ?? '?'} kcal erkannt & gespeichert`)
+        if (d.total !== undefined) updateRing(d.total)
+        removePhoto()
+      } catch { showToast('Fehler bei der Analyse', true) }
+      finally {
+        document.getElementById('analyzing').classList.remove('show')
+        setBtn(btn, false, 'Kalorien schätzen & speichern')
+      }
+    }
+
+    const zone = document.getElementById('uploadZone')
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover') })
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'))
+    zone.addEventListener('drop', e => {
+      e.preventDefault(); zone.classList.remove('dragover')
+      const file = e.dataTransfer.files[0]
+      if (file?.type.startsWith('image/')) {
+        const dt = new DataTransfer(); dt.items.add(file)
+        document.getElementById('fileInput').files = dt.files
+        handleFile(document.getElementById('fileInput'))
+      }
+    })
+
+    document.getElementById('manualCal').addEventListener('keydown', e => { if (e.key === 'Enter') submitManual() })
+    document.getElementById('manualDesc').addEventListener('keydown', e => { if (e.key === 'Enter') submitManual() })
+
+    // ── WEIGHT ─────────────────────────────────────────────
+    function drawSparkline(points) {
+      const svg = document.getElementById('sparkline')
+      if (!points || points.length < 2) { svg.innerHTML = ''; return }
+      const min = Math.min(...points), max = Math.max(...points), range = max - min || 1
+      const W = 380, H = 44, P = 2
+      const coords = points.map((v, i) => [
+        (i / (points.length - 1)) * (W - P*2) + P,
+        H - ((v - min) / range) * (H - P*2) - P
+      ])
+      const path = coords.map((c, i) => (i === 0 ? `M${c[0]},${c[1]}` : `L${c[0]},${c[1]}`)).join(' ')
+      const color = points[points.length-1] > points[0] ? '#ff6b35' : '#4ade80'
+      const last = coords[coords.length-1]
+      svg.innerHTML = `
+        <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${color}" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+        </linearGradient></defs>
+        <path d="${path} L${last[0]},${H} L${coords[0][0]},${H} Z" fill="url(#sg)"/>
+        <path d="${path}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="${last[0]}" cy="${last[1]}" r="3" fill="${color}"/>
+      `
+    }
+    drawSparkline([78.5,78.3,78.6,78.1,77.9,78.0,77.7,77.5])
+
+    async function saveWeight() {
+      const val = parseFloat(document.getElementById('weightInput').value)
+      if (!val || val < 20 || val > 300) { showToast('Ungültiges Gewicht', true); return }
+      const btn = document.getElementById('saveBtn')
+      setBtn(btn, true, 'Wird gespeichert...')
+      try {
+        const r = await fetch(N8N_WEIGHT, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ weight: val })
+        })
+        const d = await r.json()
+        document.getElementById('trendCurrent').textContent = val.toFixed(1)
+        const pct = d.changePercent ?? 0, change = d.change ?? 0, trend = d.trend ?? 'stable'
+        const pctEl = document.getElementById('trendPct')
+        pctEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%'
+        pctEl.className = 'trend-pct ' + trend
+        document.getElementById('trendSub').textContent = (change >= 0 ? '+' : '') + change.toFixed(1) + ' kg (30 Tage)'
+        showToast(`✓ ${val} kg gespeichert`)
+        document.getElementById('weightInput').value = ''
+      } catch { showToast('Fehler beim Speichern', true) }
+      finally { setBtn(btn, false, 'Gewicht speichern') }
+    }
+
+    document.getElementById('weightInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveWeight() })
+
+    // ── HELPERS ────────────────────────────────────────────
+    function setBtn(btn, loading, text) {
+      btn.disabled = loading; btn.textContent = text
+      btn.classList.toggle('loading', loading)
+    }
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast')
+      t.textContent = msg
+      t.className = 'toast' + (isError ? ' error' : '')
+      t.classList.add('show')
+      setTimeout(() => t.classList.remove('show'), 3000)
+    }
+  </script>
+</body>
+</html>
