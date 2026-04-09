@@ -10,21 +10,24 @@
     :root {
       --bg:#0f0f0f; --card:#1a1a1a; --card2:#222;
       --border:#2a2a2a; --accent:#4ade80; --accent2:#c0392b;
-      --text:#f0f0f0; --muted:#666; --success:#4ade80;
-      --orange:#e85d00; --blue:#38bdf8;
+      --text:#f0f0f0; --muted:#666; --orange:#e85d00; --blue:#38bdf8;
     }
     *{box-sizing:border-box;margin:0;padding:0;}
     html,body{background:#0f0f0f;}
     body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:stretch;}
     .page{display:none;width:100%;flex-direction:column;align-items:stretch;padding:20px 16px 80px;}
     .page.active{display:flex;}
+
+    /* ── Header ── */
     header{display:flex;align-items:center;gap:10px;margin-bottom:22px;padding-top:4px;}
     .logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.5px;color:var(--accent);}
     .logo span{color:var(--text);opacity:0.35;}
     .date-label{font-size:11px;color:var(--muted);}
     .nav-link{margin-left:auto;font-size:11px;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:6px 14px;border-radius:99px;cursor:pointer;background:none;font-family:'DM Mono',monospace;transition:all 0.2s;}
-    .nav-link:hover{border-color:var(--accent);color:var(--accent);}
-    .hero-card{background:var(--card);border-radius:20px;padding:20px;margin-bottom:12px;}
+    .nav-link:hover,.nav-link:active{border-color:var(--accent);color:var(--accent);}
+
+    /* ── Hero card ── */
+    .hero-card{background:var(--card);border-radius:20px;padding:20px;margin-bottom:12px;animation:slideUp 0.4s ease;}
     .hero-label{font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;}
     .hero-main{display:flex;align-items:center;gap:16px;}
     .ring-wrap{position:relative;flex-shrink:0;}
@@ -33,31 +36,38 @@
     .ring-fill.done{stroke:var(--accent);}
     .ring-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--text);}
     .hero-nums{flex:1;}
-    .hero-total{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;letter-spacing:-2px;line-height:1;color:var(--text);}
+    .hero-total{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;letter-spacing:-2px;line-height:1;color:var(--text);transition:color 0.3s;}
     .hero-total.done{color:var(--accent);}
     .hero-of{font-size:11px;color:var(--muted);margin-top:4px;}
     .hero-footer{display:flex;justify-content:space-between;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);}
     .hero-stat{display:flex;flex-direction:column;gap:3px;}
     .hero-stat-label{font-size:9px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;}
-    .hero-stat-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--text);}
+    .hero-stat-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--text);transition:all 0.3s;}
     .hero-stat-val.remaining{color:var(--orange);}
     .hero-stat-val.done{color:var(--accent);}
-    .entry-card{background:var(--card);border-radius:20px;padding:16px;margin-bottom:12px;}
+
+    /* ── Entry form ── */
+    .entry-card{background:var(--card);border-radius:20px;padding:16px;margin-bottom:12px;animation:slideUp 0.4s ease 0.05s both;}
     .field{display:flex;flex-direction:column;gap:6px;}
     label{font-size:10px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;}
     input[type="number"],input[type="text"]{background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:14px 16px;width:100%;outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
     input:focus{border-color:var(--accent);}
     .cal-row{display:flex;align-items:flex-end;gap:10px;}
-    .cam-btn{flex-shrink:0;width:52px;height:52px;border-radius:10px;background:var(--orange);color:#fff;border:none;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-    .btn{background:var(--accent);color:#000;border:none;border-radius:12px;padding:15px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;width:100%;letter-spacing:0.02em;transition:all 0.15s;position:relative;overflow:hidden;}
+    .cam-btn{flex-shrink:0;width:52px;height:52px;border-radius:10px;background:var(--orange);color:#fff;border:none;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.1s;-webkit-tap-highlight-color:transparent;}
+    .cam-btn:active{transform:scale(0.92);}
+    .btn{background:var(--accent);color:#000;border:none;border-radius:12px;padding:15px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;width:100%;letter-spacing:0.02em;transition:all 0.15s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+    .btn:active{transform:scale(0.98);}
     .btn:disabled{opacity:0.45;cursor:not-allowed;}
     .btn.loading::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);animation:shimmer 1.2s infinite;}
+    .btn-secondary{background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:14px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}
     @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+    @keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+    @keyframes popIn{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:none}}
     .gallery-link{text-align:center;margin-top:10px;}
     .gallery-link button{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;}
     .preview-outer{position:relative;margin-bottom:12px;}
     .preview-wrap{display:none;border-radius:14px;overflow:hidden;}
-    .preview-wrap.show{display:block;}
+    .preview-wrap.show{display:block;animation:popIn 0.25s ease;}
     .preview-wrap img{width:100%;max-height:200px;object-fit:cover;display:block;}
     .preview-remove{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;}
     .analyzing{display:none;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--muted);margin-bottom:12px;}
@@ -67,20 +77,38 @@
     .dot-pulse span:nth-child(2){animation-delay:0.2s;}
     .dot-pulse span:nth-child(3){animation-delay:0.4s;}
     @keyframes dpulse{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
-    .log-section{margin-top:6px;}
+    .photo-confirm{display:none;flex-direction:column;gap:10px;margin-bottom:12px;}
+    .photo-confirm.show{display:flex;animation:popIn 0.2s ease;}
+    .confirm-label{font-size:10px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;}
+    .confirm-cal-input{background:var(--card2);border:2px solid var(--accent);border-radius:12px;color:var(--accent);font-family:'Syne',sans-serif;font-size:40px;font-weight:800;padding:14px 20px;width:100%;outline:none;letter-spacing:-1px;-webkit-appearance:none;text-align:center;}
+    .confirm-desc{font-size:13px;color:var(--muted);text-align:center;}
+    .confirm-actions{display:flex;gap:8px;}
+    .photo-error{display:none;flex-direction:column;gap:10px;margin-bottom:12px;}
+    .photo-error.show{display:flex;animation:popIn 0.2s ease;}
+    .error-msg{background:var(--card2);border:1px solid var(--accent2);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--accent2);text-align:center;line-height:1.5;}
+
+    /* ── Log entries ── */
+    .log-section{margin-top:6px;animation:slideUp 0.4s ease 0.1s both;}
     .log-header{font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
     .log-empty{font-size:12px;color:var(--muted);padding:12px 0;text-align:center;}
-    .log-entry{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:12px 14px;margin-bottom:6px;}
-    .log-cal{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--orange);min-width:52px;}
+    .log-entry{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:12px 14px;margin-bottom:6px;transition:opacity 0.2s,transform 0.2s;}
+    .log-entry.new{animation:slideIn 0.3s cubic-bezier(0.34,1.56,0.64,1);}
+    @keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+    .log-emoji{font-size:18px;flex-shrink:0;width:26px;text-align:center;}
+    .log-cal{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--orange);min-width:46px;}
     .log-desc{font-size:12px;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .log-time{font-size:10px;color:var(--muted);min-width:36px;text-align:right;}
-    .log-del{background:none;border:none;color:#444;cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;transition:color 0.2s;flex-shrink:0;}
-    .log-del:hover{color:var(--accent2);}
-    .weight-hero{background:var(--card);border-radius:20px;padding:20px;margin-bottom:12px;}
+    .log-del{background:none;border:none;color:#333;cursor:pointer;font-size:14px;padding:4px;border-radius:4px;transition:color 0.2s;flex-shrink:0;}
+    .log-del:active{color:var(--accent2);}
+    .log-saving{color:var(--muted);font-size:12px;flex-shrink:0;animation:dpulse 1s infinite;}
+    .log-entry.optimistic{opacity:0.55;}
+
+    /* ── Weight page ── */
+    .weight-hero{background:var(--card);border-radius:20px;padding:20px;margin-bottom:12px;animation:slideUp 0.4s ease;}
     .weight-hero-label{font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
     .sparkline{width:100%;height:52px;margin-bottom:14px;}
     .weight-main-row{display:flex;align-items:flex-end;gap:12px;margin-bottom:14px;}
-    .weight-big{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;letter-spacing:-2px;line-height:1;color:var(--text);}
+    .weight-big{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;letter-spacing:-2px;line-height:1;color:var(--text);transition:all 0.3s;}
     .weight-unit{font-size:16px;color:var(--muted);margin-bottom:8px;}
     .weight-change{margin-left:auto;text-align:right;}
     .weight-pct{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;}
@@ -96,55 +124,50 @@
     .goal-status{font-size:11px;color:var(--muted);margin-top:6px;text-align:right;}
     .weight-input{background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Syne',sans-serif;font-size:32px;font-weight:700;padding:16px 20px;width:100%;outline:none;transition:border-color 0.2s;-webkit-appearance:none;letter-spacing:-1px;}
     .weight-input:focus{border-color:var(--accent);}
-    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--border);color:var(--text);padding:12px 22px;border-radius:12px;font-size:13px;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);z-index:100;white-space:nowrap;}
-    .toast.show{transform:translateX(-50%) translateY(0);}
-    .toast.error{border-color:var(--accent2);}
-    .install-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:flex-end;justify-content:center;}
-    .install-overlay.open{display:flex;}
-    .install-box{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:24px 20px 48px;width:100%;display:flex;flex-direction:column;gap:12px;}
-    .install-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
-    .install-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;}
-    .install-close{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;padding:0;line-height:1;}
-    .install-note{font-size:11px;color:var(--muted);line-height:1.6;}
+
+    /* ── Settings overlay ── */
+    .settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:flex-end;justify-content:center;}
+    .settings-overlay.open{display:flex;}
+    .settings-box{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:24px 20px 48px;width:100%;display:flex;flex-direction:column;gap:16px;animation:slideUp 0.3s ease;}
+    .settings-header{display:flex;align-items:center;justify-content:space-between;}
+    .settings-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;}
+    .settings-close{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;padding:0;line-height:1;}
+    .settings-section{font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:-4px;}
+    .settings-row{display:flex;align-items:center;justify-content:space-between;background:var(--card2);border-radius:12px;padding:14px 16px;}
+    .settings-row-label{font-size:13px;color:var(--text);}
+    .settings-row input{background:transparent;border:none;color:var(--accent);font-family:'Syne',sans-serif;font-size:16px;font-weight:700;width:80px;text-align:right;outline:none;-webkit-appearance:none;}
+    .settings-divider{height:1px;background:var(--border);}
     .install-row{display:flex;gap:8px;align-items:stretch;}
     .install-btn{flex:1;background:var(--accent);color:#000;text-decoration:none;border-radius:12px;padding:14px 16px;text-align:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;display:block;}
     .copy-btn{background:var(--card2);border:1px solid var(--border);color:var(--muted);border-radius:12px;padding:14px 16px;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0;}
     .copy-btn:hover{border-color:var(--accent);color:var(--accent);}
-    .install-trigger{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--muted);z-index:100;}
-    #cameraOverlay {
-      display:none;position:fixed;inset:0;background:#0f0f0f;z-index:400;
-      flex-direction:column;align-items:center;justify-content:center;gap:20px;
-    }
-    #cameraOverlay.show { display:flex; }
-    .cam-big-btn {
-      width:160px;height:160px;border-radius:50%;background:#e85d00;border:none;
-      font-size:64px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-      box-shadow:0 0 60px rgba(232,93,0,0.4);transition:transform 0.1s;
-      -webkit-tap-highlight-color:transparent;
-    }
+    .settings-note{font-size:11px;color:var(--muted);line-height:1.6;}
+
+    /* ── Toast ── */
+    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--border);color:var(--text);padding:12px 22px;border-radius:12px;font-size:13px;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);z-index:100;white-space:nowrap;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+    .toast.error{border-color:var(--accent2);}
+    .toast.success{border-color:var(--accent);}
+
+    /* ── Settings trigger ── */
+    .settings-trigger{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--muted);z-index:100;transition:all 0.2s;}
+    .settings-trigger:hover{border-color:var(--accent);color:var(--accent);}
+
+    /* ── Camera overlay ── */
+    #cameraOverlay{display:none;position:fixed;inset:0;background:#0f0f0f;z-index:400;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+    #cameraOverlay.show{display:flex;animation:popIn 0.2s ease;}
+    .cam-big-btn{width:160px;height:160px;border-radius:50%;background:var(--orange);border:none;font-size:64px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(232,93,0,0.4);transition:transform 0.1s;-webkit-tap-highlight-color:transparent;}
     .cam-big-btn:active{transform:scale(0.93);}
     .cam-overlay-hint{font-size:13px;color:#666;letter-spacing:0.05em;}
     .cam-overlay-close{position:absolute;top:24px;right:20px;background:none;border:none;color:#444;font-size:28px;cursor:pointer;}
 
-    .photo-confirm { display:none; flex-direction:column; gap:10px; margin-bottom:12px; }
-    .photo-confirm.show { display:flex; }
-    .confirm-label { font-size:10px; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; }
-    .confirm-cal-input {
-      background:var(--card2); border:2px solid var(--accent); border-radius:12px;
-      color:var(--accent); font-family:'Syne',sans-serif; font-size:40px; font-weight:800;
-      padding:14px 20px; width:100%; outline:none; letter-spacing:-1px;
-      -webkit-appearance:none; text-align:center;
-    }
-    .confirm-desc { font-size:12px; color:var(--muted); text-align:center; }
-    .confirm-actions { display:flex; gap:8px; }
-    .confirm-actions .btn-secondary {
-      flex:1; background:var(--card2); color:var(--text); border:1px solid var(--border);
-      border-radius:12px; padding:14px; font-family:'Syne',sans-serif; font-size:14px;
-      font-weight:700; cursor:pointer; transition:all 0.15s;
-    }
-    .photo-error { display:none; flex-direction:column; gap:10px; margin-bottom:12px; }
-    .photo-error.show { display:flex; }
-    .error-msg { background:var(--card2); border:1px solid var(--accent2); border-radius:12px; padding:14px 16px; font-size:13px; color:var(--accent2); text-align:center; line-height:1.5; }
+    /* ── Code overlay ── */
+    #codeOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:300;flex-direction:column;padding:20px;gap:12px;}
+    #codeOverlay.show{display:flex;animation:slideUp 0.2s ease;}
+    .code-overlay-header{display:flex;align-items:center;justify-content:space-between;}
+    .code-overlay-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;}
+    .code-overlay-hint{font-size:11px;color:#666;line-height:1.6;}
+    #codeTa{flex:1;background:#111;border:1px solid #2a2a2a;border-radius:12px;color:var(--accent);font-family:'DM Mono',monospace;font-size:11px;padding:14px;resize:none;outline:none;line-height:1.5;}
   </style>
 </head>
 <body>
@@ -168,13 +191,13 @@
         </div>
         <div class="hero-nums">
           <div class="hero-total" id="ringTotal">0</div>
-          <div class="hero-of">of 2.700 kcal</div>
+          <div class="hero-of" id="heroOf">of 2.700 kcal</div>
         </div>
       </div>
       <div class="hero-footer">
         <div class="hero-stat">
           <span class="hero-stat-label">Ziel</span>
-          <span class="hero-stat-val">2.700</span>
+          <span class="hero-stat-val" id="heroGoalDisplay">2.700</span>
         </div>
         <div class="hero-stat" style="text-align:right">
           <span class="hero-stat-label">Noch</span>
@@ -182,14 +205,17 @@
         </div>
       </div>
     </div>
+
     <input type="file" accept="image/*" capture="environment" id="fileInput" onchange="handleFile(this)" style="display:none">
     <input type="file" accept="image/*" id="galleryInput" onchange="handleFile(this)" style="display:none">
+
     <div class="preview-outer">
       <div class="preview-wrap" id="previewWrap">
         <img id="previewImg" src="" alt="">
         <button class="preview-remove" onclick="removePhoto()">&#10005;</button>
       </div>
     </div>
+
     <div class="entry-card" id="entryForm">
       <div class="cal-row">
         <div class="field" style="flex:1">
@@ -207,13 +233,13 @@
         <button onclick="document.getElementById('galleryInput').click()">&#128444; Aus Galerie w&#228;hlen</button>
       </div>
     </div>
+
     <div class="analyzing" id="analyzing">
       <div class="dot-pulse"><span></span><span></span><span></span></div>
       Claude analysiert das Bild...
     </div>
     <button class="btn" id="photoBtn" onclick="submitPhoto()" style="display:none;margin-bottom:14px">Kalorien sch&#228;tzen</button>
 
-    <!-- Confirm state: edit & save -->
     <div class="photo-confirm" id="photoConfirm">
       <div class="confirm-label">Erkannte Kalorien &#8212; bitte pr&#252;fen</div>
       <input class="confirm-cal-input" type="number" id="confirmCal" inputmode="numeric">
@@ -224,11 +250,11 @@
       </div>
     </div>
 
-    <!-- Error state: detection failed -->
     <div class="photo-error" id="photoError">
       <div class="error-msg">&#128247; Konnte Kalorien nicht erkennen.<br>Bitte manuell eingeben.</div>
-      <button class="btn-secondary" onclick="cancelError()" style="width:100%">Zur&#252;ck</button>
+      <button class="btn-secondary" onclick="cancelError()" style="width:100%;margin-top:4px">Zur&#252;ck</button>
     </div>
+
     <div class="log-section">
       <div class="log-header">Heute gegessen</div>
       <div id="logList"><div class="log-empty">Noch nichts eingetragen</div></div>
@@ -257,7 +283,7 @@
       <div class="goal-bar-wrap">
         <div class="goal-bar-labels">
           <span class="goal-bar-label-left" id="goalDistLabel">&#8212;</span>
-          <span class="goal-bar-label-right">Ziel: 85 kg</span>
+          <span class="goal-bar-label-right" id="goalLabelRight">Ziel: 85 kg</span>
         </div>
         <div class="goal-bar-track"><div class="goal-bar-fill" id="goalBarFill"></div></div>
         <div class="goal-status" id="goalStatus"></div>
@@ -270,48 +296,113 @@
       </div>
       <button class="btn" id="saveBtn" onclick="saveWeight()">Gewicht speichern</button>
     </div>
+    <div class="log-section" style="margin-top:20px">
+      <div class="log-header">Eintr&#228;ge</div>
+      <div id="weightLog"><div class="log-empty">Noch keine Eintr&#228;ge</div></div>
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>
 
-  <!-- INSTALL OVERLAY -->
-  <div class="install-overlay" id="installOverlay">
-    <div class="install-box">
-      <div class="install-header">
-        <span class="install-title">Widgets installieren</span>
-        <button class="install-close" onclick="toggleInstall()">&#215;</button>
+  <!-- SETTINGS OVERLAY -->
+  <div class="settings-overlay" id="settingsOverlay">
+    <div class="settings-box">
+      <div class="settings-header">
+        <span class="settings-title">Einstellungen</span>
+        <button class="settings-close" onclick="toggleSettings()">&#215;</button>
       </div>
-      <p class="install-note">Scriptable installieren, dann tippen. Oder Code kopieren und manuell einf&#252;gen.</p>
+
+      <div class="settings-section">Ziele</div>
+      <div class="settings-row">
+        <span class="settings-row-label">&#127828; Kalorien/Tag</span>
+        <input type="number" id="settingCalGoal" inputmode="numeric" onchange="saveSettings()">
+      </div>
+      <div class="settings-row">
+        <span class="settings-row-label">&#9878; Gewichtsziel (kg)</span>
+        <input type="number" id="settingWtGoal" inputmode="decimal" step="0.1" onchange="saveSettings()">
+      </div>
+
+      <div class="settings-divider"></div>
+      <div class="settings-section">Widgets installieren</div>
+      <p class="settings-note">Scriptable installieren, dann tippen. Oder Code kopieren und manuell einf&#252;gen.</p>
       <div class="install-row">
-        <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FCalorieWidget.js&name=CalorieWidget">Kalorien Widget</a>
+        <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FCalorieWidget.js&name=CalorieWidget">&#128247; Kalorien Widget</a>
         <button class="copy-btn" onclick="copyWidget('cal')">&#10697; Code</button>
       </div>
       <div class="install-row">
-        <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FWeightWidget.js&name=WeightWidget">Gewicht Widget</a>
+        <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FWeightWidget.js&name=WeightWidget">&#9878; Gewicht Widget</a>
         <button class="copy-btn" onclick="copyWidget('wt')">&#10697; Code</button>
+      </div>
+
+      <div class="settings-divider"></div>
+      <div class="settings-section">Schnellzugriff</div>
+      <div style="display:flex;gap:8px;">
+        <a class="install-btn" style="font-size:12px;padding:10px 12px;flex:1;text-align:center;text-decoration:none;" href="https://daemien-calories.vercel.app/#camera">&#128247; Foto-Link</a>
+        <button class="copy-btn" onclick="copyText('https://daemien-calories.vercel.app/#camera')">&#10697; Link</button>
       </div>
     </div>
   </div>
-  <button class="install-trigger" onclick="toggleInstall()">&#8984;</button>
+  <button class="settings-trigger" onclick="toggleSettings()">&#9881;</button>
+
+  <!-- CAMERA OVERLAY -->
+  <div id="cameraOverlay">
+    <button class="cam-overlay-close" onclick="closeCameraOverlay()">&#215;</button>
+    <button class="cam-big-btn" onclick="triggerCamera()">&#128247;</button>
+    <div class="cam-overlay-hint">Tippen zum Fotografieren</div>
+  </div>
+
+  <!-- CODE COPY OVERLAY -->
+  <div id="codeOverlay">
+    <div class="code-overlay-header">
+      <span class="code-overlay-title">Code kopieren</span>
+      <button onclick="closeCodeOverlay()" style="background:none;border:none;color:#666;font-size:24px;cursor:pointer;padding:0;line-height:1;">&#215;</button>
+    </div>
+    <p class="code-overlay-hint">Select All, dann kopieren und in Scriptable einf&#252;gen.</p>
+    <textarea id="codeTa" readonly></textarea>
+    <button onclick="doCopy()" style="background:var(--accent);color:#000;border:none;border-radius:12px;padding:15px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;">&#10003; Kopieren</button>
+  </div>
 
   <script>
-    var N8N_CAL    = "https://meshminds.app.n8n.cloud/webhook/log-calories";
-    var N8N_WEIGHT = "https://meshminds.app.n8n.cloud/webhook/log-weight";
-    var GOAL = 2700;
+    // ── Settings (localStorage) ──
+    var SETTINGS = { calGoal: 2700, wtGoal: 85 };
+    (function() {
+      try {
+        var s = JSON.parse(localStorage.getItem("ht_settings") || "{}");
+        if (s.calGoal) SETTINGS.calGoal = s.calGoal;
+        if (s.wtGoal)  SETTINGS.wtGoal  = s.wtGoal;
+      } catch(e) {}
+      document.getElementById("settingCalGoal").value = SETTINGS.calGoal;
+      document.getElementById("settingWtGoal").value  = SETTINGS.wtGoal;
+    })();
 
+    function saveSettings() {
+      SETTINGS.calGoal = parseInt(document.getElementById("settingCalGoal").value) || 2700;
+      SETTINGS.wtGoal  = parseFloat(document.getElementById("settingWtGoal").value) || 85;
+      try { localStorage.setItem("ht_settings", JSON.stringify(SETTINGS)); } catch(e) {}
+      // Update UI labels
+      document.getElementById("heroGoalDisplay").textContent = SETTINGS.calGoal.toLocaleString("de-DE");
+      document.getElementById("heroOf").textContent = "of " + SETTINGS.calGoal.toLocaleString("de-DE") + " kcal";
+      document.getElementById("goalLabelRight").textContent = "Ziel: " + SETTINGS.wtGoal + " kg";
+      loadToday();
+      showToast("Einstellungen gespeichert");
+    }
+
+    function toggleSettings() { document.getElementById("settingsOverlay").classList.toggle("open"); }
+
+    // ── Widget codes ──
     var WIDGET_CODES = {
       cal: `// Calorie Widget - Health Tracker
-var CAL_URL = "https://meshminds.app.n8n.cloud/webhook/log-calories"
+var CAL_URL  = "https://meshminds.app.n8n.cloud/webhook/log-calories"
 var SITE_URL = "https://daemien-calories.vercel.app/#calories"
-var GOAL = 2700
+var GOAL     = 2700
 
-var C_BG     = new Color("#111111")
-var C_CARD   = new Color("#1a1a1a")
+var C_BG    = new Color("#0f0f0f")
+var C_TRACK = new Color("#1e1e1e")
 var C_ORANGE = new Color("#e85d00")
 var C_GREEN  = new Color("#4ade80")
 var C_WHITE  = new Color("#f0f0f0")
-var C_MUTED  = new Color("#666666")
-var C_TRACK  = new Color("#2a2a2a")
+var C_DIM    = new Color("#999999")
+var C_MUTED  = new Color("#555555")
 
 async function getToday() {
   try {
@@ -327,28 +418,33 @@ async function getToday() {
   }
 }
 
-function makeRing(pct, done) {
-  var s = 80
+function makeDonut(total, pct, done) {
+  // Fill the full widget square
+  var S = 155
   var dc = new DrawContext()
-  dc.size = new Size(s, s)
+  dc.size = new Size(S, S)
   dc.opaque = false
   dc.respectScreenScale = true
-  var cx = s/2, cy = s/2, r = 32, lw = 8
 
-  // Track
+  var cx = S/2, cy = S/2
+  var R = 68   // outer radius — nearly fills the square
+  var lw = 14  // ring thickness
+
+  // Track ring
   dc.setLineWidth(lw)
   dc.setStrokeColor(C_TRACK)
-  dc.strokeEllipse(new Rect(cx-r, cy-r, r*2, r*2))
+  dc.strokeEllipse(new Rect(cx-R, cy-R, R*2, R*2))
 
-  // Arc
+  // Progress arc
   var filled = Math.min(pct/100, 1)
   if (filled > 0) {
-    var steps = 80, startA = -Math.PI/2
-    var sweep = filled * Math.PI * 2
+    var steps = 100
+    var startA = -Math.PI/2
+    var sweep  = filled * Math.PI * 2
     var arc = new Path()
     for (var i = 0; i <= steps; i++) {
-      var a = startA + (i/steps)*sweep
-      var pt = new Point(cx + r*Math.cos(a), cy + r*Math.sin(a))
+      var a  = startA + (i/steps)*sweep
+      var pt = new Point(cx + R*Math.cos(a), cy + R*Math.sin(a))
       if (i === 0) arc.move(pt); else arc.addLine(pt)
     }
     dc.addPath(arc)
@@ -357,10 +453,26 @@ function makeRing(pct, done) {
     dc.strokePath()
   }
 
-  // Pct label inside ring
-  dc.setFont(Font.boldSystemFont(14))
-  dc.setTextColor(done ? C_GREEN : C_WHITE)
-  dc.drawTextInRect(Math.round(pct) + "%", new Rect(cx-20, cy-9, 40, 18))
+  // ── Text inside the ring ──
+  var accent = done ? C_GREEN : C_ORANGE
+
+  // Big calorie number — centered, large
+  dc.setFont(Font.boldSystemFont(32))
+  dc.setTextColor(C_WHITE)
+  var totalStr = total.toLocaleString("de-DE")
+  dc.drawTextInRect(totalStr, new Rect(cx-60, cy-34, 120, 38))
+
+  // "X von 2700" subline
+  dc.setFont(Font.mediumSystemFont(10))
+  dc.setTextColor(C_MUTED)
+  var ofStr = total + " von " + GOAL
+  dc.drawTextInRect(ofStr, new Rect(cx-50, cy+6, 100, 14))
+
+  // Percentage — bottom of ring interior
+  dc.setFont(Font.boldMonospacedSystemFont(11))
+  dc.setTextColor(accent)
+  var pctStr = Math.round(pct) + "%"
+  dc.drawTextInRect(pctStr, new Rect(cx-24, cy+22, 48, 14))
 
   return dc.getImage()
 }
@@ -369,52 +481,26 @@ async function build() {
   var data = await getToday()
   var pct  = Math.min(data.percentage, 100)
   var done = data.goalReached
-  var accent = done ? C_GREEN : C_ORANGE
 
   var w = new ListWidget()
   w.backgroundColor = C_BG
   w.url = SITE_URL
-  w.setPadding(14, 14, 14, 14)
+  w.setPadding(0, 0, 0, 0)
 
-  // ── Label row ──
-  var r1 = w.addStack()
-  r1.layoutHorizontally()
-  var lbl = r1.addText("CALORIES TODAY")
-  lbl.font = Font.boldMonospacedSystemFont(8)
-  lbl.textColor = C_MUTED
-  w.addSpacer(10)
+  var stack = w.addStack()
+  stack.layoutVertically()
+  stack.centerAlignContent()
 
-  // ── Main row: ring left, numbers right ──
-  var r2 = w.addStack()
-  r2.layoutHorizontally()
-  r2.centerAlignContent()
+  stack.addSpacer()
 
-  var ringImg = r2.addImage(makeRing(pct, done))
-  ringImg.imageSize = new Size(66, 66)
-  r2.addSpacer(12)
+  var imgStack = stack.addStack()
+  imgStack.centerAlignContent()
+  imgStack.addSpacer()
+  var donut = imgStack.addImage(makeDonut(data.total, pct, done))
+  donut.imageSize = new Size(155, 155)
+  imgStack.addSpacer()
 
-  var nums = r2.addStack()
-  nums.layoutVertically()
-
-  var bigNum = nums.addText(data.total.toLocaleString("de-DE"))
-  bigNum.font = Font.boldSystemFont(28)
-  bigNum.textColor = C_WHITE
-  bigNum.minimumScaleFactor = 0.6
-
-  nums.addSpacer(2)
-
-  var sub = nums.addText("of " + GOAL.toLocaleString("de-DE") + " kcal")
-  sub.font = Font.mediumSystemFont(9)
-  sub.textColor = C_MUTED
-
-  w.addSpacer()
-
-  // ── Bottom: remaining ──
-  var r3 = w.addStack()
-  r3.layoutHorizontally()
-  var remTxt = r3.addText(done ? "Goal reached!" : data.remaining.toLocaleString("de-DE") + " kcal to go")
-  remTxt.font = Font.mediumSystemFont(10)
-  remTxt.textColor = done ? C_GREEN : C_MUTED
+  stack.addSpacer()
 
   return w
 }
@@ -578,51 +664,62 @@ Script.complete()
 
     function copyWidget(key) {
       var code = WIDGET_CODES[key];
-      var overlay = document.getElementById("codeOverlay");
-      var ta = document.getElementById("codeTa");
-      ta.value = code;
-      overlay.style.display = "flex";
-      setTimeout(function() { ta.focus(); ta.select(); ta.setSelectionRange(0, 99999); }, 100);
+      document.getElementById("codeTa").value = code;
+      document.getElementById("codeOverlay").classList.add("show");
+      setTimeout(function() {
+        var ta = document.getElementById("codeTa");
+        ta.focus(); ta.select(); ta.setSelectionRange(0, 99999);
+      }, 100);
     }
-    function closeCodeOverlay() {
-      document.getElementById("codeOverlay").style.display = "none";
+    function closeCodeOverlay() { document.getElementById("codeOverlay").classList.remove("show"); }
+    function doCopy() {
+      var ta = document.getElementById("codeTa");
+      ta.select(); ta.setSelectionRange(0,99999);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(function() { showToast("Code kopiert!"); closeCodeOverlay(); });
+      } else {
+        try { document.execCommand("copy"); showToast("Code kopiert!"); closeCodeOverlay(); } catch(e) {}
+      }
+    }
+    function copyText(txt) {
+      if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function(){ showToast("Link kopiert!"); });
+      else { var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); showToast("Link kopiert!"); }
     }
 
-    function toggleInstall() { document.getElementById("installOverlay").classList.toggle("open"); }
+    // ── Routing ──
+    var N8N_CAL    = "https://meshminds.app.n8n.cloud/webhook/log-calories";
+    var N8N_WEIGHT = "https://meshminds.app.n8n.cloud/webhook/log-weight";
 
     function navigate(page) {
       document.querySelectorAll(".page").forEach(function(p) { p.classList.remove("active"); });
       document.getElementById("page-" + page).classList.add("active");
       window.location.hash = page === "calories" ? "" : page;
       window.scrollTo(0, 0);
+      if (page === "weight") loadWeight();
     }
-
     function initRoute() {
-      var hash = window.location.hash.replace("#", "") || "calories";
+      var hash = window.location.hash.replace("#","") || "calories";
       document.querySelectorAll(".page").forEach(function(p) { p.classList.remove("active"); });
-      var page = (hash === "weight") ? "weight" : "calories";
+      var page = hash === "weight" ? "weight" : "calories";
       document.getElementById("page-" + page).classList.add("active");
-      if (hash === "camera") {
-        document.getElementById("cameraOverlay").classList.add("show");
-      }
-    }
-    function triggerCamera() {
-      document.getElementById("fileInput").click();
-      closeCameraOverlay();
-    }
-    function closeCameraOverlay() {
-      document.getElementById("cameraOverlay").classList.remove("show");
-      if (window.location.hash === "#camera") {
-        window.location.hash = "";
-      }
+      if (page === "weight") setTimeout(loadWeight, 0);
+      if (hash === "camera") document.getElementById("cameraOverlay").classList.add("show");
     }
     window.addEventListener("hashchange", initRoute);
     initRoute();
 
+    function triggerCamera() { document.getElementById("fileInput").click(); closeCameraOverlay(); }
+    function closeCameraOverlay() {
+      document.getElementById("cameraOverlay").classList.remove("show");
+      if (window.location.hash === "#camera") window.location.hash = "";
+    }
+
     document.getElementById("dateLabel").textContent = new Date().toLocaleDateString("de-DE", {weekday:"short", day:"numeric", month:"short"});
 
+    // ── Ring ──
     function updateRing(total) {
-      var pct = Math.min(total / GOAL, 1);
+      var goal = SETTINGS.calGoal;
+      var pct = Math.min(total / goal, 1);
       var fill = document.getElementById("ringFill");
       var totalEl = document.getElementById("ringTotal");
       var rem = document.getElementById("ringRemaining");
@@ -630,15 +727,52 @@ Script.complete()
       fill.style.strokeDashoffset = 220 - pct * 220;
       totalEl.textContent = total.toLocaleString("de-DE");
       if (pctEl) pctEl.textContent = Math.round(pct * 100) + "%";
-      if (total >= GOAL) {
+      if (total >= goal) {
         fill.classList.add("done"); totalEl.classList.add("done");
         rem.textContent = "Erreicht!"; rem.classList.add("done");
       } else {
         fill.classList.remove("done"); totalEl.classList.remove("done");
-        rem.textContent = (GOAL - total).toLocaleString("de-DE"); rem.classList.remove("done");
+        rem.textContent = (goal - total).toLocaleString("de-DE"); rem.classList.remove("done");
       }
+      document.getElementById("heroGoalDisplay").textContent = goal.toLocaleString("de-DE");
+      document.getElementById("heroOf").textContent = "of " + goal.toLocaleString("de-DE") + " kcal";
     }
 
+    // ── Emoji map ──
+    var EMOJI_MAP = [
+      [/pizza|margherita/i,"🍕"],[/pasta|nudel|spaghetti|carbonara|bolognese/i,"🍝"],
+      [/burger|hamburger/i,"🍔"],[/sandwich|toast|brot|brötchen/i,"🥪"],
+      [/salat|salad/i,"🥗"],[/suppe|soup/i,"🍲"],[/reis|sushi|ramen/i,"🍜"],
+      [/steak|fleisch|schnitzel|chicken|hähnchen|hühnchen/i,"🥩"],
+      [/fisch|fish|lachs|thunfisch/i,"🐟"],[/ei|eggs?/i,"🍳"],
+      [/apfel|apple|obst|fruit|beeren|banana|banane/i,"🍎"],
+      [/schokolade|chocolate|kuchen|cake|torte|dessert|eis cream/i,"🍰"],
+      [/kaffee|coffee/i,"☕"],[/tee|tea/i,"🍵"],
+      [/smoothie|juice|saft/i,"🥤"],[/wasser|water/i,"💧"],
+      [/joghurt|yogurt|quark/i,"🫙"],[/käse|cheese/i,"🧀"],
+      [/müsli|oatmeal|haferflocken|porridge/i,"🥣"],
+      [/nüsse|nuts|mandeln/i,"🥜"],[/protein|whey/i,"💪"],
+      [/bier|beer/i,"🍺"],[/wein|wine/i,"🍷"],
+    ];
+    var TIME_EMOJIS = ["☕","🥐","🍳","🥗","🍎","🥪","🍕","🍝","🍜","🥩","🍰","🌙"];
+    function getEmoji(desc) {
+      if (desc) {
+        var d = desc.toLowerCase();
+        for (var i = 0; i < EMOJI_MAP.length; i++) {
+          if (EMOJI_MAP[i][0].test(d)) return EMOJI_MAP[i][1];
+        }
+      }
+      // Time-based fallback
+      var h = new Date().getHours();
+      if (h < 9) return "☕";
+      if (h < 11) return "🥐";
+      if (h < 14) return "🥗";
+      if (h < 17) return "🍎";
+      if (h < 20) return "🍽️";
+      return "🌙";
+    }
+
+    // ── Load today ──
     async function loadToday() {
       try {
         var r = await fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"status"})});
@@ -649,6 +783,7 @@ Script.complete()
     }
     loadToday();
 
+    // ── Render log ──
     function renderLog(entries) {
       var list = document.getElementById("logList");
       if (!entries || entries.length === 0) {
@@ -657,64 +792,79 @@ Script.complete()
       }
       list.innerHTML = entries.slice().reverse().map(function(e) {
         var time = "";
-        if (e.timestamp) {
-          var d = new Date(e.timestamp);
-          time = d.getHours() + ":" + ("0" + d.getMinutes()).slice(-2);
-        }
+        if (e.timestamp) { var d = new Date(e.timestamp); time = d.getHours() + ":" + ("0"+d.getMinutes()).slice(-2); }
+        var emoji = getEmoji(e.description);
         return "<div class=\"log-entry\">"
+          + "<span class=\"log-emoji\">" + emoji + "</span>"
           + "<span class=\"log-cal\">" + e.calories + "</span>"
-          + "<span class=\"log-desc\">" + (e.description || "") + "</span>"
+          + "<span class=\"log-desc\">" + (e.description||"") + "</span>"
           + "<span class=\"log-time\">" + time + "</span>"
-          + "<button class=\"log-del\" onclick=\"deleteEntry(" + e.row + ")\">&#10005;</button>"
+          + "<button class=\"log-del\" onclick=\"deleteEntry(" + e.row + ", this.parentElement)\">&#10005;</button>"
           + "</div>";
       }).join("");
     }
 
-    async function deleteEntry(row) {
-      if (!row) return;
-      try {
-        await fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"delete", row:row})});
-        showToast("Eintrag gel\u00f6scht");
-        await loadToday();
-      } catch(e) { showToast("Fehler", true); }
+    // ── Optimistic add ──
+    function addOptimisticEntry(cal, desc) {
+      var now = new Date();
+      var time = now.getHours() + ":" + ("0"+now.getMinutes()).slice(-2);
+      var cur = parseInt(document.getElementById("ringTotal").textContent.replace(/\D/g,"")) || 0;
+      updateRing(cur + cal);
+      var list = document.getElementById("logList");
+      var empty = list.querySelector(".log-empty");
+      if (empty) empty.remove();
+      var el = document.createElement("div");
+      el.className = "log-entry optimistic new";
+      var emoji = getEmoji(desc);
+      el.innerHTML = "<span class=\"log-emoji\">" + emoji + "</span>"
+        + "<span class=\"log-cal\">" + cal + "</span>"
+        + "<span class=\"log-desc\">" + desc + "</span>"
+        + "<span class=\"log-time\">" + time + "</span>"
+        + "<span class=\"log-saving\">&#8987;</span>";
+      list.insertBefore(el, list.firstChild);
     }
 
+    // ── Submit manual ──
     async function submitManual() {
       var cal = parseInt(document.getElementById("manualCal").value);
-      var desc = document.getElementById("manualDesc").value.trim();
+      var desc = document.getElementById("manualDesc").value.trim() || "Manueller Eintrag";
       if (!cal || cal <= 0) { showToast("Bitte Kalorien eingeben", true); return; }
       var btn = document.getElementById("manualBtn");
-      setBtn(btn, true, "Wird gespeichert...");
-      try {
-        var r = await fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc||"Manueller Eintrag"})});
-        var d = await r.json();
-        showToast(cal + " kcal gespeichert");
-        if (d.total !== undefined) updateRing(d.total);
-        if (d.entries !== undefined) renderLog(d.entries);
-        document.getElementById("manualCal").value = "";
-        document.getElementById("manualDesc").value = "";
-      } catch(e) { showToast("Fehler beim Speichern", true); }
-      finally { setBtn(btn, false, "Eintragen"); }
+      addOptimisticEntry(cal, desc);
+      document.getElementById("manualCal").value = "";
+      document.getElementById("manualDesc").value = "";
+      setBtn(btn, true, "...");
+      fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc})})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if (d.total !== undefined) updateRing(d.total);
+          if (d.entries !== undefined) renderLog(d.entries);
+        })
+        .catch(function(){ showToast("Fehler beim Speichern", true); })
+        .finally(function(){ setBtn(btn, false, "Eintragen"); });
     }
 
-    var b64 = null;
+    // ── Delete entry ──
+    async function deleteEntry(row, el) {
+      if (!row) return;
+      if (el) { el.style.opacity = "0.2"; el.style.pointerEvents = "none"; }
+      fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"delete", row:row})})
+        .then(function(){ return loadToday(); })
+        .catch(function(){ if(el){el.style.opacity="1";el.style.pointerEvents="";} showToast("Fehler", true); });
+    }
+
+    // ── Photo flow ──
+    var b64 = null, pendingPhotoData = null;
     function handleFile(input) {
       var file = input.files[0]; if (!file) return;
       var reader = new FileReader();
       reader.onload = function(e) {
-        // Resize to max 768px before sending — cuts payload ~90%
         var img = new Image();
         img.onload = function() {
-          var MAX = 768;
-          var w = img.width, h = img.height;
-          if (w > MAX || h > MAX) {
-            var ratio = Math.min(MAX/w, MAX/h);
-            w = Math.round(w * ratio);
-            h = Math.round(h * ratio);
-          }
-          var canvas = document.createElement("canvas");
-          canvas.width = w; canvas.height = h;
-          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+          var MAX = 768, w = img.width, h = img.height;
+          if (w > MAX || h > MAX) { var ratio = Math.min(MAX/w, MAX/h); w = Math.round(w*ratio); h = Math.round(h*ratio); }
+          var canvas = document.createElement("canvas"); canvas.width=w; canvas.height=h;
+          canvas.getContext("2d").drawImage(img,0,0,w,h);
           var resized = canvas.toDataURL("image/jpeg", 0.8);
           b64 = resized.split(",")[1];
           document.getElementById("previewImg").src = resized;
@@ -734,162 +884,153 @@ Script.complete()
       document.getElementById("fileInput").value = "";
       document.getElementById("galleryInput").value = "";
     }
-    var pendingPhotoData = null;
-
     async function submitPhoto() {
       if (!b64) return;
       var btn = document.getElementById("photoBtn");
       setBtn(btn, true, "Analysiere...");
       document.getElementById("analyzing").classList.add("show");
       try {
-        var r = await fetch(N8N_CAL, {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({type: "photo_detect", image: b64})
-        });
+        var r = await fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"photo_detect", image:b64})});
         var d = await r.json();
-        var calories = d.calories || 0;
-        var description = d.description || "Foto Eintrag";
+        var calories = d.calories || 0, description = d.description || "Foto Eintrag";
         if (!calories || calories <= 0) {
-          // Detection failed — show error
           document.getElementById("photoBtn").style.display = "none";
           document.getElementById("photoError").classList.add("show");
         } else {
-          // Show confirm with editable value
           pendingPhotoData = { description: description };
           document.getElementById("confirmCal").value = calories;
-          document.getElementById("confirmDesc").textContent = description;
+          document.getElementById("confirmDesc").textContent = getEmoji(description) + "  " + description;
           document.getElementById("photoBtn").style.display = "none";
           document.getElementById("photoConfirm").classList.add("show");
         }
       } catch(e) {
         document.getElementById("photoBtn").style.display = "none";
         document.getElementById("photoError").classList.add("show");
-      }
-      finally {
+      } finally {
         document.getElementById("analyzing").classList.remove("show");
         setBtn(btn, false, "Kalorien sch\u00e4tzen");
       }
     }
-
     async function saveConfirmed() {
       var cal = parseInt(document.getElementById("confirmCal").value);
       if (!cal || cal <= 0) { showToast("Bitte Kalorien eingeben", true); return; }
       var desc = pendingPhotoData ? pendingPhotoData.description : "Foto Eintrag";
+      addOptimisticEntry(cal, desc);
+      resetPhotoFlow();
+      fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc})})
+        .then(function(r){ return r.json(); })
+        .then(function(d){ if(d.total!==undefined) updateRing(d.total); if(d.entries!==undefined) renderLog(d.entries); })
+        .catch(function(){ showToast("Fehler", true); });
+    }
+    function cancelConfirm() { document.getElementById("photoConfirm").classList.remove("show"); document.getElementById("photoBtn").style.display = "block"; pendingPhotoData = null; }
+    function cancelError()   { document.getElementById("photoError").classList.remove("show"); document.getElementById("photoBtn").style.display = "block"; }
+    function resetPhotoFlow(){ pendingPhotoData = null; document.getElementById("photoConfirm").classList.remove("show"); document.getElementById("photoError").classList.remove("show"); removePhoto(); }
+
+    document.getElementById("manualCal").addEventListener("keydown", function(e){ if(e.key==="Enter") submitManual(); });
+    document.getElementById("manualDesc").addEventListener("keydown", function(e){ if(e.key==="Enter") submitManual(); });
+
+    // ── Weight ──
+    async function loadWeight() {
       try {
-        var r = await fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc})});
+        var r = await fetch(N8N_WEIGHT, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"status"})});
         var d = await r.json();
-        showToast(cal + " kcal gespeichert");
-        if (d.total !== undefined) updateRing(d.total);
-        if (d.entries !== undefined) renderLog(d.entries);
-        resetPhotoFlow();
-      } catch(e) { showToast("Fehler beim Speichern", true); }
+        if (!d.current) return;
+        updateWeightUI(d);
+      } catch(e) {}
     }
-
-    function cancelConfirm() {
-      document.getElementById("photoConfirm").classList.remove("show");
-      document.getElementById("photoBtn").style.display = "block";
-      pendingPhotoData = null;
+    function updateWeightUI(d) {
+      document.getElementById("trendCurrent").textContent = Number(d.current).toFixed(1);
+      var pct = d.changePercent||0, change = d.change||0, trend = d.trend||"stable";
+      var pctEl = document.getElementById("trendPct");
+      pctEl.textContent = (pct>=0?"+":"") + pct.toFixed(1) + "%";
+      pctEl.className = "weight-pct " + trend;
+      document.getElementById("trendSub").textContent = (change>=0?"+":"") + change.toFixed(1) + " kg (30 Tage)";
+      updateGoalBar(d.current, d.goal||SETTINGS.wtGoal, d.distanceToGoal);
+      if (d.history && d.history.length > 1) drawSparkline(d.history);
+      if (d.entries) renderWeightLog(d.entries);
     }
-
-    function cancelError() {
-      document.getElementById("photoError").classList.remove("show");
-      document.getElementById("photoBtn").style.display = "block";
+    function renderWeightLog(entries) {
+      var list = document.getElementById("weightLog");
+      if (!list) return;
+      if (!entries || entries.length === 0) { list.innerHTML = "<div class=\"log-empty\">Noch keine Eintr\u00e4ge</div>"; return; }
+      list.innerHTML = entries.slice().reverse().map(function(e) {
+        return "<div class=\"log-entry\">"
+          + "<span class=\"log-emoji\">&#9878;</span>"
+          + "<span class=\"log-cal\">" + Number(e.weight_kg).toFixed(1) + " kg</span>"
+          + "<span class=\"log-desc\">" + (e.date||"") + "</span>"
+          + "<span class=\"log-time\"></span>"
+          + "<button class=\"log-del\" onclick=\"deleteWeight(" + e.row + ", this.parentElement)\">&#10005;</button>"
+          + "</div>";
+      }).join("");
     }
-
-    function resetPhotoFlow() {
-      pendingPhotoData = null;
-      document.getElementById("photoConfirm").classList.remove("show");
-      document.getElementById("photoError").classList.remove("show");
-      removePhoto();
+    async function deleteWeight(row, el) {
+      if (!row) return;
+      if (el) { el.style.opacity="0.2"; el.style.pointerEvents="none"; }
+      fetch(N8N_WEIGHT, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"delete", row:row})})
+        .then(function(){ return loadWeight(); })
+        .catch(function(){ if(el){el.style.opacity="1";el.style.pointerEvents="";} showToast("Fehler", true); });
     }
-
-    document.getElementById("manualCal").addEventListener("keydown", function(e) { if (e.key === "Enter") submitManual(); });
-    document.getElementById("manualDesc").addEventListener("keydown", function(e) { if (e.key === "Enter") submitManual(); });
-
-    function drawSparkline(points) {
-      var svg = document.getElementById("sparkline");
-      if (!points || points.length < 2) { svg.innerHTML = ""; return; }
-      var min = Math.min.apply(null, points), max = Math.max.apply(null, points), range = max - min || 1;
-      var W = 380, H = 48, P = 2;
-      var coords = points.map(function(v, i) { return [(i / (points.length-1)) * (W-P*2) + P, H - ((v-min)/range) * (H-P*2) - P]; });
-      var path = coords.map(function(c, i) { return (i===0?"M":"L") + c[0] + "," + c[1]; }).join(" ");
-      var color = points[points.length-1] > points[0] ? "#e85d00" : "#4ade80";
-      var last = coords[coords.length-1];
-      svg.innerHTML = "<defs><linearGradient id=\"sg\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0%\" stop-color=\"" + color + "\" stop-opacity=\"0.2\"/><stop offset=\"100%\" stop-color=\"" + color + "\" stop-opacity=\"0\"/></linearGradient></defs>"
-        + "<path d=\"" + path + " L" + last[0] + "," + H + " L" + coords[0][0] + "," + H + " Z\" fill=\"url(#sg)\"/>"
-        + "<path d=\"" + path + "\" fill=\"none\" stroke=\"" + color + "\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
-        + "<circle cx=\"" + last[0] + "\" cy=\"" + last[1] + "\" r=\"3\" fill=\"" + color + "\"/>";
-    }
-
     async function saveWeight() {
       var val = parseFloat(document.getElementById("weightInput").value);
       if (!val || val < 20 || val > 300) { showToast("Ung\u00fcltiges Gewicht", true); return; }
       var btn = document.getElementById("saveBtn");
-      setBtn(btn, true, "Wird gespeichert...");
-      try {
-        var r = await fetch(N8N_WEIGHT, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({weight:val})});
-        var d = await r.json();
-        document.getElementById("trendCurrent").textContent = val.toFixed(1);
-        var pct = d.changePercent || 0, change = d.change || 0, trend = d.trend || "stable";
-        var pctEl = document.getElementById("trendPct");
-        pctEl.textContent = (pct >= 0 ? "+" : "") + pct.toFixed(1) + "%";
-        pctEl.className = "weight-pct " + trend;
-        document.getElementById("trendSub").textContent = (change >= 0 ? "+" : "") + change.toFixed(1) + " kg (30 Tage)";
-        updateGoalBar(val, d.goal || 85, d.distanceToGoal);
-        showToast(val + " kg gespeichert");
-        document.getElementById("weightInput").value = "";
-      } catch(e) { showToast("Fehler beim Speichern", true); }
-      finally { setBtn(btn, false, "Gewicht speichern"); }
+      document.getElementById("trendCurrent").textContent = val.toFixed(1);
+      document.getElementById("weightInput").value = "";
+      showToast("\u2705 " + val + " kg gespeichert");
+      setBtn(btn, true, "...");
+      fetch(N8N_WEIGHT, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({weight:val})})
+        .then(function(r){ return r.json(); })
+        .then(function(d){ updateWeightUI(d); })
+        .catch(function(){ showToast("Fehler beim Speichern", true); })
+        .finally(function(){ setBtn(btn, false, "Gewicht speichern"); });
     }
-    document.getElementById("weightInput").addEventListener("keydown", function(e) { if (e.key === "Enter") saveWeight(); });
+    document.getElementById("weightInput").addEventListener("keydown", function(e){ if(e.key==="Enter") saveWeight(); });
+    loadWeight();
+
+    function drawSparkline(points) {
+      var svg = document.getElementById("sparkline");
+      if (!points || points.length < 2) { svg.innerHTML = ""; return; }
+      var min = Math.min.apply(null,points), max = Math.max.apply(null,points), range = max-min||1;
+      var W=380,H=48,P=2;
+      var coords = points.map(function(v,i){ return [(i/(points.length-1))*(W-P*2)+P, H-((v-min)/range)*(H-P*2)-P]; });
+      var path = coords.map(function(c,i){ return (i===0?"M":"L")+c[0]+","+c[1]; }).join(" ");
+      var color = points[points.length-1] > points[0] ? "#e85d00" : "#4ade80";
+      var last = coords[coords.length-1];
+      svg.innerHTML = "<defs><linearGradient id=\"sg\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0%\" stop-color=\""+color+"\" stop-opacity=\"0.2\"/><stop offset=\"100%\" stop-color=\""+color+"\" stop-opacity=\"0\"/></linearGradient></defs>"
+        + "<path d=\""+path+" L"+last[0]+","+H+" L"+coords[0][0]+","+H+" Z\" fill=\"url(#sg)\"/>"
+        + "<path d=\""+path+"\" fill=\"none\" stroke=\""+color+"\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+        + "<circle cx=\""+last[0]+"\" cy=\""+last[1]+"\" r=\"3\" fill=\""+color+"\"/>";
+    }
 
     function updateGoalBar(current, goal, distance) {
-      var dist = distance != null ? distance : Math.round((current - goal) * 10) / 10;
+      goal = goal || SETTINGS.wtGoal;
+      var dist = distance != null ? distance : Math.round((current-goal)*10)/10;
       var reached = current <= goal;
       var fill = document.getElementById("goalBarFill");
       var label = document.getElementById("goalDistLabel");
       var status = document.getElementById("goalStatus");
+      document.getElementById("goalLabelRight").textContent = "Ziel: " + goal + " kg";
       if (reached) {
-        fill.style.width = "100%"; fill.classList.add("reached");
-        label.textContent = "Ziel erreicht!"; status.textContent = "";
+        fill.style.width="100%"; fill.classList.add("reached");
+        label.textContent="Ziel erreicht!"; status.textContent="";
       } else {
-        var pct = Math.min(100, Math.max(0, Math.round((1 - dist / (120 - goal)) * 100)));
-        fill.style.width = pct + "%"; fill.classList.remove("reached");
-        label.textContent = "Noch " + dist.toFixed(1) + " kg bis Ziel";
-        status.textContent = current.toFixed(1) + " kg von 85 kg";
+        var pct = Math.min(100, Math.max(0, Math.round((1-dist/(120-goal))*100)));
+        fill.style.width=pct+"%"; fill.classList.remove("reached");
+        label.textContent="Noch " + dist.toFixed(1) + " kg bis Ziel";
+        status.textContent=current.toFixed(1) + " kg von " + goal + " kg";
       }
     }
 
     function setBtn(btn, loading, text) {
-      btn.disabled = loading; btn.textContent = text;
-      btn.classList.toggle("loading", loading);
+      btn.disabled=loading; btn.textContent=text; btn.classList.toggle("loading",loading);
     }
     function showToast(msg, isError) {
       var t = document.getElementById("toast");
       t.textContent = msg;
-      t.className = "toast" + (isError ? " error" : "");
+      t.className = "toast" + (isError ? " error" : " success");
       t.classList.add("show");
-      setTimeout(function() { t.classList.remove("show"); }, 3000);
+      setTimeout(function(){ t.classList.remove("show"); }, 2500);
     }
   </script>
-  <!-- CAMERA OVERLAY -->
-  <div id="cameraOverlay">
-    <button class="cam-overlay-close" onclick="closeCameraOverlay()">&#215;</button>
-    <button class="cam-big-btn" onclick="triggerCamera()">&#128247;</button>
-    <div class="cam-overlay-hint">Tippen zum Fotografieren</div>
-  </div>
-
-  <!-- CODE COPY OVERLAY -->
-  <div id="codeOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:300;flex-direction:column;padding:20px;gap:12px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#f0f0f0;">Code kopieren</span>
-      <button onclick="closeCodeOverlay()" style="background:none;border:none;color:#666;font-size:24px;cursor:pointer;padding:0;line-height:1;">&#215;</button>
-    </div>
-    <p style="font-size:11px;color:#666;line-height:1.6;">Alles markieren (Select All), dann kopieren und in Scriptable einf&#252;gen.</p>
-    <textarea id="codeTa" readonly style="flex:1;background:#111;border:1px solid #2a2a2a;border-radius:12px;color:#4ade80;font-family:'DM Mono',monospace;font-size:11px;padding:14px;resize:none;outline:none;line-height:1.5;"></textarea>
-    <button onclick="var ta=document.getElementById('codeTa');ta.select();ta.setSelectionRange(0,99999);if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(function(){showToast('Code kopiert!');closeCodeOverlay();});}else{try{document.execCommand('copy');showToast('Code kopiert!');closeCodeOverlay();}catch(e){}}" style="background:#4ade80;color:#000;border:none;border-radius:12px;padding:15px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">Kopieren</button>
-  </div>
-
 </body>
 </html>
