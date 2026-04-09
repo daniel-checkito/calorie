@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>Health Tracker</title>
+  <title>Road to 85kg</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f0f0f'/%3E%3Ctext x='32' y='28' font-family='Arial Black' font-weight='900' font-size='26' fill='%234ade80' text-anchor='middle' dominant-baseline='middle'%3E85%3C/text%3E%3Cpolyline points='20,42 26,34 32,38 44,24' fill='none' stroke='%23e85d00' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
@@ -33,7 +34,7 @@
     .hero-main{display:flex;align-items:center;gap:16px;}
     .ring-wrap{position:relative;flex-shrink:0;}
     .ring-bg{fill:none;stroke:#2a2a2a;stroke-width:8;}
-    .ring-fill{fill:none;stroke:var(--orange);stroke-width:8;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:220;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset 0.8s cubic-bezier(0.34,1.56,0.64,1);}
+    .ring-fill{fill:none;stroke:var(--accent);stroke-width:8;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:220;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset 0.8s cubic-bezier(0.34,1.56,0.64,1);}
     .ring-fill.done{stroke:var(--accent);}
     .ring-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--text);}
     .hero-nums{flex:1;}
@@ -161,11 +162,13 @@
     .cam-big-btn:active{transform:scale(0.93);}
     .cam-overlay-hint{font-size:13px;color:#666;letter-spacing:0.05em;}
     .cam-overlay-close{position:absolute;top:24px;right:20px;background:none;border:none;color:#444;font-size:28px;cursor:pointer;}
-
-
   </style>
 </head>
 <body>
+
+
+
+  
 
   <!-- CALORIES PAGE -->
   <div class="page" id="page-calories">
@@ -184,10 +187,16 @@
       <div class="hero-main">
         <div class="ring-wrap" style="flex-shrink:0">
           <svg width="110" height="110" viewBox="0 0 110 110">
+            <!-- Track -->
             <circle class="ring-bg" cx="55" cy="55" r="48" style="stroke-width:10"/>
+            <!-- Pace ghost arc: dimmed orange from 0 to where you should be -->
+            <circle id="paceArc" cx="55" cy="55" r="48"
+              style="fill:none;stroke:#e85d00;stroke-width:10;stroke-linecap:round;
+                     stroke-dasharray:301;stroke-dashoffset:301;
+                     transform:rotate(-90deg);transform-origin:55px 55px;
+                     transition:stroke-dashoffset 0.6s ease;opacity:0.25;"/>
+            <!-- Actual progress arc: green on top -->
             <circle class="ring-fill" id="ringFill" cx="55" cy="55" r="48" style="stroke-width:10;stroke-dasharray:301;stroke-dashoffset:301"/>
-            <!-- Pace marker: small tick at target position -->
-            <circle id="paceTick" cx="55" cy="7" r="5" fill="#e85d00" opacity="0.9" style="transform-origin:55px 55px;transform:rotate(0deg);transition:transform 0.6s ease;display:none"/>
           </svg>
           <div class="ring-pct" id="ringPct" style="font-size:15px;">0%</div>
         </div>
@@ -197,288 +206,12 @@
           <!-- Pace bar -->
           <div style="margin-top:14px;">
             <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
-              <span style="font-size:10px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;">Pace</span>
+              <span style="font-size:10px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;">Progress</span>
               <span id="paceVal" style="font-size:10px;color:var(--muted);"></span>
             </div>
-            <div style="height:6px;background:var(--border);border-radius:99px;position:relative;overflow:visible;">
-              <!-- Actual progress fill (green/orange) -->
-              <div id="paceBar" style="height:100%;border-radius:99px;background:var(--orange);width:0%;transition:width 0.6s ease;position:relative;z-index:1;"></div>
-              <!-- Pace target marker line -->
-              <div id="paceMarker" style="position:absolute;top:-3px;width:3px;height:12px;background:#e85d00;border-radius:2px;left:0%;transition:left 0.6s ease;z-index:2;opacity:0.9;"></div>
-            </div>
-          </div>
-          <!-- Noch -->
-          <div style="margin-top:12px;display:flex;gap:20px;">
-            <div>
-              <div style="font-size:9px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;">Noch</div>
-              <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--orange);" id="ringRemaining">2.700</div>
-            </div>
-            <div>
-              <div style="font-size:9px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;">Ziel</div>
-              <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--muted);" id="heroGoalDisplay">2.700</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <input type="file" accept="image/*" capture="environment" id="fileInput" onchange="handleFile(this)" style="display:none">
-    <input type="file" accept="image/*" id="galleryInput" onchange="handleFile(this)" style="display:none">
-
-    <div class="preview-outer">
-      <div class="preview-wrap" id="previewWrap">
-        <img id="previewImg" src="" alt="">
-        <button class="preview-remove" onclick="removePhoto()">&#10005;</button>
-      </div>
-    </div>
-
-    <div class="entry-card" id="entryForm">
-      <!-- Meal name row: description input + 🔍 lookup on right -->
-      <div style="display:flex;gap:10px;margin-bottom:10px;">
-        <input type="text" id="foodLookup" placeholder="z.B. D&#246;ner, Protein Shake, Skyr..." autocomplete="off"
-          style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:16px 18px;outline:none;-webkit-appearance:none;">
-        <button id="lookupBtn" onclick="lookupFood()" title="Kalorien automatisch suchen"
-          style="flex-shrink:0;width:58px;height:58px;border-radius:12px;background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;">&#128269;</button>
-      </div>
-
-      <!-- Calorie input + camera/submit row -->
-      <div id="manualEntry">
-        <input type="number" id="manualCal" placeholder="Kalorien eingeben..." inputmode="numeric"
-          style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:16px 18px;outline:none;-webkit-appearance:none;margin-bottom:10px;">
-        <div style="display:flex;gap:10px;">
-          <button class="cam-btn" onclick="document.getElementById('fileInput').click()"
-            style="flex:1;width:auto;height:60px;border-radius:12px;font-size:26px;">&#128247;</button>
-          <button class="btn" id="manualBtn" onclick="submitManual()"
-            style="flex:1;height:60px;padding:0;font-size:17px;">Eintragen</button>
-        </div>
-        <div class="gallery-link">
-          <button onclick="document.getElementById('galleryInput').click()">&#128444; Aus Galerie w&#228;hlen</button>
-        </div>
-      </div>
-
-      <!-- Photo submit button — shown when image selected -->
-      <button class="btn" id="photoBtn" onclick="submitPhoto()" style="display:none;margin-top:0;margin-bottom:10px">&#128247; Kalorien sch&#228;tzen</button>
-
-      <!-- Lookup result: shown after 🔍 fills in calories -->
-      <div id="lookupResult" style="display:none;margin-top:10px;padding:14px;background:var(--card2);border-radius:12px;border:1px solid var(--border);">
-        <div style="font-size:10px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Gefunden &#8212; bitte pr&#252;fen</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <input type="number" id="lookupCal" inputmode="numeric"
-            style="font-family:Syne,sans-serif;font-size:32px;font-weight:800;color:var(--accent);background:transparent;border:none;outline:none;width:120px;-webkit-appearance:none;">
-          <div>
-            <div style="font-size:11px;color:var(--muted);">kcal</div>
-            <div id="lookupDesc" style="font-size:12px;color:var(--text);margin-top:2px;"></div>
-          </div>
-        </div>
-        <button class="btn" style="margin-top:12px" onclick="saveLookupResult()">&#10003; Eintragen</button>
-      </div>
-    </div>TYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>Health Tracker</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg:#0f0f0f; --card:#1a1a1a; --card2:#222;
-      --border:#2a2a2a; --accent:#4ade80; --accent2:#c0392b;
-      --text:#f0f0f0; --muted:#666; --orange:#e85d00; --blue:#38bdf8;
-    }
-    *{box-sizing:border-box;margin:0;padding:0;}
-    html,body{background:#0f0f0f;}
-    body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:stretch;}
-    .page{display:none;width:100%;flex-direction:column;align-items:stretch;padding:20px 16px 80px;}
-    .page.active{display:flex;}
-
-    /* ── Header ── */
-    header{display:flex;align-items:center;gap:10px;margin-bottom:22px;padding-top:4px;}
-    .logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.5px;color:var(--accent);}
-    .logo span{color:var(--text);opacity:0.35;}
-    .date-label{font-size:11px;color:var(--muted);}
-    .nav-link{margin-left:auto;font-size:11px;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:6px 14px;border-radius:99px;cursor:pointer;background:none;font-family:'DM Mono',monospace;transition:all 0.2s;}
-    .nav-link:hover,.nav-link:active{border-color:var(--accent);color:var(--accent);}
-
-    /* ── Hero card ── */
-    .hero-card{background:var(--card);border-radius:20px;padding:20px;margin-bottom:12px;animation:slideUp 0.4s ease;}
-    .hero-label{font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;}
-    .hero-main{display:flex;align-items:center;gap:16px;}
-    .ring-wrap{position:relative;flex-shrink:0;}
-    .ring-bg{fill:none;stroke:#2a2a2a;stroke-width:8;}
-    .ring-fill{fill:none;stroke:var(--orange);stroke-width:8;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:220;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset 0.8s cubic-bezier(0.34,1.56,0.64,1);}
-    .ring-fill.done{stroke:var(--accent);}
-    .ring-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--text);}
-    .hero-nums{flex:1;}
-    .hero-total{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;letter-spacing:-2px;line-height:1;color:var(--text);transition:color 0.3s;}
-    .hero-total.done{color:var(--accent);}
-    .hero-of{font-size:11px;color:var(--muted);margin-top:4px;}
-    .hero-footer{display:flex;justify-content:space-between;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);}
-    .hero-stat{display:flex;flex-direction:column;gap:3px;}
-    .hero-stat-label{font-size:9px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;}
-    .hero-stat-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--text);transition:all 0.3s;}
-    .hero-stat-val.remaining{color:var(--orange);}
-    .hero-stat-val.done{color:var(--accent);}
-
-    /* ── Entry form ── */
-    .entry-card{background:var(--card);border-radius:20px;padding:16px;margin-bottom:12px;animation:slideUp 0.4s ease 0.05s both;}
-    .field{display:flex;flex-direction:column;gap:6px;}
-    label{font-size:10px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;}
-    input[type="number"],input[type="text"]{background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:14px 16px;width:100%;outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
-    input:focus{border-color:var(--accent);}
-    .cal-row{display:flex;align-items:flex-end;gap:10px;}
-    .cam-btn{flex-shrink:0;width:52px;height:52px;border-radius:10px;background:var(--orange);color:#fff;border:none;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.1s;-webkit-tap-highlight-color:transparent;}
-    .cam-btn:active{transform:scale(0.92);}
-    .btn{background:var(--accent);color:#000;border:none;border-radius:12px;padding:15px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;width:100%;letter-spacing:0.02em;transition:all 0.15s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
-    .btn:active{transform:scale(0.98);}
-    .btn:disabled{opacity:0.45;cursor:not-allowed;}
-    .btn.loading::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);animation:shimmer 1.2s infinite;}
-    .btn-secondary{background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:14px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}
-    @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-    @keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-    @keyframes popIn{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:none}}
-    .gallery-link{text-align:center;margin-top:10px;}
-    .gallery-link button{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;}
-    .preview-outer{position:relative;margin-bottom:12px;}
-    .preview-wrap{display:none;border-radius:14px;overflow:hidden;}
-    .preview-wrap.show{display:block;animation:popIn 0.25s ease;}
-    .preview-wrap img{width:100%;max-height:200px;object-fit:cover;display:block;}
-    .preview-remove{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;}
-    .analyzing{display:none;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--muted);margin-bottom:12px;}
-    .analyzing.show{display:flex;}
-    .dot-pulse{display:flex;gap:4px;}
-    .dot-pulse span{width:5px;height:5px;background:var(--accent);border-radius:50%;animation:dpulse 1.2s infinite;}
-    .dot-pulse span:nth-child(2){animation-delay:0.2s;}
-    .dot-pulse span:nth-child(3){animation-delay:0.4s;}
-    @keyframes dpulse{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
-    .photo-confirm{display:none;flex-direction:column;gap:10px;margin-bottom:12px;}
-    .photo-confirm.show{display:flex;animation:popIn 0.2s ease;}
-    .confirm-label{font-size:10px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;}
-    .confirm-cal-input{background:var(--card2);border:2px solid var(--accent);border-radius:12px;color:var(--accent);font-family:'Syne',sans-serif;font-size:40px;font-weight:800;padding:14px 20px;width:100%;outline:none;letter-spacing:-1px;-webkit-appearance:none;text-align:center;}
-    .confirm-desc{font-size:13px;color:var(--muted);text-align:center;}
-    .confirm-actions{display:flex;gap:8px;}
-    .photo-error{display:none;flex-direction:column;gap:10px;margin-bottom:12px;}
-    .photo-error.show{display:flex;animation:popIn 0.2s ease;}
-    .error-msg{background:var(--card2);border:1px solid var(--accent2);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--accent2);text-align:center;line-height:1.5;}
-
-    /* ── Log entries ── */
-    .log-section{margin-top:6px;animation:slideUp 0.4s ease 0.1s both;}
-    .log-header{font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
-    .log-empty{font-size:12px;color:var(--muted);padding:12px 0;text-align:center;}
-    .log-entry{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:12px 14px;margin-bottom:6px;transition:opacity 0.2s,transform 0.2s;}
-    .log-entry.new{animation:slideIn 0.3s cubic-bezier(0.34,1.56,0.64,1);}
-    @keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
-    .log-emoji{font-size:18px;flex-shrink:0;width:26px;text-align:center;}
-    .log-cal{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--orange);min-width:46px;}
-    .log-desc{font-size:12px;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .log-time{font-size:10px;color:var(--muted);min-width:36px;text-align:right;}
-    .log-del{background:none;border:none;color:#333;cursor:pointer;font-size:14px;padding:4px;border-radius:4px;transition:color 0.2s;flex-shrink:0;}
-    .log-del:active{color:var(--accent2);}
-    .log-saving{color:var(--muted);font-size:12px;flex-shrink:0;animation:dpulse 1s infinite;}
-    .log-entry.optimistic{opacity:0.55;}
-
-    /* ── Weight page ── */
-    .weight-hero{background:var(--card);border-radius:20px;padding:20px;margin-bottom:12px;animation:slideUp 0.4s ease;}
-    .weight-hero-label{font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
-    .sparkline{width:100%;height:52px;margin-bottom:14px;}
-    .weight-main-row{display:flex;align-items:flex-end;gap:12px;margin-bottom:14px;}
-    .weight-big{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;letter-spacing:-2px;line-height:1;color:var(--text);transition:all 0.3s;}
-    .weight-unit{font-size:16px;color:var(--muted);margin-bottom:8px;}
-    .weight-change{margin-left:auto;text-align:right;}
-    .weight-pct{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;}
-    .weight-pct.up{color:var(--accent);}.weight-pct.down{color:var(--orange);}.weight-pct.stable{color:var(--muted);}
-    .weight-sub{font-size:11px;color:var(--muted);margin-top:2px;}
-    .goal-bar-wrap{border-top:1px solid var(--border);padding-top:14px;}
-    .goal-bar-labels{display:flex;justify-content:space-between;margin-bottom:8px;}
-    .goal-bar-label-left{font-size:12px;color:var(--text);font-weight:500;}
-    .goal-bar-label-right{font-size:11px;color:var(--muted);}
-    .goal-bar-track{height:5px;background:var(--border);border-radius:99px;overflow:hidden;}
-    .goal-bar-fill{height:100%;border-radius:99px;background:var(--orange);transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1);width:0%;}
-    .goal-bar-fill.reached{background:var(--accent);}
-    .goal-status{font-size:11px;color:var(--muted);margin-top:6px;text-align:right;}
-    .weight-input{background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Syne',sans-serif;font-size:32px;font-weight:700;padding:16px 20px;width:100%;outline:none;transition:border-color 0.2s;-webkit-appearance:none;letter-spacing:-1px;}
-    .weight-input:focus{border-color:var(--accent);}
-
-    /* ── Settings overlay ── */
-    .settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:flex-end;justify-content:center;}
-    .settings-overlay.open{display:flex;}
-    .settings-box{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:24px 20px 48px;width:100%;display:flex;flex-direction:column;gap:16px;animation:slideUp 0.3s ease;}
-    .settings-header{display:flex;align-items:center;justify-content:space-between;}
-    .settings-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;}
-    .settings-close{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;padding:0;line-height:1;}
-    .settings-section{font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:-4px;}
-    .settings-row{display:flex;align-items:center;justify-content:space-between;background:var(--card2);border-radius:12px;padding:14px 16px;}
-    .settings-row-label{font-size:13px;color:var(--text);}
-    .settings-row input{background:transparent;border:none;color:var(--accent);font-family:'Syne',sans-serif;font-size:16px;font-weight:700;width:80px;text-align:right;outline:none;-webkit-appearance:none;}
-    .settings-divider{height:1px;background:var(--border);}
-    .install-row{display:flex;gap:8px;align-items:stretch;}
-    .install-btn{flex:1;background:var(--accent);color:#000;text-decoration:none;border-radius:12px;padding:14px 16px;text-align:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;display:block;}
-    .copy-btn{background:var(--card2);border:1px solid var(--border);color:var(--muted);border-radius:12px;padding:14px 16px;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0;}
-    .copy-btn:hover{border-color:var(--accent);color:var(--accent);}
-    .settings-note{font-size:11px;color:var(--muted);line-height:1.6;}
-
-    /* ── Toast ── */
-    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--border);color:var(--text);padding:12px 22px;border-radius:12px;font-size:13px;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);z-index:100;white-space:nowrap;}
-    .toast.show{transform:translateX(-50%) translateY(0);}
-    .toast.error{border-color:var(--accent2);}
-    .toast.success{border-color:var(--accent);}
-
-    /* ── Settings trigger ── */
-    .settings-trigger{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--muted);z-index:100;transition:all 0.2s;}
-    .settings-trigger:hover{border-color:var(--accent);color:var(--accent);}
-
-    /* ── Camera overlay ── */
-    #cameraOverlay{display:none;position:fixed;inset:0;background:#0f0f0f;z-index:400;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
-    #cameraOverlay.show{display:flex;animation:popIn 0.2s ease;}
-    .cam-big-btn{width:160px;height:160px;border-radius:50%;background:var(--orange);border:none;font-size:64px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(232,93,0,0.4);transition:transform 0.1s;-webkit-tap-highlight-color:transparent;}
-    .cam-big-btn:active{transform:scale(0.93);}
-    .cam-overlay-hint{font-size:13px;color:#666;letter-spacing:0.05em;}
-    .cam-overlay-close{position:absolute;top:24px;right:20px;background:none;border:none;color:#444;font-size:28px;cursor:pointer;}
-
-
-  </style>
-</head>
-<body>
-
-  <!-- CALORIES PAGE -->
-  <div class="page" id="page-calories">
-    <header>
-      <div class="logo">calories<span>.</span></div>
-      <div class="date-label" id="dateLabel"></div>
-      <button class="nav-link" onclick="navigate('weight')">Gewicht &#8594;</button>
-    </header>
-    <div class="hero-card">
-      <!-- Top row: label + date context -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <span class="hero-label" style="margin-bottom:0">Calories Today</span>
-        <span id="paceLabel" style="font-size:11px;color:var(--muted);"></span>
-      </div>
-      <!-- Main: large ring left, big stats right -->
-      <div class="hero-main">
-        <div class="ring-wrap" style="flex-shrink:0">
-          <svg width="110" height="110" viewBox="0 0 110 110">
-            <circle class="ring-bg" cx="55" cy="55" r="48" style="stroke-width:10"/>
-            <circle class="ring-fill" id="ringFill" cx="55" cy="55" r="48" style="stroke-width:10;stroke-dasharray:301;stroke-dashoffset:301"/>
-            <!-- Pace marker: small tick at target position -->
-            <circle id="paceTick" cx="55" cy="7" r="5" fill="#e85d00" opacity="0.9" style="transform-origin:55px 55px;transform:rotate(0deg);transition:transform 0.6s ease;display:none"/>
-          </svg>
-          <div class="ring-pct" id="ringPct" style="font-size:15px;">0%</div>
-        </div>
-        <div style="flex:1;padding-left:4px;">
-          <div class="hero-total" id="ringTotal" style="font-size:52px;">0</div>
-          <div class="hero-of" id="heroOf" style="font-size:12px;margin-top:2px;">of 2.700 kcal</div>
-          <!-- Pace bar -->
-          <div style="margin-top:14px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
-              <span style="font-size:10px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;">Pace</span>
-              <span id="paceVal" style="font-size:10px;color:var(--muted);"></span>
-            </div>
-            <div style="height:6px;background:var(--border);border-radius:99px;position:relative;overflow:visible;">
-              <!-- Actual progress fill (green/orange) -->
-              <div id="paceBar" style="height:100%;border-radius:99px;background:var(--orange);width:0%;transition:width 0.6s ease;position:relative;z-index:1;"></div>
-              <!-- Pace target marker line -->
-              <div id="paceMarker" style="position:absolute;top:-3px;width:3px;height:12px;background:#e85d00;border-radius:2px;left:0%;transition:left 0.6s ease;z-index:2;opacity:0.9;"></div>
+            <div style="height:6px;background:var(--border);border-radius:99px;position:relative;overflow:hidden;">
+              <div id="paceGhost" style="position:absolute;top:0;left:0;height:100%;border-radius:99px;background:#e85d00;width:0%;transition:width 0.6s ease;opacity:0.3;"></div>
+              <div id="progressBar" style="position:absolute;top:0;left:0;height:100%;border-radius:99px;background:var(--accent);width:0%;transition:width 0.6s ease;"></div>
             </div>
           </div>
           <!-- Noch -->
@@ -538,6 +271,9 @@
           <button onclick="document.getElementById('galleryInput').click()">&#128444; Aus Galerie w&#228;hlen</button>
         </div>
       </div>
+
+      <!-- Photo submit button — shown when image selected -->
+      <button class="btn" id="photoBtn" onclick="submitPhoto()" style="display:none;margin-top:10px;">&#128247; Kalorien sch&#228;tzen</button>
     </div>
 
     <div class="analyzing" id="analyzing">
@@ -688,275 +424,8 @@
 
     // ── Widget codes ──
     var WIDGET_CODES = {
-      cal: `// Calorie Widget - Health Tracker
-var CAL_URL  = "https://meshminds.app.n8n.cloud/webhook/log-calories"
-var SITE_URL = "https://daemien-calories.vercel.app/#calories"
-var GOAL     = 2700
-
-var C_BG     = new Color("#0f0f0f")
-var C_TRACK  = new Color("#1e1e1e")
-var C_ORANGE = new Color("#e85d00")
-var C_GREEN  = new Color("#4ade80")
-var C_WHITE  = new Color("#f0f0f0")
-var C_MUTED  = new Color("#666666")
-
-async function getToday() {
-  try {
-    var r = new Request(CAL_URL)
-    r.method = "POST"
-    r.headers = {"Content-Type": "application/json"}
-    r.body = JSON.stringify({type: "status"})
-    r.timeoutInterval = 8
-    var d = await r.loadJSON()
-    return {total: d.total||0, remaining: d.remaining||GOAL, percentage: d.percentage||0, goalReached: d.goalReached||false}
-  } catch(e) {
-    return {total: 0, remaining: GOAL, percentage: 0, goalReached: false}
-  }
-}
-
-function makeDonut(total, pct, done) {
-  var S   = 155
-  var dc  = new DrawContext()
-  dc.size = new Size(S, S)
-  dc.opaque = false
-  dc.respectScreenScale = true
-
-  var cx  = S / 2
-  var cy  = S / 2
-  var R   = 64
-  var lw  = 13
-
-  // Track
-  dc.setLineWidth(lw)
-  dc.setStrokeColor(C_TRACK)
-  dc.strokeEllipse(new Rect(cx-R, cy-R, R*2, R*2))
-
-  // Arc
-  var filled = Math.min(pct / 100, 1)
-  if (filled > 0) {
-    var steps  = 100
-    var startA = -Math.PI / 2
-    var sweep  = filled * Math.PI * 2
-    var arc    = new Path()
-    for (var i = 0; i <= steps; i++) {
-      var a  = startA + (i / steps) * sweep
-      var pt = new Point(cx + R * Math.cos(a), cy + R * Math.sin(a))
-      if (i === 0) arc.move(pt); else arc.addLine(pt)
-    }
-    dc.addPath(arc)
-    dc.setLineWidth(lw)
-    dc.setStrokeColor(done ? C_GREEN : C_ORANGE)
-    dc.strokePath()
-  }
-
-  // ── Centered text inside ring ──
-  // Use drawTextInRect with centered alignment via DrawContext
-  dc.setTextAlignedCenter()
-
-  // Big calorie number — vertically offset above center
-  dc.setFont(Font.boldSystemFont(28))
-  dc.setTextColor(done ? C_GREEN : C_WHITE)
-  var totalStr = total.toLocaleString("de-DE")
-  dc.drawTextInRect(totalStr, new Rect(cx - 55, cy - 32, 110, 34))
-
-  // "von 2700 kcal" line
-  dc.setFont(Font.mediumSystemFont(9))
-  dc.setTextColor(C_MUTED)
-  dc.drawTextInRect("von " + GOAL.toLocaleString("de-DE"), new Rect(cx - 50, cy + 4, 100, 14))
-
-  // Percentage
-  dc.setFont(Font.boldSystemFont(12))
-  dc.setTextColor(done ? C_GREEN : C_ORANGE)
-  dc.drawTextInRect(Math.round(pct) + "%", new Rect(cx - 30, cy + 20, 60, 16))
-
-  return dc.getImage()
-}
-
-async function build() {
-  var data = await getToday()
-  var pct  = Math.min(data.percentage, 100)
-  var done = data.goalReached
-
-  var w = new ListWidget()
-  w.backgroundColor = C_BG
-  w.url = SITE_URL
-  w.setPadding(0, 0, 0, 0)
-
-  // Center the donut in the widget
-  var outer = w.addStack()
-  outer.layoutVertically()
-  outer.centerAlignContent()
-  outer.addSpacer()
-
-  var row = outer.addStack()
-  row.layoutHorizontally()
-  row.centerAlignContent()
-  row.addSpacer()
-
-  var img = row.addImage(makeDonut(data.total, pct, done))
-  img.imageSize = new Size(155, 155)
-
-  row.addSpacer()
-  outer.addSpacer()
-
-  return w
-}
-
-var widget = await build()
-if (config.runsInWidget) { Script.setWidget(widget) } else { widget.presentSmall() }
-Script.complete()
-`,
-      wt:  `// Weight Widget - Health Tracker
-var WT_URL   = "https://meshminds.app.n8n.cloud/webhook/log-weight"
-var SITE_URL = "https://daemien-calories.vercel.app/#weight"
-var GOAL     = 85
-
-var C_BG    = new Color("#111111")
-var C_GREEN = new Color("#4ade80")
-var C_BLUE  = new Color("#38bdf8")
-var C_GOAL  = new Color("#4ade80")
-var C_WHITE = new Color("#f0f0f0")
-var C_MUTED = new Color("#666666")
-var C_UP    = new Color("#e85d00")
-
-function loadCache() {
-  try {
-    if (Keychain.contains("ht_weight")) return JSON.parse(Keychain.get("ht_weight"))
-  } catch(e) {}
-  return {current: null, change: 0, changePercent: 0, trend: "stable", distanceToGoal: null, history: []}
-}
-
-function saveCache(d) {
-  try { Keychain.set("ht_weight", JSON.stringify(d)) } catch(e) {}
-}
-
-async function fetchWeight() {
-  try {
-    var r = new Request(WT_URL)
-    r.method = "POST"
-    r.headers = {"Content-Type": "application/json"}
-    r.body = JSON.stringify({type: "status"})
-    r.timeoutInterval = 8
-    var d = await r.loadJSON()
-    if (d && d.current != null) {
-      var data = {current: d.current, change: d.change||0, changePercent: d.changePercent||0, trend: d.trend||"stable", distanceToGoal: d.distanceToGoal, history: d.history||[]}
-      saveCache(data)
-      return data
-    }
-  } catch(e) {}
-  return loadCache()
-}
-
-function makeSparkline(history) {
-  var W = 160, H = 50
-  var dc = new DrawContext()
-  dc.size = new Size(W, H)
-  dc.opaque = false
-  dc.respectScreenScale = true
-
-  if (!history || history.length < 2) return null
-
-  var vals = history.map(function(v) { return Number(v) })
-  var min = Math.min.apply(null, vals)
-  var max = Math.max.apply(null, vals)
-  var range = max - min || 1
-
-  // Goal line
-  if (GOAL >= min && GOAL <= max + 2) {
-    var goalY = H - ((GOAL - min) / range) * (H - 8) - 4
-    dc.setLineWidth(1)
-    dc.setStrokeColor(C_GOAL)
-    // Dashed goal line via segments
-    for (var x = 0; x < W; x += 12) {
-      var seg = new Path()
-      seg.move(new Point(x, goalY))
-      seg.addLine(new Point(Math.min(x+7, W), goalY))
-      dc.addPath(seg)
-      dc.strokePath()
-    }
-  }
-
-  // Line
-  var path = new Path()
-  for (var i = 0; i < vals.length; i++) {
-    var px = (i / (vals.length - 1)) * (W - 4) + 2
-    var py = H - ((vals[i] - min) / range) * (H - 8) - 4
-    if (i === 0) path.move(new Point(px, py))
-    else path.addLine(new Point(px, py))
-  }
-  dc.addPath(path)
-  dc.setLineWidth(2)
-  dc.setStrokeColor(C_BLUE)
-  dc.strokePath()
-
-  // Dot at end
-  var lx = (W - 4) + 2
-  var ly = H - ((vals[vals.length-1] - min) / range) * (H - 8) - 4
-  dc.setFillColor(C_BLUE)
-  dc.fillEllipse(new Rect(lx-4, ly-4, 8, 8))
-
-  return dc.getImage()
-}
-
-function makeWidget(d) {
-  var trend = d.trend || "stable"
-  var dist  = d.distanceToGoal != null ? d.distanceToGoal : (d.current != null ? Math.round((d.current - GOAL)*10)/10 : null)
-  var atGoal = dist != null && dist <= 0
-
-  var w = new ListWidget()
-  w.backgroundColor = C_BG
-  w.url = SITE_URL
-  w.setPadding(14, 14, 14, 14)
-
-  // ── Label ──
-  var r1 = w.addStack()
-  r1.layoutHorizontally()
-  var lbl = r1.addText("WEIGHT — 30 DAYS")
-  lbl.font = Font.boldMonospacedSystemFont(8)
-  lbl.textColor = C_MUTED
-  w.addSpacer(6)
-
-  // ── Sparkline ── (only render if we have history)
-  var sparkImg = (d.history && d.history.length > 1) ? makeSparkline(d.history) : null
-  if (sparkImg) {
-    var spark = w.addImage(sparkImg)
-    spark.imageSize = new Size(160, 40)
-  }
-  w.addSpacer(6)
-
-  // ── Big weight ──
-  var num = w.addText(d.current != null ? Number(d.current).toFixed(1) : "--")
-  num.font = Font.boldSystemFont(28)
-  num.textColor = C_WHITE
-  num.minimumScaleFactor = 0.6
-
-  var unit = w.addText("kg")
-  unit.font = Font.mediumSystemFont(10)
-  unit.textColor = C_MUTED
-  w.addSpacer(4)
-
-  // ── Goal distance ──
-  if (dist != null) {
-    var arrow = trend === "down" ? "▼ " : trend === "up" ? "▲ " : "— "
-    var goalLine = atGoal
-      ? "Goal reached!"
-      : arrow + Math.abs(dist).toFixed(1) + " kg to goal"
-    var gl = w.addText(goalLine)
-    gl.font = Font.boldSystemFont(10)
-    gl.textColor = atGoal ? C_GREEN : (trend === "down" ? C_GREEN : C_UP)
-  }
-
-  return w
-}
-
-if (config.runsInWidget) {
-  var data = await fetchWeight()
-  Script.setWidget(makeWidget(data))
-} else {
-  Script.setWidget(makeWidget(loadCache()))
-}
-Script.complete()
-`
+      cal: "https://daemien-calories.vercel.app/CalorieWidget.js",
+      wt:  "https://daemien-calories.vercel.app/WeightWidget.js"
     };
 
     function copyWidget(key) {
@@ -1034,20 +503,22 @@ Script.complete()
         var h = new Date().getHours() + new Date().getMinutes()/60;
         var dayStart = 7, dayEnd = 23;
         var elapsed = Math.max(0, Math.min(h - dayStart, dayEnd - dayStart));
-        var pacePct = Math.round(elapsed / (dayEnd - dayStart) * 100);
-        var paceTarget = Math.round(goal * elapsed / (dayEnd - dayStart));
-        var bar = document.getElementById("paceBar");
-        var paceValEl = document.getElementById("paceVal");
-        var paceLblEl = document.getElementById("paceLabel");
-        var eatPct = Math.round(total / goal * 100);
-        if (bar) bar.style.width = pacePct + "%";
-        if (bar) bar.style.background = eatPct >= pacePct ? "var(--accent)" : "var(--orange)";
-        if (paceValEl) paceValEl.textContent = "Soll: " + paceTarget.toLocaleString("de-DE");
-        if (paceLblEl) {
-          var meals = ["","Frühstück","Brunch","Mittagessen","Snack","Abendessen","Abend"];
-          var slot = h < 9 ? "Frühstück" : h < 11 ? "Brunch" : h < 14 ? "Mittagessen" : h < 17 ? "Snack" : h < 20 ? "Abendessen" : "Spätmahlzeit";
-          paceLblEl.textContent = slot;
-        }
+        var paceFrac = elapsed / (dayEnd - dayStart);
+        var paceTarget = Math.round(goal * paceFrac);
+        var eatPct = Math.min(Math.round(total / goal * 100), 100);
+        // Green bar — actual progress
+        var bar = document.getElementById("progressBar");
+        if (bar) bar.style.width = eatPct + "%";
+        // Orange ghost bar — pace (0 → where you should be)
+        var ghost = document.getElementById("paceGhost");
+        if (ghost) ghost.style.width = Math.round(paceFrac * 100) + "%";
+        // Orange ghost arc on ring — pace position
+        var arc = document.getElementById("paceArc");
+        if (arc) arc.style.strokeDashoffset = (301 - paceFrac * 301).toFixed(1);
+        var pv = document.getElementById("paceVal");
+        if (pv) pv.textContent = "Soll: " + paceTarget.toLocaleString("de-DE");
+        var pl = document.getElementById("paceLabel");
+        if (pl) { var slot = h<9?"Frühstück":h<11?"Brunch":h<14?"Mittagessen":h<17?"Snack":h<20?"Abendessen":"Spätmahlzeit"; pl.textContent = slot; }
       })();
     }
 
