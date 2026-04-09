@@ -8,138 +8,197 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #fffbf5; /* dynamic via JS */ --surface: #ffffff; --border: #ece8e0;
-      --accent: #e85d00; --accent2: #c0392b; --text: #1c1410;
-      --muted: #9a8f85; --success: #2d7d2d; --up: #c0392b; --down: #2d7d2d;
+      --bg: #0f0f0f;
+      --card: #1a1a1a;
+      --card2: #222222;
+      --border: #2a2a2a;
+      --accent: #e85d00;
+      --accent2: #c0392b;
+      --text: #f0f0f0;
+      --muted: #666666;
+      --success: #4ade80;
+      --blue: #38bdf8;
+      --up: #e85d00;
+      --down: #4ade80;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace;
-      min-height: 100vh; display: flex; flex-direction: column; align-items: stretch;
-      padding: 0;
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: stretch; padding: 0;
     }
-    .page { display: none; width: 100%; flex-direction: column; align-items: stretch; padding: 16px 16px 48px; }
+    .page { display: none; width: 100%; flex-direction: column; align-items: stretch; padding: 20px 16px 60px; }
     .page.active { display: flex; }
-    header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 28px; padding-top: 8px; }
-    .logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--accent); }
-    .logo span { color: var(--text); }
-    .date-label { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
+    header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-top: 4px; }
+    .logo { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: var(--accent); }
+    .logo span { color: var(--text); opacity: 0.4; }
+    .date-label { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
     .nav-link {
-      margin-left: auto; font-size: 12px; color: var(--muted); text-decoration: none;
-      border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px;
+      margin-left: auto; font-size: 11px; color: var(--muted); text-decoration: none;
+      border: 1px solid var(--border); padding: 6px 14px; border-radius: 99px;
       transition: all 0.2s; cursor: pointer; background: none; font-family: 'DM Mono', monospace;
     }
     .nav-link:hover { border-color: var(--accent); color: var(--accent); }
-    .goal-ring-wrap {
-      display: flex; align-items: center; gap: 20px;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 20px; margin-bottom: 20px;
+
+    /* ── Calorie hero card ── */
+    .hero-card {
+      background: var(--card); border-radius: 20px; padding: 22px 20px 18px;
+      margin-bottom: 14px; position: relative; overflow: hidden;
     }
-    .ring-bg { fill: none; stroke: #ece8e0; stroke-width: 6; }
+    .hero-label { font-size: 10px; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 14px; text-transform: uppercase; }
+    .hero-main { display: flex; align-items: center; gap: 16px; }
+    .ring-wrap { position: relative; flex-shrink: 0; }
+    .ring-wrap svg { display: block; }
+    .ring-bg { fill: none; stroke: #2a2a2a; stroke-width: 8; }
     .ring-fill {
-      fill: none; stroke: var(--accent); stroke-width: 6; stroke-linecap: round;
+      fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round;
       stroke-dasharray: 220; stroke-dashoffset: 220;
       transform: rotate(-90deg); transform-origin: 50% 50%;
-      transition: stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: stroke-dashoffset 0.8s cubic-bezier(0.34,1.56,0.64,1);
     }
     .ring-fill.done { stroke: var(--success); }
-    .ring-total { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; line-height: 1; color: var(--accent); letter-spacing: -1px; }
-    .ring-total.done { color: var(--success); }
-    .ring-unit { font-size: 13px; color: var(--muted); margin-top: 2px; }
-    .ring-remaining { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.6; }
-    .ring-remaining strong { color: var(--text); }
+    .ring-pct {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; color: var(--text);
+    }
+    .hero-nums { flex: 1; }
+    .hero-total { font-family: 'Syne', sans-serif; font-size: 44px; font-weight: 800; letter-spacing: -2px; line-height: 1; color: var(--text); }
+    .hero-total.done { color: var(--success); }
+    .hero-of { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .hero-footer { display: flex; justify-content: space-between; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .hero-stat { display: flex; flex-direction: column; gap: 3px; }
+    .hero-stat-label { font-size: 9px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+    .hero-stat-val { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
+    .hero-stat-val.remaining { color: var(--accent); }
+    .hero-stat-val.done { color: var(--success); }
 
+    /* ── Entry form ── */
+    .entry-card { background: var(--card); border-radius: 20px; padding: 18px 16px; margin-bottom: 14px; }
     .field { display: flex; flex-direction: column; gap: 6px; }
-    label { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+    label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
     input[type="number"], input[type="text"] {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      background: var(--card2); border: 1px solid var(--border); border-radius: 10px;
       color: var(--text); font-family: 'DM Mono', monospace; font-size: 16px;
       padding: 14px 16px; width: 100%; outline: none; transition: border-color 0.2s; -webkit-appearance: none;
     }
     input:focus { border-color: var(--accent); }
-    .upload-zone {
-      border: 2px dashed var(--border); border-radius: 12px; padding: 32px 20px;
-      text-align: center; cursor: pointer; transition: all 0.2s; position: relative;
+    .cal-row { display: flex; align-items: flex-end; gap: 10px; }
+    .cam-btn {
+      flex-shrink: 0; width: 52px; height: 52px; border-radius: 10px;
+      background: var(--accent); color: #fff; border: none; font-size: 22px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: filter 0.2s;
     }
-    .upload-zone:hover, .upload-zone.dragover { border-color: var(--accent); background: #fff3eb; }
-    .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-    .upload-icon { font-size: 32px; margin-bottom: 8px; }
-    .upload-text { font-size: 13px; color: var(--muted); }
-    .upload-text strong { color: var(--accent); }
-    .preview-wrap { position: relative; border-radius: 12px; overflow: hidden; display: none; }
-    .preview-wrap.show { display: block; }
-    .preview-wrap img { width: 100%; max-height: 220px; object-fit: cover; display: block; border-radius: 12px; }
-    .preview-remove {
-      position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.55);
-      border: 1px solid var(--border); color: var(--text); border-radius: 8px;
-      padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: 'DM Mono', monospace;
-    }
+    .cam-btn:hover { filter: brightness(1.1); }
     .btn {
       background: var(--accent); color: #fff; border: none; border-radius: 12px;
-      padding: 16px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
-      cursor: pointer; width: 100%; letter-spacing: 0.02em; transition: all 0.2s; position: relative; overflow: hidden;
+      padding: 15px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+      cursor: pointer; width: 100%; letter-spacing: 0.02em; transition: all 0.15s;
+      position: relative; overflow: hidden;
     }
-    .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn:hover { filter: brightness(1.08); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
     .btn.loading::after {
       content: ''; position: absolute; inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
       animation: shimmer 1.2s infinite;
     }
-    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+    .gallery-link { text-align: center; margin-top: 10px; }
+    .gallery-link button { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; font-family: inherit; }
+
+    /* ── Photo ── */
+    .preview-wrap { display: none; border-radius: 14px; overflow: hidden; margin-bottom: 12px; }
+    .preview-wrap.show { display: block; }
+    .preview-wrap img { width: 100%; max-height: 200px; object-fit: cover; display: block; }
+    .preview-remove {
+      position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6);
+      border: none; color: #fff; border-radius: 8px; padding: 6px 10px;
+      font-size: 12px; cursor: pointer; font-family: 'DM Mono', monospace;
+    }
     .analyzing {
-      display: none; align-items: center; gap: 10px; background: var(--surface);
-      border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; font-size: 12px; color: var(--muted);
+      display: none; align-items: center; gap: 10px; background: var(--card2);
+      border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px;
+      font-size: 12px; color: var(--muted); margin-bottom: 12px;
     }
     .analyzing.show { display: flex; }
     .dot-pulse { display: flex; gap: 4px; }
     .dot-pulse span { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; animation: dpulse 1.2s infinite; }
     .dot-pulse span:nth-child(2) { animation-delay: 0.2s; }
     .dot-pulse span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes dpulse { 0%,80%,100%{ opacity:.2; transform:scale(.8); } 40%{ opacity:1; transform:scale(1); } }
-    .trend-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 24px; margin-bottom: 20px;
+    @keyframes dpulse { 0%,80%,100%{opacity:.2;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }
+
+    /* ── Log ── */
+    .log-section { margin-top: 6px; }
+    .log-header { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+    .log-empty { font-size: 12px; color: var(--muted); padding: 12px 0; text-align: center; }
+    .log-entry {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--card); border-radius: 12px; padding: 12px 14px; margin-bottom: 6px;
     }
-    .trend-label { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-    .trend-row { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 16px; }
-    .trend-current { font-family: 'Syne', sans-serif; font-size: 52px; font-weight: 800; letter-spacing: -2px; line-height: 1; color: var(--text); }
-    .trend-unit { font-size: 18px; color: var(--muted); margin-bottom: 8px; }
-    .trend-change { margin-left: auto; text-align: right; }
-    .trend-pct { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; }
-    .trend-pct.up { color: var(--up); } .trend-pct.down { color: var(--down); } .trend-pct.stable { color: var(--muted); }
-    .trend-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .sparkline { width: 100%; height: 48px; margin-top: 4px; }
+    .log-cal { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--accent); min-width: 52px; }
+    .log-desc { font-size: 12px; color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .log-time { font-size: 10px; color: var(--muted); min-width: 36px; text-align: right; }
+    .log-del { background: none; border: none; color: #333; cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 4px; transition: color 0.2s; flex-shrink: 0; }
+    .log-del:hover { color: var(--accent2); }
+
+    /* ── Weight page ── */
+    .weight-hero {
+      background: var(--card); border-radius: 20px; padding: 22px 20px 18px; margin-bottom: 14px;
+    }
+    .weight-hero-label { font-size: 10px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+    .sparkline { width: 100%; height: 52px; margin-bottom: 14px; }
+    .weight-main-row { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 14px; }
+    .weight-big { font-family: 'Syne', sans-serif; font-size: 52px; font-weight: 800; letter-spacing: -2px; line-height: 1; color: var(--text); }
+    .weight-unit { font-size: 16px; color: var(--muted); margin-bottom: 8px; }
+    .weight-change { margin-left: auto; text-align: right; }
+    .weight-pct { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; }
+    .weight-pct.up { color: var(--up); } .weight-pct.down { color: var(--down); } .weight-pct.stable { color: var(--muted); }
+    .weight-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .goal-bar-wrap { border-top: 1px solid var(--border); padding-top: 14px; margin-top: 4px; }
+    .goal-bar-labels { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .goal-bar-label-left { font-size: 12px; color: var(--text); font-weight: 500; }
+    .goal-bar-label-right { font-size: 11px; color: var(--muted); }
+    .goal-bar-track { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .goal-bar-fill { height: 100%; border-radius: 99px; background: var(--accent); transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); width: 0%; }
+    .goal-bar-fill.reached { background: var(--success); }
+    .goal-status { font-size: 11px; color: var(--muted); margin-top: 6px; text-align: right; }
     .weight-input {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      background: var(--card2); border: 1px solid var(--border); border-radius: 10px;
       color: var(--text); font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700;
       padding: 16px 20px; width: 100%; outline: none; transition: border-color 0.2s;
       -webkit-appearance: none; letter-spacing: -1px;
     }
     .weight-input:focus { border-color: var(--accent); }
+    .weight-form { display: flex; flex-direction: column; gap: 10px; }
+
+    /* ── Toast ── */
     .toast {
       position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px);
-      background: var(--surface); border: 1px solid var(--accent); color: var(--text);
-      padding: 14px 24px; border-radius: 12px; font-size: 13px;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 100; white-space: nowrap;
+      background: var(--card); border: 1px solid var(--border); color: var(--text);
+      padding: 12px 22px; border-radius: 12px; font-size: 13px;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); z-index: 100; white-space: nowrap;
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.error { border-color: var(--accent2); }
+
+    /* ── Install overlay ── */
     .install-overlay {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
       z-index: 200; align-items: center; justify-content: center; padding: 24px;
     }
     .install-overlay.open { display: flex; }
     .install-box {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
-      padding: 28px 24px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 14px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      padding: 24px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px;
     }
     .install-header { display: flex; align-items: center; justify-content: space-between; }
     .install-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; }
     .install-close { background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; padding: 0; }
     .install-note { font-size: 11px; color: var(--muted); line-height: 1.6; }
     .install-btn {
-      display: block; background: var(--accent); color: #000; text-decoration: none;
+      flex: 1; display: block; background: var(--accent); color: #fff; text-decoration: none;
       border-radius: 10px; padding: 13px 16px; text-align: center;
       font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
     }
@@ -150,44 +209,12 @@
     }
     .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
     .install-trigger {
-      position: fixed; bottom: 20px; right: 20px; background: none;
-      border: 1px solid var(--border); border-radius: 50%; width: 34px; height: 34px;
+      position: fixed; bottom: 20px; right: 20px; background: var(--card);
+      border: 1px solid var(--border); border-radius: 50%; width: 36px; height: 36px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; font-size: 15px; color: var(--muted); z-index: 100;
     }
-    .cal-row { display: flex; align-items: flex-end; gap: 10px; }
-    .cam-btn {
-      flex-shrink: 0; width: 52px; height: 52px; border-radius: 10px;
-      background: var(--accent); color: #fff; border: none; font-size: 22px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: filter 0.2s; margin-bottom: 0;
-    }
-    .cam-btn:hover { filter: brightness(1.1); }
-    .camera-cta {
-      border: 2px dashed var(--border); border-radius: 16px; padding: 36px 20px;
-      text-align: center; cursor: pointer; transition: all 0.2s;
-      background: #fff8f2;
-    }
-    .camera-cta:hover { border-color: var(--accent); background: #fff3eb; }
-    .camera-icon { font-size: 40px; margin-bottom: 8px; }
-    .camera-label { font-size: 14px; color: var(--accent); font-weight: 500; }
-    .goal-bar-wrap { margin-top: 16px; }
-    .goal-bar-labels { display: flex; justify-content: space-between; margin-bottom: 6px; }
-    .goal-bar-label-left { font-size: 12px; color: var(--text); font-weight: 500; }
-    .goal-bar-label-right { font-size: 11px; color: var(--muted); }
-    .goal-bar-track { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
-    .goal-bar-fill { height: 100%; border-radius: 99px; background: var(--accent); transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); width: 0%; }
-    .goal-bar-fill.reached { background: var(--success); }
-    .goal-status { font-size: 11px; color: var(--muted); margin-top: 6px; text-align: right; }
-    .log-section { margin-top: 24px; }
-    .log-header { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
-    .log-empty { font-size: 12px; color: var(--muted); padding: 16px 0; text-align: center; }
-    .log-entry { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 6px; }
-    .log-cal { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--accent); min-width: 52px; }
-    .log-desc { font-size: 12px; color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .log-time { font-size: 10px; color: var(--muted); min-width: 36px; text-align: right; }
-    .log-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 15px; padding: 2px 4px; border-radius: 4px; transition: color 0.2s; flex-shrink: 0; }
-    .log-del:hover { color: var(--accent2); }
+    .install-trigger:hover { border-color: var(--accent); color: var(--accent); }
   </style>
 </head>
 <body>
@@ -199,50 +226,61 @@
       <div class="date-label" id="dateLabel"></div>
       <button class="nav-link" onclick="navigate('weight')">Gewicht &#8594;</button>
     </header>
-    <div class="goal-ring-wrap">
-      <svg width="80" height="80" viewBox="0 0 80 80">
-        <circle class="ring-bg" cx="40" cy="40" r="35"/>
-        <circle class="ring-fill" id="ringFill" cx="40" cy="40" r="35"/>
-      </svg>
-      <div style="flex:1">
-        <div class="ring-total" id="ringTotal">0</div>
-        <div class="ring-unit">kcal heute</div>
-        <div style="margin-top:10px;display:flex;gap:16px;align-items:baseline;">
-          <div>
-            <div style="font-size:11px;color:var(--muted);letter-spacing:0.06em;">ZIEL</div>
-            <div style="font-family:Syne,sans-serif;font-size:18px;font-weight:700;color:var(--muted);">2.700</div>
-          </div>
-          <div>
-            <div style="font-size:11px;color:var(--muted);letter-spacing:0.06em;">NOCH</div>
-            <div style="font-family:Syne,sans-serif;font-size:18px;font-weight:700;color:var(--text);" id="ringRemaining">—</div>
-          </div>
+
+    <!-- Hero ring card -->
+    <div class="hero-card">
+      <div class="hero-label">Calories Today</div>
+      <div class="hero-main">
+        <div class="ring-wrap">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle class="ring-bg" cx="40" cy="40" r="35"/>
+            <circle class="ring-fill" id="ringFill" cx="40" cy="40" r="35"/>
+          </svg>
+          <div class="ring-pct" id="ringPct">0%</div>
+        </div>
+        <div class="hero-nums">
+          <div class="hero-total" id="ringTotal">0</div>
+          <div class="hero-of" id="heroOf">of 2.700 kcal</div>
+        </div>
+      </div>
+      <div class="hero-footer">
+        <div class="hero-stat">
+          <span class="hero-stat-label">Ziel</span>
+          <span class="hero-stat-val">2.700</span>
+        </div>
+        <div class="hero-stat" style="text-align:right">
+          <span class="hero-stat-label">Noch</span>
+          <span class="hero-stat-val remaining" id="ringRemaining">2.700</span>
         </div>
       </div>
     </div>
 
+    <!-- Entry form -->
     <input type="file" accept="image/*" capture="environment" id="fileInput" onchange="handleFile(this)" style="display:none">
     <input type="file" accept="image/*" id="galleryInput" onchange="handleFile(this)" style="display:none">
 
-    <div class="preview-wrap" id="previewWrap">
-      <img id="previewImg" src="" alt="">
-      <button class="preview-remove" onclick="removePhoto()">&#10005;</button>
+    <div style="position:relative">
+      <div class="preview-wrap" id="previewWrap">
+        <img id="previewImg" src="" alt="">
+        <button class="preview-remove" onclick="removePhoto()">&#10005;</button>
+      </div>
     </div>
 
-    <div id="entryForm">
+    <div class="entry-card" id="entryForm">
       <div class="cal-row">
         <div class="field" style="flex:1">
           <label>Kalorien (kcal)</label>
           <input type="number" id="manualCal" placeholder="z.B. 650" inputmode="numeric">
         </div>
-        <button class="cam-btn" onclick="document.getElementById('fileInput').click()" title="Kamera &#246;ffnen">&#128247;</button>
+        <button class="cam-btn" onclick="document.getElementById('fileInput').click()" title="Kamera">&#128247;</button>
       </div>
       <div class="field" style="margin-top:10px">
         <label>Beschreibung (optional)</label>
         <input type="text" id="manualDesc" placeholder="z.B. Pasta mit Tomatensauce">
       </div>
-      <button class="btn" id="manualBtn" style="margin-top:10px" onclick="submitManual()">Eintragen</button>
-      <div style="text-align:center;margin-top:10px">
-        <button onclick="document.getElementById('galleryInput').click()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;">&#128444; Aus Galerie w&#228;hlen</button>
+      <button class="btn" id="manualBtn" style="margin-top:12px" onclick="submitManual()">Eintragen</button>
+      <div class="gallery-link">
+        <button onclick="document.getElementById('galleryInput').click()">&#128444; Aus Galerie w&#228;hlen</button>
       </div>
     </div>
 
@@ -250,7 +288,7 @@
       <div class="dot-pulse"><span></span><span></span><span></span></div>
       Claude analysiert das Bild...
     </div>
-    <button class="btn" id="photoBtn" onclick="submitPhoto()" style="display:none;margin-top:10px">Kalorien sch&#228;tzen &amp; speichern</button>
+    <button class="btn" id="photoBtn" onclick="submitPhoto()" style="display:none;margin-bottom:14px">Kalorien sch&#228;tzen &amp; speichern</button>
 
     <div class="log-section">
       <div class="log-header">Heute gegessen</div>
@@ -264,18 +302,19 @@
       <div class="logo">weight<span>.</span></div>
       <button class="nav-link" onclick="navigate('calories')">&#8592; Kalorien</button>
     </header>
-    <div class="trend-card">
-      <div class="trend-row">
+    <div class="weight-hero">
+      <div class="weight-hero-label">Weight — 30 Days</div>
+      <svg class="sparkline" id="sparkline" viewBox="0 0 380 52" preserveAspectRatio="none"></svg>
+      <div class="weight-main-row">
         <div>
-          <div class="trend-current" id="trendCurrent">&#8212;</div>
-          <div class="trend-unit">kg aktuell</div>
+          <div class="weight-big" id="trendCurrent">&#8212;</div>
+          <div class="weight-unit">kg</div>
         </div>
-        <div class="trend-change">
-          <div class="trend-pct stable" id="trendPct">&#8212;</div>
-          <div class="trend-sub" id="trendSub">30 Tage</div>
+        <div class="weight-change">
+          <div class="weight-pct stable" id="trendPct">&#8212;</div>
+          <div class="weight-sub" id="trendSub">30 Tage</div>
         </div>
       </div>
-      <svg class="sparkline" id="sparkline" viewBox="0 0 380 48" preserveAspectRatio="none"></svg>
       <div class="goal-bar-wrap">
         <div class="goal-bar-labels">
           <span class="goal-bar-label-left" id="goalDistLabel">&#8212;</span>
@@ -287,7 +326,7 @@
         <div class="goal-status" id="goalStatus"></div>
       </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:12px;">
+    <div class="weight-form">
       <div class="field">
         <label>Aktuelles Gewicht (kg)</label>
         <input class="weight-input" type="number" id="weightInput" placeholder="78.5" step="0.1" inputmode="decimal">
@@ -318,6 +357,14 @@ var CAL_URL = "https://meshminds.app.n8n.cloud/webhook/log-calories"
 var SITE_URL = "https://daemien-calories.vercel.app/#calories"
 var GOAL = 2700
 
+var C_BG     = new Color("#111111")
+var C_CARD   = new Color("#1a1a1a")
+var C_ORANGE = new Color("#e85d00")
+var C_GREEN  = new Color("#4ade80")
+var C_WHITE  = new Color("#f0f0f0")
+var C_MUTED  = new Color("#666666")
+var C_TRACK  = new Color("#2a2a2a")
+
 async function getToday() {
   try {
     var r = new Request(CAL_URL)
@@ -333,110 +380,93 @@ async function getToday() {
 }
 
 function makeRing(pct, done) {
-  var s = 76
+  var s = 80
   var dc = new DrawContext()
   dc.size = new Size(s, s)
   dc.opaque = false
   dc.respectScreenScale = true
-  var cx = s/2, cy = s/2, r = 30, lw = 7
+  var cx = s/2, cy = s/2, r = 32, lw = 8
 
   // Track
   dc.setLineWidth(lw)
-  dc.setStrokeColor(new Color("#222222"))
+  dc.setStrokeColor(C_TRACK)
   dc.strokeEllipse(new Rect(cx-r, cy-r, r*2, r*2))
 
-  // Fill
+  // Arc
   var filled = Math.min(pct/100, 1)
   if (filled > 0) {
-    var steps = 80
-    var startA = -Math.PI/2
+    var steps = 80, startA = -Math.PI/2
     var sweep = filled * Math.PI * 2
     var arc = new Path()
     for (var i = 0; i <= steps; i++) {
-      var a = startA + (i/steps) * sweep
+      var a = startA + (i/steps)*sweep
       var pt = new Point(cx + r*Math.cos(a), cy + r*Math.sin(a))
-      if (i === 0) arc.move(pt)
-      else arc.addLine(pt)
+      if (i === 0) arc.move(pt); else arc.addLine(pt)
     }
     dc.addPath(arc)
     dc.setLineWidth(lw)
-    dc.setStrokeColor(new Color(done ? "#4ade80" : "#e85d00"))
+    dc.setStrokeColor(done ? C_GREEN : C_ORANGE)
     dc.strokePath()
   }
+
+  // Pct label inside ring
+  dc.setFont(Font.boldSystemFont(14))
+  dc.setTextColor(done ? C_GREEN : C_WHITE)
+  dc.drawTextInRect(Math.round(pct) + "%", new Rect(cx-20, cy-9, 40, 18))
+
   return dc.getImage()
 }
 
 async function build() {
   var data = await getToday()
-  var pct = Math.min(data.percentage, 100)
+  var pct  = Math.min(data.percentage, 100)
   var done = data.goalReached
+  var accent = done ? C_GREEN : C_ORANGE
 
   var w = new ListWidget()
-  w.backgroundColor = new Color("#0f0f0f")
+  w.backgroundColor = C_BG
   w.url = SITE_URL
   w.setPadding(14, 14, 14, 14)
 
-  // ── Row 1: label + status dot ──
-  var row1 = w.addStack()
-  row1.layoutHorizontally()
-  var lbl = row1.addText("KALORIEN")
+  // ── Label row ──
+  var r1 = w.addStack()
+  r1.layoutHorizontally()
+  var lbl = r1.addText("CALORIES TODAY")
   lbl.font = Font.boldMonospacedSystemFont(8)
-  lbl.textColor = new Color("#444444")
-  row1.addSpacer()
-  var dot = row1.addText(done ? "✓ Ziel" : pct + "%")
-  dot.font = Font.mediumMonospacedSystemFont(8)
-  dot.textColor = new Color(done ? "#4ade80" : "#555555")
+  lbl.textColor = C_MUTED
+  w.addSpacer(10)
 
-  w.addSpacer(8)
+  // ── Main row: ring left, numbers right ──
+  var r2 = w.addStack()
+  r2.layoutHorizontally()
+  r2.centerAlignContent()
 
-  // ── Row 2: big number + ring ──
-  var row2 = w.addStack()
-  row2.layoutHorizontally()
-  row2.centerAlignContent()
+  var ringImg = r2.addImage(makeRing(pct, done))
+  ringImg.imageSize = new Size(66, 66)
+  r2.addSpacer(12)
 
-  var numStack = row2.addStack()
-  numStack.layoutVertically()
+  var nums = r2.addStack()
+  nums.layoutVertically()
 
-  var num = numStack.addText(data.total.toLocaleString("de-DE"))
-  num.font = Font.boldSystemFont(32)
-  num.textColor = new Color(done ? "#4ade80" : "#ffffff")
-  num.minimumScaleFactor = 0.6
+  var bigNum = nums.addText(data.total.toLocaleString("de-DE"))
+  bigNum.font = Font.boldSystemFont(28)
+  bigNum.textColor = C_WHITE
+  bigNum.minimumScaleFactor = 0.6
 
-  var unit = numStack.addText("kcal heute")
-  unit.font = Font.mediumSystemFont(9)
-  unit.textColor = new Color("#444444")
+  nums.addSpacer(2)
 
-  row2.addSpacer()
-
-  var ringImg = row2.addImage(makeRing(pct, done))
-  ringImg.imageSize = new Size(56, 56)
+  var sub = nums.addText("of " + GOAL.toLocaleString("de-DE") + " kcal")
+  sub.font = Font.mediumSystemFont(9)
+  sub.textColor = C_MUTED
 
   w.addSpacer()
 
-  // ── Row 3: goal / remaining ──
-  var row3 = w.addStack()
-  row3.layoutHorizontally()
-
-  var goalStack = row3.addStack()
-  goalStack.layoutVertically()
-  var goalLbl = goalStack.addText("ZIEL")
-  goalLbl.font = Font.mediumMonospacedSystemFont(7)
-  goalLbl.textColor = new Color("#333333")
-  var goalVal = goalStack.addText(GOAL.toLocaleString("de-DE"))
-  goalVal.font = Font.boldMonospacedSystemFont(10)
-  goalVal.textColor = new Color("#555555")
-
-  row3.addSpacer()
-
-  var remStack = row3.addStack()
-  remStack.layoutVertically()
-  remStack.bottomAlignContent()
-  var remLbl = remStack.addText("NOCH")
-  remLbl.font = Font.mediumMonospacedSystemFont(7)
-  remLbl.textColor = new Color("#333333")
-  var remVal = remStack.addText(done ? "—" : data.remaining.toLocaleString("de-DE"))
-  remVal.font = Font.boldMonospacedSystemFont(10)
-  remVal.textColor = new Color(done ? "#4ade80" : "#e85d00")
+  // ── Bottom: remaining ──
+  var r3 = w.addStack()
+  r3.layoutHorizontally()
+  var remTxt = r3.addText(done ? "Goal reached!" : data.remaining.toLocaleString("de-DE") + " kcal to go")
+  remTxt.font = Font.mediumSystemFont(10)
+  remTxt.textColor = done ? C_GREEN : C_MUTED
 
   return w
 }
@@ -487,16 +517,18 @@ Script.complete()
       var fill = document.getElementById('ringFill')
       var totalEl = document.getElementById('ringTotal')
       var rem = document.getElementById('ringRemaining')
+      var pctEl = document.getElementById('ringPct')
       fill.style.strokeDashoffset = 220 - pct * 220
       totalEl.textContent = total.toLocaleString('de-DE')
+      if (pctEl) pctEl.textContent = Math.round(pct * 100) + '%'
       if (total >= GOAL) {
         fill.classList.add('done'); totalEl.classList.add('done')
         rem.textContent = 'Erreicht!'
-        rem.style.color = 'var(--success)'
+        rem.classList.add('done')
       } else {
         fill.classList.remove('done'); totalEl.classList.remove('done')
         rem.textContent = (GOAL - total).toLocaleString('de-DE')
-        rem.style.color = 'var(--text)'
+        rem.classList.remove('done')
       }
     }
 
@@ -530,8 +562,6 @@ Script.complete()
       r.style.setProperty('--success', progress >= 1 ? success : accent)
     }
 
-    // Init theme immediately based on time, will update once data loads
-    updateTheme(0, 2700)
 
     async function loadToday() {
       try {
@@ -668,7 +698,7 @@ Script.complete()
         return [(i / (points.length - 1)) * (W - P*2) + P, H - ((v - min) / range) * (H - P*2) - P]
       })
       var path = coords.map(function(c, i) { return (i === 0 ? 'M' : 'L') + c[0] + ',' + c[1] }).join(' ')
-      var color = points[points.length-1] > points[0] ? '#ff6b35' : '#4ade80'
+      var color = points[points.length-1] > points[0] ? '#e85d00' : '#4ade80'
       var last = coords[coords.length-1]
       svg.innerHTML = '<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="' + color + '" stop-opacity="0.25"/><stop offset="100%" stop-color="' + color + '" stop-opacity="0"/></linearGradient></defs>'
         + '<path d="' + path + ' L' + last[0] + ',' + H + ' L' + coords[0][0] + ',' + H + ' Z" fill="url(#sg)"/>'
