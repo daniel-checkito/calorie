@@ -8,19 +8,19 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0a0a0a; --surface: #111111; --border: #1e1e1e;
-      --accent: #c8f55a; --accent2: #ff6b35; --text: #f0f0f0;
-      --muted: #555; --success: #4ade80; --up: #ff6b35; --down: #4ade80;
+      --bg: #fffbf5; /* dynamic via JS */ --surface: #ffffff; --border: #ece8e0;
+      --accent: #e85d00; --accent2: #c0392b; --text: #1c1410;
+      --muted: #9a8f85; --success: #2d7d2d; --up: #c0392b; --down: #2d7d2d;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace;
-      min-height: 100vh; display: flex; flex-direction: column; align-items: center;
-      padding: 24px 16px 48px;
+      min-height: 100vh; display: flex; flex-direction: column; align-items: stretch;
+      padding: 0;
     }
-    .page { display: none; width: 100%; max-width: 420px; flex-direction: column; align-items: center; }
+    .page { display: none; width: 100%; flex-direction: column; align-items: stretch; padding: 16px 16px 48px; }
     .page.active { display: flex; }
-    header { width: 100%; display: flex; align-items: baseline; gap: 12px; margin-bottom: 32px; padding-top: 8px; }
+    header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 28px; padding-top: 8px; }
     .logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--accent); }
     .logo span { color: var(--text); }
     .date-label { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
@@ -31,11 +31,11 @@
     }
     .nav-link:hover { border-color: var(--accent); color: var(--accent); }
     .goal-ring-wrap {
-      width: 100%; display: flex; align-items: center; gap: 24px;
+      display: flex; align-items: center; gap: 20px;
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 20px 24px; margin-bottom: 24px;
+      border-radius: 16px; padding: 20px; margin-bottom: 20px;
     }
-    .ring-bg { fill: none; stroke: #1e1e1e; stroke-width: 6; }
+    .ring-bg { fill: none; stroke: #ece8e0; stroke-width: 6; }
     .ring-fill {
       fill: none; stroke: var(--accent); stroke-width: 6; stroke-linecap: round;
       stroke-dasharray: 220; stroke-dashoffset: 220;
@@ -48,17 +48,7 @@
     .ring-unit { font-size: 13px; color: var(--muted); margin-top: 2px; }
     .ring-remaining { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.6; }
     .ring-remaining strong { color: var(--text); }
-    .tabs {
-      width: 100%; display: flex; gap: 4px; background: var(--surface);
-      border: 1px solid var(--border); border-radius: 12px; padding: 4px; margin-bottom: 20px;
-    }
-    .tab {
-      flex: 1; padding: 10px; border-radius: 8px; border: none; background: transparent;
-      color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; transition: all 0.2s;
-    }
-    .tab.active { background: var(--accent); color: #000; font-weight: 500; }
-    .panel { width: 100%; display: none; flex-direction: column; gap: 12px; }
-    .panel.active { display: flex; }
+
     .field { display: flex; flex-direction: column; gap: 6px; }
     label { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
     input[type="number"], input[type="text"] {
@@ -71,7 +61,7 @@
       border: 2px dashed var(--border); border-radius: 12px; padding: 32px 20px;
       text-align: center; cursor: pointer; transition: all 0.2s; position: relative;
     }
-    .upload-zone:hover, .upload-zone.dragover { border-color: var(--accent); background: rgba(200,245,90,0.04); }
+    .upload-zone:hover, .upload-zone.dragover { border-color: var(--accent); background: #fff3eb; }
     .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
     .upload-icon { font-size: 32px; margin-bottom: 8px; }
     .upload-text { font-size: 13px; color: var(--muted); }
@@ -80,12 +70,12 @@
     .preview-wrap.show { display: block; }
     .preview-wrap img { width: 100%; max-height: 220px; object-fit: cover; display: block; border-radius: 12px; }
     .preview-remove {
-      position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7);
+      position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.55);
       border: 1px solid var(--border); color: var(--text); border-radius: 8px;
       padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: 'DM Mono', monospace;
     }
     .btn {
-      background: var(--accent); color: #000; border: none; border-radius: 12px;
+      background: var(--accent); color: #fff; border: none; border-radius: 12px;
       padding: 16px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
       cursor: pointer; width: 100%; letter-spacing: 0.02em; transition: all 0.2s; position: relative; overflow: hidden;
     }
@@ -108,7 +98,7 @@
     .dot-pulse span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes dpulse { 0%,80%,100%{ opacity:.2; transform:scale(.8); } 40%{ opacity:1; transform:scale(1); } }
     .trend-card {
-      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      background: var(--surface); border: 1px solid var(--border);
       border-radius: 16px; padding: 24px; margin-bottom: 20px;
     }
     .trend-label { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
@@ -136,36 +126,62 @@
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.error { border-color: var(--accent2); }
     .install-overlay {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
       z-index: 200; align-items: center; justify-content: center; padding: 24px;
     }
     .install-overlay.open { display: flex; }
     .install-box {
-      background: #111; border: 1px solid #1e1e1e; border-radius: 20px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
       padding: 28px 24px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 14px;
     }
     .install-header { display: flex; align-items: center; justify-content: space-between; }
     .install-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; }
-    .install-close { background: none; border: none; color: #444; font-size: 22px; cursor: pointer; line-height: 1; padding: 0; }
-    .install-note { font-size: 11px; color: #444; line-height: 1.6; }
-    .install-row { display: flex; gap: 8px; align-items: stretch; }
+    .install-close { background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; padding: 0; }
+    .install-note { font-size: 11px; color: var(--muted); line-height: 1.6; }
     .install-btn {
-      flex: 1; display: block; background: var(--accent); color: #000; text-decoration: none;
+      display: block; background: var(--accent); color: #000; text-decoration: none;
       border-radius: 10px; padding: 13px 16px; text-align: center;
       font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
     }
-    .copy-btn {
-      background: none; border: 1px solid #1e1e1e; color: #555; border-radius: 10px;
-      padding: 13px 14px; font-family: 'DM Mono', monospace; font-size: 11px;
-      cursor: pointer; white-space: nowrap; transition: all 0.2s;
-    }
-    .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
     .install-trigger {
       position: fixed; bottom: 20px; right: 20px; background: none;
-      border: 1px solid #1e1e1e; border-radius: 50%; width: 34px; height: 34px;
+      border: 1px solid var(--border); border-radius: 50%; width: 34px; height: 34px;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 15px; color: #252525; z-index: 100;
+      cursor: pointer; font-size: 15px; color: var(--muted); z-index: 100;
     }
+    .cal-row { display: flex; align-items: flex-end; gap: 10px; }
+    .cam-btn {
+      flex-shrink: 0; width: 52px; height: 52px; border-radius: 10px;
+      background: var(--accent); color: #fff; border: none; font-size: 22px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: filter 0.2s; margin-bottom: 0;
+    }
+    .cam-btn:hover { filter: brightness(1.1); }
+    .camera-cta {
+      border: 2px dashed var(--border); border-radius: 16px; padding: 36px 20px;
+      text-align: center; cursor: pointer; transition: all 0.2s;
+      background: #fff8f2;
+    }
+    .camera-cta:hover { border-color: var(--accent); background: #fff3eb; }
+    .camera-icon { font-size: 40px; margin-bottom: 8px; }
+    .camera-label { font-size: 14px; color: var(--accent); font-weight: 500; }
+    .goal-bar-wrap { margin-top: 16px; }
+    .goal-bar-labels { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .goal-bar-label-left { font-size: 12px; color: var(--text); font-weight: 500; }
+    .goal-bar-label-right { font-size: 11px; color: var(--muted); }
+    .goal-bar-track { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .goal-bar-fill { height: 100%; border-radius: 99px; background: var(--accent); transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); width: 0%; }
+    .goal-bar-fill.reached { background: var(--success); }
+    .goal-status { font-size: 11px; color: var(--muted); margin-top: 6px; text-align: right; }
+    .log-section { margin-top: 24px; }
+    .log-header { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+    .log-empty { font-size: 12px; color: var(--muted); padding: 16px 0; text-align: center; }
+    .log-entry { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 6px; }
+    .log-cal { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--accent); min-width: 52px; }
+    .log-desc { font-size: 12px; color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .log-time { font-size: 10px; color: var(--muted); min-width: 36px; text-align: right; }
+    .log-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 15px; padding: 2px 4px; border-radius: 4px; transition: color 0.2s; flex-shrink: 0; }
+    .log-del:hover { color: var(--accent2); }
   </style>
 </head>
 <body>
@@ -173,7 +189,7 @@
   <!-- CALORIES PAGE -->
   <div class="page" id="page-calories">
     <header>
-      <div class="logo">health<span>.</span></div>
+      <div class="logo">calories<span>.</span></div>
       <div class="date-label" id="dateLabel"></div>
       <button class="nav-link" onclick="navigate('weight')">Gewicht &#8594;</button>
     </header>
@@ -182,42 +198,57 @@
         <circle class="ring-bg" cx="40" cy="40" r="35"/>
         <circle class="ring-fill" id="ringFill" cx="40" cy="40" r="35"/>
       </svg>
-      <div>
+      <div style="flex:1">
         <div class="ring-total" id="ringTotal">0</div>
         <div class="ring-unit">kcal heute</div>
-        <div class="ring-remaining" id="ringRemaining">Lade...</div>
+        <div style="margin-top:10px;display:flex;gap:16px;align-items:baseline;">
+          <div>
+            <div style="font-size:11px;color:var(--muted);letter-spacing:0.06em;">ZIEL</div>
+            <div style="font-family:Syne,sans-serif;font-size:18px;font-weight:700;color:var(--muted);">2.700</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);letter-spacing:0.06em;">NOCH</div>
+            <div style="font-family:Syne,sans-serif;font-size:18px;font-weight:700;color:var(--text);" id="ringRemaining">—</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('manual')">Manuell</button>
-      <button class="tab" onclick="switchTab('photo')">Foto</button>
+
+    <input type="file" accept="image/*" capture="environment" id="fileInput" onchange="handleFile(this)" style="display:none">
+    <input type="file" accept="image/*" id="galleryInput" onchange="handleFile(this)" style="display:none">
+
+    <div class="preview-wrap" id="previewWrap">
+      <img id="previewImg" src="" alt="">
+      <button class="preview-remove" onclick="removePhoto()">&#10005;</button>
     </div>
-    <div class="panel active" id="panel-manual">
-      <div class="field">
-        <label>Kalorien (kcal)</label>
-        <input type="number" id="manualCal" placeholder="z.B. 650" inputmode="numeric">
+
+    <div id="entryForm">
+      <div class="cal-row">
+        <div class="field" style="flex:1">
+          <label>Kalorien (kcal)</label>
+          <input type="number" id="manualCal" placeholder="z.B. 650" inputmode="numeric">
+        </div>
+        <button class="cam-btn" onclick="document.getElementById('fileInput').click()" title="Kamera &#246;ffnen">&#128247;</button>
       </div>
-      <div class="field">
+      <div class="field" style="margin-top:10px">
         <label>Beschreibung (optional)</label>
         <input type="text" id="manualDesc" placeholder="z.B. Pasta mit Tomatensauce">
       </div>
-      <button class="btn" id="manualBtn" onclick="submitManual()">Eintragen</button>
+      <button class="btn" id="manualBtn" style="margin-top:10px" onclick="submitManual()">Eintragen</button>
+      <div style="text-align:center;margin-top:10px">
+        <button onclick="document.getElementById('galleryInput').click()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;">&#128444; Aus Galerie w&#228;hlen</button>
+      </div>
     </div>
-    <div class="panel" id="panel-photo">
-      <div class="upload-zone" id="uploadZone">
-        <input type="file" accept="image/*" capture="environment" id="fileInput" onchange="handleFile(this)">
-        <div class="upload-icon">&#128248;</div>
-        <div class="upload-text"><strong>Foto ausw&#228;hlen</strong><br>oder Kamera &#246;ffnen</div>
-      </div>
-      <div class="preview-wrap" id="previewWrap">
-        <img id="previewImg" src="" alt="">
-        <button class="preview-remove" onclick="removePhoto()">&#10005;</button>
-      </div>
-      <div class="analyzing" id="analyzing">
-        <div class="dot-pulse"><span></span><span></span><span></span></div>
-        Claude analysiert das Bild...
-      </div>
-      <button class="btn" id="photoBtn" onclick="submitPhoto()" disabled>Kalorien sch&#228;tzen &amp; speichern</button>
+
+    <div class="analyzing" id="analyzing">
+      <div class="dot-pulse"><span></span><span></span><span></span></div>
+      Claude analysiert das Bild...
+    </div>
+    <button class="btn" id="photoBtn" onclick="submitPhoto()" style="display:none;margin-top:10px">Kalorien sch&#228;tzen &amp; speichern</button>
+
+    <div class="log-section">
+      <div class="log-header">Heute gegessen</div>
+      <div id="logList"><div class="log-empty">Noch nichts eingetragen</div></div>
     </div>
   </div>
 
@@ -228,11 +259,10 @@
       <button class="nav-link" onclick="navigate('calories')">&#8592; Kalorien</button>
     </header>
     <div class="trend-card">
-      <div class="trend-label">30-Tage Trend</div>
       <div class="trend-row">
         <div>
           <div class="trend-current" id="trendCurrent">&#8212;</div>
-          <div class="trend-unit">kg</div>
+          <div class="trend-unit">kg aktuell</div>
         </div>
         <div class="trend-change">
           <div class="trend-pct stable" id="trendPct">&#8212;</div>
@@ -240,8 +270,18 @@
         </div>
       </div>
       <svg class="sparkline" id="sparkline" viewBox="0 0 380 48" preserveAspectRatio="none"></svg>
+      <div class="goal-bar-wrap">
+        <div class="goal-bar-labels">
+          <span class="goal-bar-label-left" id="goalDistLabel">&#8212;</span>
+          <span class="goal-bar-label-right">Ziel: 85 kg</span>
+        </div>
+        <div class="goal-bar-track">
+          <div class="goal-bar-fill" id="goalBarFill"></div>
+        </div>
+        <div class="goal-status" id="goalStatus"></div>
+      </div>
     </div>
-    <div style="width:100%;display:flex;flex-direction:column;gap:12px;">
+    <div style="display:flex;flex-direction:column;gap:12px;">
       <div class="field">
         <label>Aktuelles Gewicht (kg)</label>
         <input class="weight-input" type="number" id="weightInput" placeholder="78.5" step="0.1" inputmode="decimal">
@@ -259,15 +299,9 @@
         <span class="install-title">Widgets installieren</span>
         <button class="install-close" onclick="toggleInstall()">&#215;</button>
       </div>
-      <p class="install-note">Scriptable muss installiert sein. Tippe auf &#8222;Installieren&#8220; &#8212; oder kopiere den Code manuell und f&#252;ge ihn in Scriptable ein.</p>
-      <div class="install-row">
-        <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FCalorieWidget.js&name=CalorieWidget">Kalorien Widget</a>
-        <button class="copy-btn" onclick="copyWidget('CalorieWidget')">&#10697; Code</button>
-      </div>
-      <div class="install-row">
-        <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FWeightWidget.js&name=WeightWidget">Gewicht Widget</a>
-        <button class="copy-btn" onclick="copyWidget('WeightWidget')">&#10697; Code</button>
-      </div>
+      <p class="install-note">Scriptable muss installiert sein. Tippe auf einen Button &#8212; das Widget installiert sich direkt, kein Copy-Paste.</p>
+      <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FCalorieWidget.js&name=CalorieWidget">Kalorien Widget</a>
+      <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FWeightWidget.js&name=WeightWidget">Gewicht Widget</a>
     </div>
   </div>
   <button class="install-trigger" onclick="toggleInstall()" title="Widgets installieren">&#8984;</button>
@@ -281,296 +315,6 @@
       document.getElementById('installOverlay').classList.toggle('open')
     }
 
-    var WIDGET_CODES = {
-      CalorieWidget: `// Calorie Widget - Health Tracker
-var CAL_URL = "https://meshminds.app.n8n.cloud/webhook/log-calories"
-var SITE_URL = "https://daemien-calories.vercel.app/#calories"
-var GOAL = 2700
-var DAY_START = 7
-var DAY_END   = 22
-
-async function getToday() {
-  try {
-    var r = new Request(CAL_URL)
-    r.method = "POST"
-    r.headers = {"Content-Type": "application/json"}
-    r.body = JSON.stringify({type: "status"})
-    r.timeoutInterval = 8
-    var d = await r.loadJSON()
-    return {total: d.total||0, remaining: d.remaining||GOAL, percentage: d.percentage||0, goalReached: d.goalReached||false}
-  } catch(e) {
-    return {total: 0, remaining: GOAL, percentage: 0, goalReached: false}
-  }
-}
-
-function getPace(total) {
-  var now = new Date()
-  var h = now.getHours() + now.getMinutes() / 60
-  var dayLen = DAY_END - DAY_START
-  var elapsed = Math.max(0, Math.min(h - DAY_START, dayLen))
-  var paceTarget = Math.round(GOAL * elapsed / dayLen)
-  var gap = total - paceTarget
-  var label
-  if (h < 9)        label = "Frühstück"
-  else if (h < 11)  label = "Frühstück"
-  else if (h < 14)  label = "Mittagessen"
-  else if (h < 17)  label = "Snack Zeit"
-  else if (h < 20)  label = "Abendessen"
-  else              label = "Letzter Snack"
-  return {paceTarget: paceTarget, gap: gap, label: label}
-}
-
-function makeDonut(pct, done) {
-  var s = 120
-  var dc = new DrawContext()
-  dc.size = new Size(s, s)
-  dc.opaque = false
-  dc.respectScreenScale = true
-  var cx = s / 2, cy = s / 2, r = 44, lw = 11
-
-  dc.setLineWidth(lw)
-  dc.setStrokeColor(new Color("#1e1e1e"))
-  dc.strokeEllipse(new Rect(cx - r, cy - r, r * 2, r * 2))
-
-  var filled = Math.min(pct / 100, 1)
-  if (filled > 0) {
-    var steps = 60
-    var startA = -Math.PI / 2
-    var sweep = filled * Math.PI * 2
-    var arc = new Path()
-    for (var i = 0; i <= steps; i++) {
-      var a = startA + (i / steps) * sweep
-      var pt = new Point(cx + r * Math.cos(a), cy + r * Math.sin(a))
-      if (i === 0) arc.move(pt)
-      else arc.addLine(pt)
-    }
-    dc.addPath(arc)
-    dc.setLineWidth(lw)
-    dc.setStrokeColor(new Color(done ? "#4ade80" : "#c8f55a"))
-    dc.strokePath()
-  }
-
-  return dc.getImage()
-}
-
-async function build() {
-  var data = await getToday()
-  var pct  = Math.min(data.percentage, 100)
-  var done = data.goalReached
-  var pace = getPace(data.total)
-  var gap  = pace.gap
-  var ahead = gap >= 0
-  var gapStr = (ahead ? "+" : "") + gap.toLocaleString("de-DE")
-  var gapColor = done ? "#4ade80" : ahead ? "#4ade80" : "#c8f55a"
-
-  var w = new ListWidget()
-  w.backgroundColor = new Color("#0a0a0a")
-  w.url = SITE_URL
-  w.setPadding(12, 14, 12, 14)
-
-  var top = w.addStack()
-  top.layoutHorizontally()
-  top.centerAlignContent()
-  var lbl = top.addText("KCAL")
-  lbl.font = Font.boldMonospacedSystemFont(9)
-  lbl.textColor = new Color("#555555")
-  top.addSpacer()
-  var mealTxt = top.addText(pace.label)
-  mealTxt.font = Font.mediumSystemFont(9)
-  mealTxt.textColor = new Color("#555555")
-  mealTxt.lineLimit = 1
-
-  w.addSpacer(2)
-
-  var mid = w.addStack()
-  mid.layoutHorizontally()
-  mid.centerAlignContent()
-
-  var donutStack = mid.addStack()
-  donutStack.layoutVertically()
-  donutStack.centerAlignContent()
-  var donutImg = donutStack.addImage(makeDonut(pct, done))
-  donutImg.imageSize = new Size(72, 72)
-
-  mid.addSpacer(10)
-
-  var numStack = mid.addStack()
-  numStack.layoutVertically()
-
-  var num = numStack.addText(data.total.toLocaleString("de-DE"))
-  num.font = Font.boldSystemFont(26)
-  num.textColor = new Color(done ? "#4ade80" : "#f0f0f0")
-  num.minimumScaleFactor = 0.7
-
-  numStack.addSpacer(2)
-
-  var div = numStack.addText("────────")
-  div.font = Font.mediumMonospacedSystemFont(7)
-  div.textColor = new Color("#222222")
-
-  numStack.addSpacer(2)
-
-  var tgtRow = numStack.addStack()
-  tgtRow.layoutHorizontally()
-  tgtRow.centerAlignContent()
-  var tgtLbl = tgtRow.addText("ziel ")
-  tgtLbl.font = Font.mediumMonospacedSystemFont(8)
-  tgtLbl.textColor = new Color("#444444")
-  var tgtVal = tgtRow.addText(pace.paceTarget.toLocaleString("de-DE"))
-  tgtVal.font = Font.boldMonospacedSystemFont(8)
-  tgtVal.textColor = new Color("#666666")
-
-  numStack.addSpacer(3)
-
-  var gapTxt = numStack.addText(done ? "Ziel erreicht!" : gapStr)
-  gapTxt.font = Font.boldSystemFont(13)
-  gapTxt.textColor = new Color(gapColor)
-  gapTxt.minimumScaleFactor = 0.7
-
-  w.addSpacer()
-
-  if (!done) {
-    var bot = w.addStack()
-    bot.layoutHorizontally()
-    var remLbl = bot.addText("noch ")
-    remLbl.font = Font.mediumMonospacedSystemFont(9)
-    remLbl.textColor = new Color("#444444")
-    var remVal = bot.addText(data.remaining.toLocaleString("de-DE") + " kcal")
-    remVal.font = Font.boldMonospacedSystemFont(9)
-    remVal.textColor = new Color("#555555")
-  }
-
-  return w
-}
-
-var widget = await build()
-if (config.runsInWidget) { Script.setWidget(widget) } else { widget.presentSmall() }
-Script.complete()`,
-
-      WeightWidget: `// Weight Widget - Health Tracker
-var WT_URL = "https://meshminds.app.n8n.cloud/webhook/log-weight"
-var SITE_URL = "https://daemien-calories.vercel.app/#weight"
-var C_BG = new Color("#0a0a0a")
-var C_UP = new Color("#ff6b35")
-var C_DOWN = new Color("#4ade80")
-var C_MUTED = new Color("#555555")
-var C_WHITE = new Color("#f0f0f0")
-
-function loadCache() {
-  try {
-    if (Keychain.contains("ht_weight")) return JSON.parse(Keychain.get("ht_weight"))
-  } catch(e) {}
-  return {current: null, change: 0, changePercent: 0, trend: "stable"}
-}
-
-function saveCache(d) {
-  try { Keychain.set("ht_weight", JSON.stringify(d)) } catch(e) {}
-}
-
-async function fetchLatestWeight() {
-  try {
-    var r = new Request(WT_URL)
-    r.method = "POST"
-    r.headers = {"Content-Type": "application/json"}
-    r.body = JSON.stringify({type: "status"})
-    r.timeoutInterval = 8
-    var d = await r.loadJSON()
-    if (d && d.current != null) {
-      var data = {current: d.current, change: d.change||0, changePercent: d.changePercent||0, trend: d.trend||"stable"}
-      saveCache(data)
-      return data
-    }
-  } catch(e) {}
-  return loadCache()
-}
-
-function makeWidget(d) {
-  var trend = d.trend || "stable"
-  var tc = trend === "up" ? C_UP : trend === "down" ? C_DOWN : C_MUTED
-  var arrow = trend === "up" ? "↑" : trend === "down" ? "↓" : "—"
-  var w = new ListWidget()
-  w.backgroundColor = C_BG
-  w.url = SITE_URL
-  w.setPadding(14, 14, 14, 14)
-
-  var top = w.addStack()
-  top.layoutHorizontally()
-  top.centerAlignContent()
-  var lbl = top.addText("GEWICHT")
-  lbl.font = Font.boldMonospacedSystemFont(9)
-  lbl.textColor = C_MUTED
-  top.addSpacer()
-  var arr = top.addText(arrow)
-  arr.font = Font.boldSystemFont(10)
-  arr.textColor = tc
-
-  w.addSpacer(6)
-
-  var num = w.addText(d.current != null ? Number(d.current).toFixed(1) : "--")
-  num.font = Font.boldSystemFont(30)
-  num.textColor = C_WHITE
-  num.minimumScaleFactor = 0.6
-
-  var unit = w.addText("kg")
-  unit.font = Font.mediumSystemFont(11)
-  unit.textColor = C_MUTED
-
-  w.addSpacer()
-
-  var hint = w.addText("Tippen zum Eintragen")
-  hint.font = Font.mediumSystemFont(8)
-  hint.textColor = C_MUTED
-
-  w.addSpacer(4)
-
-  var bot = w.addStack()
-  bot.layoutHorizontally()
-  bot.centerAlignContent()
-  var ch = Number(d.change||0)
-  var pc = Number(d.changePercent||0)
-  var ct = bot.addText((ch>=0?"+":"")+ch.toFixed(1)+" kg")
-  ct.font = Font.mediumMonospacedSystemFont(10)
-  ct.textColor = tc
-  bot.addSpacer()
-  var pt = bot.addText((pc>=0?"+":"")+pc.toFixed(1)+"%")
-  pt.font = Font.boldMonospacedSystemFont(9)
-  pt.textColor = tc
-
-  return w
-}
-
-if (config.runsInWidget) {
-  var data = await fetchLatestWeight()
-  Script.setWidget(makeWidget(data))
-} else {
-  await makeWidget(loadCache()).presentSmall()
-}
-Script.complete()`
-    }
-
-    function copyWidget(name) {
-      var code = WIDGET_CODES[name]
-      if (!code) return
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(code)
-          .then(function() { showToast(name + ' Code kopiert!') })
-          .catch(function() { fallbackCopy(code, name) })
-        return
-      }
-      fallbackCopy(code, name)
-    }
-
-    function fallbackCopy(text, name) {
-      var ta = document.createElement('textarea')
-      ta.value = text
-      ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0'
-      document.body.appendChild(ta)
-      ta.focus(); ta.select()
-      try { document.execCommand('copy'); showToast(name + ' Code kopiert!') }
-      catch(e) { showToast('Kopieren fehlgeschlagen', true) }
-      document.body.removeChild(ta)
-    }
-
     function navigate(page) {
       document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active') })
       document.getElementById('page-' + page).classList.add('active')
@@ -582,6 +326,10 @@ Script.complete()`
       var hash = window.location.hash.replace('#', '') || 'calories'
       document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active') })
       document.getElementById('page-' + (hash === 'weight' ? 'weight' : 'calories')).classList.add('active')
+      if (hash === 'camera') {
+        switchTab('photo')
+        setTimeout(function() { document.getElementById('fileInput').click() }, 300)
+      }
     }
 
     window.addEventListener('hashchange', initRoute)
@@ -600,12 +348,47 @@ Script.complete()`
       totalEl.textContent = total.toLocaleString('de-DE')
       if (total >= GOAL) {
         fill.classList.add('done'); totalEl.classList.add('done')
-        rem.textContent = 'Tagesziel erreicht!'
+        rem.textContent = 'Erreicht!'
+        rem.style.color = 'var(--success)'
       } else {
         fill.classList.remove('done'); totalEl.classList.remove('done')
-        rem.innerHTML = 'Noch <strong>' + (GOAL - total).toLocaleString('de-DE') + ' kcal</strong> bis Ziel'
+        rem.textContent = (GOAL - total).toLocaleString('de-DE')
+        rem.style.color = 'var(--text)'
       }
     }
+
+
+    function updateTheme(total, goal) {
+      // Progress 0..1 based on calories logged vs goal
+      var progress = Math.min(1, (total || 0) / (goal || 2700))
+      // Time-of-day factor: how far through the eating day are we (07:00–22:00)
+      var now = new Date()
+      var h = now.getHours() + now.getMinutes() / 60
+      var timeFactor = Math.max(0, Math.min(1, (h - 7) / 15))
+      // Blend: start red-ish, go green as progress increases
+      // bg: interpolate from warm red-tinted to warm green-tinted
+      // At 0%: hue ~15 (orange-red warm), at 100%: hue ~120 (green)
+      var hue = Math.round(15 + progress * 105)
+      var sat = Math.round(60 + progress * 20)
+      var bgL = 97  // keep it light
+      var surfL = 100
+      // accent: orange at 0%, green at 100%
+      var accentHue = Math.round(20 + progress * 110)
+      var bg = 'hsl(' + hue + ',' + sat + '%,' + bgL + '%)'
+      var surface = 'hsl(' + hue + ',20%,' + surfL + '%)'
+      var border = 'hsl(' + hue + ',25%,88%)'
+      var accent = 'hsl(' + accentHue + ',85%,40%)'
+      var success = 'hsl(120,50%,35%)'
+      var r = document.documentElement
+      r.style.setProperty('--bg', bg)
+      r.style.setProperty('--surface', surface)
+      r.style.setProperty('--border', border)
+      r.style.setProperty('--accent', accent)
+      r.style.setProperty('--success', progress >= 1 ? success : accent)
+    }
+
+    // Init theme immediately based on time, will update once data loads
+    updateTheme(0, 2700)
 
     async function loadToday() {
       try {
@@ -615,14 +398,52 @@ Script.complete()`
         })
         var d = await r.json()
         updateRing(d.total || 0)
-      } catch(e) { updateRing(0); document.getElementById('ringRemaining').textContent = 'Ersten Eintrag machen' }
+        renderLog(d.entries || [])
+        updateTheme(d.total || 0, d.goal || 2700)
+      } catch(e) { updateRing(0); }
     }
     loadToday()
+
+    function renderLog(entries) {
+      var list = document.getElementById('logList')
+      if (!entries || entries.length === 0) {
+        list.innerHTML = '<div class="log-empty">Noch nichts eingetragen</div>'
+        return
+      }
+      var reversed = entries.slice().reverse()
+      list.innerHTML = reversed.map(function(e) {
+        var time = ''
+        if (e.timestamp) {
+          var d = new Date(e.timestamp)
+          time = d.getHours() + ':' + ('0' + d.getMinutes()).slice(-2)
+        }
+        return '<div class="log-entry">'
+          + '<span class="log-cal">' + e.calories + '</span>'
+          + '<span class="log-desc">' + (e.description || '') + '</span>'
+          + '<span class="log-time">' + time + '</span>'
+          + '<button class="log-del" onclick="deleteEntry(' + e.row + ')" title="Loeschen">&#10005;</button>'
+          + '</div>'
+      }).join('')
+    }
+
+    async function deleteEntry(row) {
+      if (!row) return
+      try {
+        var r = await fetch(N8N_CAL, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'delete', row: row })
+        })
+        var d = await r.json()
+        showToast('Eintrag geloescht')
+        await loadToday()
+      } catch(e) { showToast('Fehler beim Loeschen', true) }
+    }
 
     function switchTab(tab) {
       document.querySelectorAll('.tab').forEach(function(t, i) { t.classList.toggle('active', (i === 0) === (tab === 'manual')) })
       document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active') })
       document.getElementById('panel-' + tab).classList.add('active')
+
     }
 
     async function submitManual() {
@@ -638,7 +459,8 @@ Script.complete()`
         })
         var d = await r.json()
         showToast(cal + ' kcal gespeichert')
-        if (d.total !== undefined) updateRing(d.total)
+        if (d.total !== undefined) { updateRing(d.total); updateTheme(d.total, d.goal || 2700); }
+        if (d.entries !== undefined) renderLog(d.entries)
         document.getElementById('manualCal').value = ''
         document.getElementById('manualDesc').value = ''
       } catch(e) { showToast('Fehler beim Speichern', true) }
@@ -654,8 +476,8 @@ Script.complete()`
         b64 = e.target.result.split(',')[1]
         document.getElementById('previewImg').src = e.target.result
         document.getElementById('previewWrap').classList.add('show')
-        document.getElementById('uploadZone').style.display = 'none'
-        document.getElementById('photoBtn').disabled = false
+        document.getElementById('entryForm').style.display = 'none'
+        document.getElementById('photoBtn').style.display = 'block'
       }
       reader.readAsDataURL(file)
     }
@@ -663,9 +485,10 @@ Script.complete()`
     function removePhoto() {
       b64 = null
       document.getElementById('previewWrap').classList.remove('show')
-      document.getElementById('uploadZone').style.display = 'block'
-      document.getElementById('photoBtn').disabled = true
+      document.getElementById('entryForm').style.display = 'block'
+      document.getElementById('photoBtn').style.display = 'none'
       document.getElementById('fileInput').value = ''
+      document.getElementById('galleryInput').value = ''
     }
 
     async function submitPhoto() {
@@ -680,7 +503,8 @@ Script.complete()`
         })
         var d = await r.json()
         showToast((d.calories || '?') + ' kcal erkannt & gespeichert')
-        if (d.total !== undefined) updateRing(d.total)
+        if (d.total !== undefined) { updateRing(d.total); updateTheme(d.total, d.goal || 2700); }
+        if (d.entries !== undefined) renderLog(d.entries)
         removePhoto()
       } catch(e) { showToast('Fehler bei der Analyse', true) }
       finally {
@@ -688,19 +512,6 @@ Script.complete()`
         setBtn(btn, false, 'Kalorien sch\u00e4tzen & speichern')
       }
     }
-
-    var zone = document.getElementById('uploadZone')
-    zone.addEventListener('dragover', function(e) { e.preventDefault(); zone.classList.add('dragover') })
-    zone.addEventListener('dragleave', function() { zone.classList.remove('dragover') })
-    zone.addEventListener('drop', function(e) {
-      e.preventDefault(); zone.classList.remove('dragover')
-      var file = e.dataTransfer.files[0]
-      if (file && file.type.startsWith('image/')) {
-        var dt = new DataTransfer(); dt.items.add(file)
-        document.getElementById('fileInput').files = dt.files
-        handleFile(document.getElementById('fileInput'))
-      }
-    })
 
     document.getElementById('manualCal').addEventListener('keydown', function(e) { if (e.key === 'Enter') submitManual() })
     document.getElementById('manualDesc').addEventListener('keydown', function(e) { if (e.key === 'Enter') submitManual() })
@@ -740,6 +551,7 @@ Script.complete()`
         pctEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%'
         pctEl.className = 'trend-pct ' + trend
         document.getElementById('trendSub').textContent = (change >= 0 ? '+' : '') + change.toFixed(1) + ' kg (30 Tage)'
+        updateGoalBar(val, d.goal || 85, d.distanceToGoal)
         showToast(val + ' kg gespeichert')
         document.getElementById('weightInput').value = ''
       } catch(e) { showToast('Fehler beim Speichern', true) }
@@ -747,6 +559,28 @@ Script.complete()`
     }
 
     document.getElementById('weightInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') saveWeight() })
+
+    function updateGoalBar(current, goal, distance) {
+      var WEIGHT_START = 120  // assumed max for bar scale
+      var reached = current <= goal
+      var dist = distance != null ? distance : Math.round((current - goal) * 10) / 10
+      var fill = document.getElementById('goalBarFill')
+      var label = document.getElementById('goalDistLabel')
+      var status = document.getElementById('goalStatus')
+      if (reached) {
+        fill.style.width = '100%'
+        fill.classList.add('reached')
+        label.textContent = 'Ziel erreicht!'
+        status.textContent = ''
+      } else {
+        // progress = how far along from start toward goal
+        var pct = Math.min(100, Math.max(0, Math.round((1 - (dist / (WEIGHT_START - goal))) * 100)))
+        fill.style.width = pct + '%'
+        fill.classList.remove('reached')
+        label.textContent = dist > 0 ? 'Noch ' + dist.toFixed(1) + ' kg bis Ziel' : 'Ziel erreicht!'
+        status.textContent = current.toFixed(1) + ' kg von 85 kg'
+      }
+    }
 
     function setBtn(btn, loading, text) {
       btn.disabled = loading; btn.textContent = text
