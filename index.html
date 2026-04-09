@@ -239,6 +239,7 @@
       </div>
     </div>
 
+    <button class="btn" id="photoBtn" onclick="submitPhoto()" style="display:none;margin-bottom:12px;font-size:18px;">&#128247; Kalorien sch&#228;tzen</button>
     <div class="entry-card" id="entryForm">
       <div class="field">
         <label>Essen suchen</label>
@@ -272,8 +273,6 @@
         </div>
       </div>
 
-      <!-- Photo submit button — shown when image selected -->
-      <button class="btn" id="photoBtn" onclick="submitPhoto()" style="display:none;margin-top:10px;">&#128247; Kalorien sch&#228;tzen</button>
     </div>
 
     <div class="analyzing" id="analyzing">
@@ -654,8 +653,11 @@
       var desc = document.getElementById("foodLookup").value.trim() || document.getElementById("lookupDesc").textContent || "Eintrag";
       if (!cal || cal <= 0) { showToast("Kalorien prüfen", true); return; }
       addOptimisticEntry(cal, desc);
+      // Clear both inputs
       document.getElementById("lookupResult").style.display = "none";
       document.getElementById("manualEntry").style.display = "block";
+      document.getElementById("foodLookup").value = "";
+      document.getElementById("manualCal").value = "";
       fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc})})
         .then(function(r){return r.json();})
         .then(function(d){if(d.total!==undefined)updateRing(d.total);if(d.entries!==undefined)renderLog(d.entries);})
@@ -686,7 +688,7 @@
           b64 = resized.split(",")[1];
           document.getElementById("previewImg").src = resized;
           document.getElementById("previewWrap").classList.add("show");
-          document.getElementById("manualEntry").style.display = "none";
+          document.getElementById("entryForm").style.display = "none";
           document.getElementById("photoBtn").style.display = "block";
         };
         img.src = e.target.result;
@@ -696,7 +698,7 @@
     function removePhoto() {
       b64 = null;
       document.getElementById("previewWrap").classList.remove("show");
-      document.getElementById("manualEntry").style.display = "block";
+      document.getElementById("entryForm").style.display = "block";
       document.getElementById("photoBtn").style.display = "none";
       var fi = document.getElementById("fileInput"); if(fi) fi.value = "";
       var gi = document.getElementById("galleryInput"); if(gi) gi.value = "";
@@ -763,7 +765,8 @@
       pctEl.className = "weight-pct " + trend;
       document.getElementById("trendSub").textContent = (change>=0?"+":"") + change.toFixed(1) + " kg (30 Tage)";
       updateGoalBar(d.current, d.goal||SETTINGS.wtGoal, d.distanceToGoal, d.reached);
-      if (d.history && d.history.length > 1) drawSparkline(d.history);
+      if (d.history && d.history.length > 1 && d.multiDay !== false) drawSparkline(d.history);
+      else { var svg = document.getElementById("sparkline"); if(svg) svg.innerHTML = ""; }
       if (d.entries && d.entries.length > 0) renderWeightLog(d.entries);
     }
     function renderWeightLog(entries) {
@@ -791,15 +794,24 @@
       var val = parseFloat(document.getElementById("weightInput").value);
       if (!val || val < 20 || val > 300) { showToast("Ung\u00fcltiges Gewicht", true); return; }
       var btn = document.getElementById("saveBtn");
-      document.getElementById("trendCurrent").textContent = val.toFixed(1);
+      // Show loading state — don't update UI optimistically, weight needs server confirmation
+      setBtn(btn, true, "Wird gespeichert...");
       document.getElementById("weightInput").value = "";
-      showToast("\u2705 " + val + " kg gespeichert");
-      setBtn(btn, true, "...");
-      fetch(N8N_WEIGHT, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({weight:val})})
-        .then(function(r){ return r.json(); })
-        .then(function(d){ updateWeightUI(d); })
-        .catch(function(){ showToast("Fehler beim Speichern", true); })
-        .finally(function(){ setBtn(btn, false, "Gewicht speichern"); });
+      try {
+        var r = await fetch(N8N_WEIGHT, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({weight:val})});
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        var d = await r.json();
+        if (!d.success) throw new Error("No success");
+        showToast("\u2705 " + val + " kg gespeichert");
+        document.getElementById("trendCurrent").textContent = val.toFixed(1);
+        updateWeightUI(d);
+      } catch(e) {
+        showToast("Fehler beim Speichern", true);
+        // Restore input so user can retry
+        document.getElementById("weightInput").value = val;
+      } finally {
+        setBtn(btn, false, "Gewicht speichern");
+      }
     }
     (function(){ var w=document.getElementById("weightInput"); if(w)w.addEventListener("keydown",function(e){if(e.key==="Enter")saveWeight();}); })();
     loadWeight();
