@@ -525,17 +525,14 @@ Script.complete()
 
     function copyWidget(key) {
       var code = WIDGET_CODES[key];
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(code).then(function() { showToast("Code kopiert!"); });
-      } else {
-        var ta = document.createElement("textarea");
-        ta.value = code;
-        ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
-        document.body.appendChild(ta);
-        ta.focus(); ta.select();
-        try { document.execCommand("copy"); showToast("Code kopiert!"); } catch(e) {}
-        document.body.removeChild(ta);
-      }
+      var overlay = document.getElementById("codeOverlay");
+      var ta = document.getElementById("codeTa");
+      ta.value = code;
+      overlay.style.display = "flex";
+      setTimeout(function() { ta.focus(); ta.select(); ta.setSelectionRange(0, 99999); }, 100);
+    }
+    function closeCodeOverlay() {
+      document.getElementById("codeOverlay").style.display = "none";
     }
 
     function toggleInstall() { document.getElementById("installOverlay").classList.toggle("open"); }
@@ -746,5 +743,16 @@ Script.complete()
       setTimeout(function() { t.classList.remove("show"); }, 3000);
     }
   </script>
+  <!-- CODE COPY OVERLAY -->
+  <div id="codeOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:300;flex-direction:column;padding:20px;gap:12px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#f0f0f0;">Code kopieren</span>
+      <button onclick="closeCodeOverlay()" style="background:none;border:none;color:#666;font-size:24px;cursor:pointer;padding:0;line-height:1;">&#215;</button>
+    </div>
+    <p style="font-size:11px;color:#666;line-height:1.6;">Alles markieren (Select All), dann kopieren und in Scriptable einf&#252;gen.</p>
+    <textarea id="codeTa" readonly style="flex:1;background:#111;border:1px solid #2a2a2a;border-radius:12px;color:#4ade80;font-family:'DM Mono',monospace;font-size:11px;padding:14px;resize:none;outline:none;line-height:1.5;"></textarea>
+    <button onclick="var ta=document.getElementById('codeTa');ta.select();ta.setSelectionRange(0,99999);if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(function(){showToast('Code kopiert!');closeCodeOverlay();});}else{try{document.execCommand('copy');showToast('Code kopiert!');closeCodeOverlay();}catch(e){}}" style="background:#4ade80;color:#000;border:none;border-radius:12px;padding:15px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">Kopieren</button>
+  </div>
+
 </body>
 </html>
