@@ -111,6 +111,20 @@
     .copy-btn{background:var(--card2);border:1px solid var(--border);color:var(--muted);border-radius:12px;padding:14px 16px;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0;}
     .copy-btn:hover{border-color:var(--accent);color:var(--accent);}
     .install-trigger{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--muted);z-index:100;}
+    #cameraOverlay {
+      display:none;position:fixed;inset:0;background:#0f0f0f;z-index:400;
+      flex-direction:column;align-items:center;justify-content:center;gap:20px;
+    }
+    #cameraOverlay.show { display:flex; }
+    .cam-big-btn {
+      width:160px;height:160px;border-radius:50%;background:#e85d00;border:none;
+      font-size:64px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+      box-shadow:0 0 60px rgba(232,93,0,0.4);transition:transform 0.1s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .cam-big-btn:active{transform:scale(0.93);}
+    .cam-overlay-hint{font-size:13px;color:#666;letter-spacing:0.05em;}
+    .cam-overlay-close{position:absolute;top:24px;right:20px;background:none;border:none;color:#444;font-size:28px;cursor:pointer;}
   </style>
 </head>
 <body>
@@ -550,7 +564,17 @@ Script.complete()
       var page = (hash === "weight") ? "weight" : "calories";
       document.getElementById("page-" + page).classList.add("active");
       if (hash === "camera") {
-        setTimeout(function() { document.getElementById("fileInput").click(); }, 300);
+        document.getElementById("cameraOverlay").classList.add("show");
+      }
+    }
+    function triggerCamera() {
+      document.getElementById("fileInput").click();
+      closeCameraOverlay();
+    }
+    function closeCameraOverlay() {
+      document.getElementById("cameraOverlay").classList.remove("show");
+      if (window.location.hash === "#camera") {
+        window.location.hash = "";
       }
     }
     window.addEventListener("hashchange", initRoute);
@@ -639,11 +663,27 @@ Script.complete()
       var file = input.files[0]; if (!file) return;
       var reader = new FileReader();
       reader.onload = function(e) {
-        b64 = e.target.result.split(",")[1];
-        document.getElementById("previewImg").src = e.target.result;
-        document.getElementById("previewWrap").classList.add("show");
-        document.getElementById("entryForm").style.display = "none";
-        document.getElementById("photoBtn").style.display = "block";
+        // Resize to max 768px before sending — cuts payload ~90%
+        var img = new Image();
+        img.onload = function() {
+          var MAX = 768;
+          var w = img.width, h = img.height;
+          if (w > MAX || h > MAX) {
+            var ratio = Math.min(MAX/w, MAX/h);
+            w = Math.round(w * ratio);
+            h = Math.round(h * ratio);
+          }
+          var canvas = document.createElement("canvas");
+          canvas.width = w; canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+          var resized = canvas.toDataURL("image/jpeg", 0.8);
+          b64 = resized.split(",")[1];
+          document.getElementById("previewImg").src = resized;
+          document.getElementById("previewWrap").classList.add("show");
+          document.getElementById("entryForm").style.display = "none";
+          document.getElementById("photoBtn").style.display = "block";
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }
@@ -743,6 +783,13 @@ Script.complete()
       setTimeout(function() { t.classList.remove("show"); }, 3000);
     }
   </script>
+  <!-- CAMERA OVERLAY -->
+  <div id="cameraOverlay">
+    <button class="cam-overlay-close" onclick="closeCameraOverlay()">&#215;</button>
+    <button class="cam-big-btn" onclick="triggerCamera()">&#128247;</button>
+    <div class="cam-overlay-hint">Tippen zum Fotografieren</div>
+  </div>
+
   <!-- CODE COPY OVERLAY -->
   <div id="codeOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:300;flex-direction:column;padding:20px;gap:12px;">
     <div style="display:flex;align-items:center;justify-content:space-between;">
