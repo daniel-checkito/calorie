@@ -1,5 +1,5 @@
 // Weight Widget - Health Tracker
-var WT_URL = "https://meshminds.app.n8n.cloud/webhook/34673c88-0335-4e98-96f6-1fa96d74a10c"
+var WT_URL = "https://meshminds.app.n8n.cloud/webhook/log-weight"
 var SITE_URL = "https://daemien-calories.vercel.app/#weight"
 var C_BG = new Color("#0a0a0a")
 var C_UP = new Color("#ff6b35")
