@@ -175,28 +175,310 @@
       <button class="nav-link" onclick="navigate('weight')">Gewicht &#8594;</button>
     </header>
     <div class="hero-card">
-      <div class="hero-label">Calories Today</div>
+      <!-- Top row: label + date context -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <span class="hero-label" style="margin-bottom:0">Calories Today</span>
+        <span id="paceLabel" style="font-size:11px;color:var(--muted);"></span>
+      </div>
+      <!-- Main: large ring left, big stats right -->
       <div class="hero-main">
-        <div class="ring-wrap">
-          <svg width="80" height="80" viewBox="0 0 80 80">
-            <circle class="ring-bg" cx="40" cy="40" r="35"/>
-            <circle class="ring-fill" id="ringFill" cx="40" cy="40" r="35"/>
+        <div class="ring-wrap" style="flex-shrink:0">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle class="ring-bg" cx="55" cy="55" r="48" style="stroke-width:10"/>
+            <circle class="ring-fill" id="ringFill" cx="55" cy="55" r="48" style="stroke-width:10;stroke-dasharray:301;stroke-dashoffset:301"/>
           </svg>
-          <div class="ring-pct" id="ringPct">0%</div>
+          <div class="ring-pct" id="ringPct" style="font-size:15px;">0%</div>
         </div>
-        <div class="hero-nums">
-          <div class="hero-total" id="ringTotal">0</div>
-          <div class="hero-of" id="heroOf">of 2.700 kcal</div>
+        <div style="flex:1;padding-left:4px;">
+          <div class="hero-total" id="ringTotal" style="font-size:52px;">0</div>
+          <div class="hero-of" id="heroOf" style="font-size:12px;margin-top:2px;">of 2.700 kcal</div>
+          <!-- Pace bar -->
+          <div style="margin-top:14px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+              <span style="font-size:10px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;">Pace</span>
+              <span id="paceVal" style="font-size:10px;color:var(--muted);"></span>
+            </div>
+            <div style="height:4px;background:var(--border);border-radius:99px;overflow:hidden;">
+              <div id="paceBar" style="height:100%;border-radius:99px;background:var(--orange);width:0%;transition:width 0.6s ease;"></div>
+            </div>
+          </div>
+          <!-- Noch -->
+          <div style="margin-top:12px;display:flex;gap:20px;">
+            <div>
+              <div style="font-size:9px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;">Noch</div>
+              <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--orange);" id="ringRemaining">2.700</div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;">Ziel</div>
+              <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--muted);" id="heroGoalDisplay">2.700</div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="hero-footer">
-        <div class="hero-stat">
-          <span class="hero-stat-label">Ziel</span>
-          <span class="hero-stat-val" id="heroGoalDisplay">2.700</span>
+    </div>
+
+    <input type="file" accept="image/*" capture="environment" id="fileInput" onchange="handleFile(this)" style="display:none">
+    <input type="file" accept="image/*" id="galleryInput" onchange="handleFile(this)" style="display:none">
+
+    <div class="preview-outer">
+      <div class="preview-wrap" id="previewWrap">
+        <img id="previewImg" src="" alt="">
+        <button class="preview-remove" onclick="removePhoto()">&#10005;</button>
+      </div>
+    </div>
+
+    <div class="entry-card" id="entryForm">
+      <!-- Meal name row: description input + 🔍 lookup on right -->
+      <div style="display:flex;gap:10px;margin-bottom:10px;">
+        <input type="text" id="foodLookup" placeholder="z.B. D&#246;ner, Protein Shake, Skyr..." autocomplete="off"
+          style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:16px 18px;outline:none;-webkit-appearance:none;">
+        <button id="lookupBtn" onclick="lookupFood()" title="Kalorien automatisch suchen"
+          style="flex-shrink:0;width:58px;height:58px;border-radius:12px;background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;">&#128269;</button>
+      </div>
+
+      <!-- Calorie input + camera/submit row -->
+      <div id="manualEntry">
+        <input type="number" id="manualCal" placeholder="Kalorien eingeben..." inputmode="numeric"
+          style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:16px 18px;outline:none;-webkit-appearance:none;margin-bottom:10px;">
+        <div style="display:flex;gap:10px;">
+          <button class="cam-btn" onclick="document.getElementById('fileInput').click()"
+            style="flex:1;width:auto;height:60px;border-radius:12px;font-size:26px;">&#128247;</button>
+          <button class="btn" id="manualBtn" onclick="submitManual()"
+            style="flex:1;height:60px;padding:0;font-size:17px;">Eintragen</button>
         </div>
-        <div class="hero-stat" style="text-align:right">
-          <span class="hero-stat-label">Noch</span>
-          <span class="hero-stat-val remaining" id="ringRemaining">2.700</span>
+        <div class="gallery-link">
+          <button onclick="document.getElementById('galleryInput').click()">&#128444; Aus Galerie w&#228;hlen</button>
+        </div>
+      </div>
+
+      <!-- Lookup result: shown after 🔍 fills in calories -->
+      <div id="lookupResult" style="display:none;margin-top:10px;padding:14px;background:var(--card2);border-radius:12px;border:1px solid var(--border);">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Gefunden &#8212; bitte pr&#252;fen</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input type="number" id="lookupCal" inputmode="numeric"
+            style="font-family:Syne,sans-serif;font-size:32px;font-weight:800;color:var(--accent);background:transparent;border:none;outline:none;width:120px;-webkit-appearance:none;">
+          <div>
+            <div style="font-size:11px;color:var(--muted);">kcal</div>
+            <div id="lookupDesc" style="font-size:12px;color:var(--text);margin-top:2px;"></div>
+          </div>
+        </div>
+        <button class="btn" style="margin-top:12px" onclick="saveLookupResult()">&#10003; Eintragen</button>
+      </div>
+    </div>TYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Health Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0f0f0f; --card:#1a1a1a; --card2:#222;
+      --border:#2a2a2a; --accent:#4ade80; --accent2:#c0392b;
+      --text:#f0f0f0; --muted:#666; --orange:#e85d00; --blue:#38bdf8;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{background:#0f0f0f;}
+    body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:stretch;}
+    .page{display:none;width:100%;flex-direction:column;align-items:stretch;padding:20px 16px 80px;}
+    .page.active{display:flex;}
+
+    /* ── Header ── */
+    header{display:flex;align-items:center;gap:10px;margin-bottom:22px;padding-top:4px;}
+    .logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.5px;color:var(--accent);}
+    .logo span{color:var(--text);opacity:0.35;}
+    .date-label{font-size:11px;color:var(--muted);}
+    .nav-link{margin-left:auto;font-size:11px;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:6px 14px;border-radius:99px;cursor:pointer;background:none;font-family:'DM Mono',monospace;transition:all 0.2s;}
+    .nav-link:hover,.nav-link:active{border-color:var(--accent);color:var(--accent);}
+
+    /* ── Hero card ── */
+    .hero-card{background:var(--card);border-radius:20px;padding:20px;margin-bottom:12px;animation:slideUp 0.4s ease;}
+    .hero-label{font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;}
+    .hero-main{display:flex;align-items:center;gap:16px;}
+    .ring-wrap{position:relative;flex-shrink:0;}
+    .ring-bg{fill:none;stroke:#2a2a2a;stroke-width:8;}
+    .ring-fill{fill:none;stroke:var(--orange);stroke-width:8;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:220;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset 0.8s cubic-bezier(0.34,1.56,0.64,1);}
+    .ring-fill.done{stroke:var(--accent);}
+    .ring-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--text);}
+    .hero-nums{flex:1;}
+    .hero-total{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;letter-spacing:-2px;line-height:1;color:var(--text);transition:color 0.3s;}
+    .hero-total.done{color:var(--accent);}
+    .hero-of{font-size:11px;color:var(--muted);margin-top:4px;}
+    .hero-footer{display:flex;justify-content:space-between;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);}
+    .hero-stat{display:flex;flex-direction:column;gap:3px;}
+    .hero-stat-label{font-size:9px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;}
+    .hero-stat-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--text);transition:all 0.3s;}
+    .hero-stat-val.remaining{color:var(--orange);}
+    .hero-stat-val.done{color:var(--accent);}
+
+    /* ── Entry form ── */
+    .entry-card{background:var(--card);border-radius:20px;padding:16px;margin-bottom:12px;animation:slideUp 0.4s ease 0.05s both;}
+    .field{display:flex;flex-direction:column;gap:6px;}
+    label{font-size:10px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;}
+    input[type="number"],input[type="text"]{background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:14px 16px;width:100%;outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
+    input:focus{border-color:var(--accent);}
+    .cal-row{display:flex;align-items:flex-end;gap:10px;}
+    .cam-btn{flex-shrink:0;width:52px;height:52px;border-radius:10px;background:var(--orange);color:#fff;border:none;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.1s;-webkit-tap-highlight-color:transparent;}
+    .cam-btn:active{transform:scale(0.92);}
+    .btn{background:var(--accent);color:#000;border:none;border-radius:12px;padding:15px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;width:100%;letter-spacing:0.02em;transition:all 0.15s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+    .btn:active{transform:scale(0.98);}
+    .btn:disabled{opacity:0.45;cursor:not-allowed;}
+    .btn.loading::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);animation:shimmer 1.2s infinite;}
+    .btn-secondary{background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:14px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}
+    @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+    @keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+    @keyframes popIn{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:none}}
+    .gallery-link{text-align:center;margin-top:10px;}
+    .gallery-link button{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;}
+    .preview-outer{position:relative;margin-bottom:12px;}
+    .preview-wrap{display:none;border-radius:14px;overflow:hidden;}
+    .preview-wrap.show{display:block;animation:popIn 0.25s ease;}
+    .preview-wrap img{width:100%;max-height:200px;object-fit:cover;display:block;}
+    .preview-remove{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;}
+    .analyzing{display:none;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--muted);margin-bottom:12px;}
+    .analyzing.show{display:flex;}
+    .dot-pulse{display:flex;gap:4px;}
+    .dot-pulse span{width:5px;height:5px;background:var(--accent);border-radius:50%;animation:dpulse 1.2s infinite;}
+    .dot-pulse span:nth-child(2){animation-delay:0.2s;}
+    .dot-pulse span:nth-child(3){animation-delay:0.4s;}
+    @keyframes dpulse{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+    .photo-confirm{display:none;flex-direction:column;gap:10px;margin-bottom:12px;}
+    .photo-confirm.show{display:flex;animation:popIn 0.2s ease;}
+    .confirm-label{font-size:10px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;}
+    .confirm-cal-input{background:var(--card2);border:2px solid var(--accent);border-radius:12px;color:var(--accent);font-family:'Syne',sans-serif;font-size:40px;font-weight:800;padding:14px 20px;width:100%;outline:none;letter-spacing:-1px;-webkit-appearance:none;text-align:center;}
+    .confirm-desc{font-size:13px;color:var(--muted);text-align:center;}
+    .confirm-actions{display:flex;gap:8px;}
+    .photo-error{display:none;flex-direction:column;gap:10px;margin-bottom:12px;}
+    .photo-error.show{display:flex;animation:popIn 0.2s ease;}
+    .error-msg{background:var(--card2);border:1px solid var(--accent2);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--accent2);text-align:center;line-height:1.5;}
+
+    /* ── Log entries ── */
+    .log-section{margin-top:6px;animation:slideUp 0.4s ease 0.1s both;}
+    .log-header{font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
+    .log-empty{font-size:12px;color:var(--muted);padding:12px 0;text-align:center;}
+    .log-entry{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:12px 14px;margin-bottom:6px;transition:opacity 0.2s,transform 0.2s;}
+    .log-entry.new{animation:slideIn 0.3s cubic-bezier(0.34,1.56,0.64,1);}
+    @keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+    .log-emoji{font-size:18px;flex-shrink:0;width:26px;text-align:center;}
+    .log-cal{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--orange);min-width:46px;}
+    .log-desc{font-size:12px;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .log-time{font-size:10px;color:var(--muted);min-width:36px;text-align:right;}
+    .log-del{background:none;border:none;color:#333;cursor:pointer;font-size:14px;padding:4px;border-radius:4px;transition:color 0.2s;flex-shrink:0;}
+    .log-del:active{color:var(--accent2);}
+    .log-saving{color:var(--muted);font-size:12px;flex-shrink:0;animation:dpulse 1s infinite;}
+    .log-entry.optimistic{opacity:0.55;}
+
+    /* ── Weight page ── */
+    .weight-hero{background:var(--card);border-radius:20px;padding:20px;margin-bottom:12px;animation:slideUp 0.4s ease;}
+    .weight-hero-label{font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
+    .sparkline{width:100%;height:52px;margin-bottom:14px;}
+    .weight-main-row{display:flex;align-items:flex-end;gap:12px;margin-bottom:14px;}
+    .weight-big{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;letter-spacing:-2px;line-height:1;color:var(--text);transition:all 0.3s;}
+    .weight-unit{font-size:16px;color:var(--muted);margin-bottom:8px;}
+    .weight-change{margin-left:auto;text-align:right;}
+    .weight-pct{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;}
+    .weight-pct.up{color:var(--accent);}.weight-pct.down{color:var(--orange);}.weight-pct.stable{color:var(--muted);}
+    .weight-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+    .goal-bar-wrap{border-top:1px solid var(--border);padding-top:14px;}
+    .goal-bar-labels{display:flex;justify-content:space-between;margin-bottom:8px;}
+    .goal-bar-label-left{font-size:12px;color:var(--text);font-weight:500;}
+    .goal-bar-label-right{font-size:11px;color:var(--muted);}
+    .goal-bar-track{height:5px;background:var(--border);border-radius:99px;overflow:hidden;}
+    .goal-bar-fill{height:100%;border-radius:99px;background:var(--orange);transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1);width:0%;}
+    .goal-bar-fill.reached{background:var(--accent);}
+    .goal-status{font-size:11px;color:var(--muted);margin-top:6px;text-align:right;}
+    .weight-input{background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Syne',sans-serif;font-size:32px;font-weight:700;padding:16px 20px;width:100%;outline:none;transition:border-color 0.2s;-webkit-appearance:none;letter-spacing:-1px;}
+    .weight-input:focus{border-color:var(--accent);}
+
+    /* ── Settings overlay ── */
+    .settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:flex-end;justify-content:center;}
+    .settings-overlay.open{display:flex;}
+    .settings-box{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:24px 20px 48px;width:100%;display:flex;flex-direction:column;gap:16px;animation:slideUp 0.3s ease;}
+    .settings-header{display:flex;align-items:center;justify-content:space-between;}
+    .settings-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;}
+    .settings-close{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;padding:0;line-height:1;}
+    .settings-section{font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:-4px;}
+    .settings-row{display:flex;align-items:center;justify-content:space-between;background:var(--card2);border-radius:12px;padding:14px 16px;}
+    .settings-row-label{font-size:13px;color:var(--text);}
+    .settings-row input{background:transparent;border:none;color:var(--accent);font-family:'Syne',sans-serif;font-size:16px;font-weight:700;width:80px;text-align:right;outline:none;-webkit-appearance:none;}
+    .settings-divider{height:1px;background:var(--border);}
+    .install-row{display:flex;gap:8px;align-items:stretch;}
+    .install-btn{flex:1;background:var(--accent);color:#000;text-decoration:none;border-radius:12px;padding:14px 16px;text-align:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;display:block;}
+    .copy-btn{background:var(--card2);border:1px solid var(--border);color:var(--muted);border-radius:12px;padding:14px 16px;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0;}
+    .copy-btn:hover{border-color:var(--accent);color:var(--accent);}
+    .settings-note{font-size:11px;color:var(--muted);line-height:1.6;}
+
+    /* ── Toast ── */
+    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--border);color:var(--text);padding:12px 22px;border-radius:12px;font-size:13px;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);z-index:100;white-space:nowrap;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+    .toast.error{border-color:var(--accent2);}
+    .toast.success{border-color:var(--accent);}
+
+    /* ── Settings trigger ── */
+    .settings-trigger{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--muted);z-index:100;transition:all 0.2s;}
+    .settings-trigger:hover{border-color:var(--accent);color:var(--accent);}
+
+    /* ── Camera overlay ── */
+    #cameraOverlay{display:none;position:fixed;inset:0;background:#0f0f0f;z-index:400;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+    #cameraOverlay.show{display:flex;animation:popIn 0.2s ease;}
+    .cam-big-btn{width:160px;height:160px;border-radius:50%;background:var(--orange);border:none;font-size:64px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(232,93,0,0.4);transition:transform 0.1s;-webkit-tap-highlight-color:transparent;}
+    .cam-big-btn:active{transform:scale(0.93);}
+    .cam-overlay-hint{font-size:13px;color:#666;letter-spacing:0.05em;}
+    .cam-overlay-close{position:absolute;top:24px;right:20px;background:none;border:none;color:#444;font-size:28px;cursor:pointer;}
+
+
+  </style>
+</head>
+<body>
+
+  <!-- CALORIES PAGE -->
+  <div class="page" id="page-calories">
+    <header>
+      <div class="logo">calories<span>.</span></div>
+      <div class="date-label" id="dateLabel"></div>
+      <button class="nav-link" onclick="navigate('weight')">Gewicht &#8594;</button>
+    </header>
+    <div class="hero-card">
+      <!-- Top row: label + date context -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <span class="hero-label" style="margin-bottom:0">Calories Today</span>
+        <span id="paceLabel" style="font-size:11px;color:var(--muted);"></span>
+      </div>
+      <!-- Main: large ring left, big stats right -->
+      <div class="hero-main">
+        <div class="ring-wrap" style="flex-shrink:0">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle class="ring-bg" cx="55" cy="55" r="48" style="stroke-width:10"/>
+            <circle class="ring-fill" id="ringFill" cx="55" cy="55" r="48" style="stroke-width:10;stroke-dasharray:301;stroke-dashoffset:301"/>
+          </svg>
+          <div class="ring-pct" id="ringPct" style="font-size:15px;">0%</div>
+        </div>
+        <div style="flex:1;padding-left:4px;">
+          <div class="hero-total" id="ringTotal" style="font-size:52px;">0</div>
+          <div class="hero-of" id="heroOf" style="font-size:12px;margin-top:2px;">of 2.700 kcal</div>
+          <!-- Pace bar -->
+          <div style="margin-top:14px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+              <span style="font-size:10px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;">Pace</span>
+              <span id="paceVal" style="font-size:10px;color:var(--muted);"></span>
+            </div>
+            <div style="height:4px;background:var(--border);border-radius:99px;overflow:hidden;">
+              <div id="paceBar" style="height:100%;border-radius:99px;background:var(--orange);width:0%;transition:width 0.6s ease;"></div>
+            </div>
+          </div>
+          <!-- Noch -->
+          <div style="margin-top:12px;display:flex;gap:20px;">
+            <div>
+              <div style="font-size:9px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;">Noch</div>
+              <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--orange);" id="ringRemaining">2.700</div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;">Ziel</div>
+              <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--muted);" id="heroGoalDisplay">2.700</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -222,7 +504,7 @@
       <div id="lookupResult" style="display:none;margin-top:10px;padding:12px;background:var(--card2);border-radius:12px;border:1px solid var(--border);">
         <div style="font-size:10px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Gefunden &#8212; bitte pr&#252;fen</div>
         <div style="display:flex;align-items:center;gap:10px;">
-          <input type="number" id="lookupCal" inputmode="numeric" style="font-family:Syne,sans-serif;font-size:28px;font-weight:800;color:var(--accent);background:transparent;border:none;outline:none;width:90px;-webkit-appearance:none;">
+          <input type="number" id="lookupCal" inputmode="numeric" style="font-family:Syne,sans-serif;font-size:32px;font-weight:800;color:var(--accent);background:transparent;border:none;outline:none;width:120px;-webkit-appearance:none;">
           <div>
             <div style="font-size:11px;color:var(--muted);">kcal</div>
             <div id="lookupDesc" style="font-size:12px;color:var(--text);margin-top:2px;"></div>
@@ -231,14 +513,14 @@
         <button class="btn" style="margin-top:10px" onclick="saveLookupResult()">&#10003; Eintragen</button>
       </div>
       <div id="manualEntry" style="margin-top:10px">
-        <div class="cal-row">
-          <div class="field" style="flex:1">
-            <label>Oder manuell eingeben</label>
-            <input type="number" id="manualCal" placeholder="z.B. 650" inputmode="numeric">
-          </div>
-          <button class="cam-btn" onclick="document.getElementById('fileInput').click()">&#128247;</button>
+        <input type="number" id="manualCal" placeholder="Kalorien eingeben..." inputmode="numeric"
+          style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:16px 18px;outline:none;-webkit-appearance:none;margin-bottom:10px;">
+        <div style="display:flex;gap:10px;">
+          <button class="cam-btn" onclick="document.getElementById('fileInput').click()"
+            style="flex:1;width:auto;height:60px;border-radius:12px;font-size:26px;">&#128247;</button>
+          <button class="btn" id="manualBtn" onclick="submitManual()"
+            style="flex:1;height:60px;padding:0;font-size:17px;">Eintragen</button>
         </div>
-        <button class="btn" id="manualBtn" style="margin-top:10px" onclick="submitManual()">Eintragen</button>
         <div class="gallery-link">
           <button onclick="document.getElementById('galleryInput').click()">&#128444; Aus Galerie w&#228;hlen</button>
         </div>
@@ -723,7 +1005,7 @@ Script.complete()
       var totalEl = document.getElementById("ringTotal");
       var rem = document.getElementById("ringRemaining");
       var pctEl = document.getElementById("ringPct");
-      fill.style.strokeDashoffset = 220 - pct * 220;
+      fill.style.strokeDashoffset = 301 - pct * 301;
       totalEl.textContent = total.toLocaleString("de-DE");
       if (pctEl) pctEl.textContent = Math.round(pct * 100) + "%";
       if (total >= goal) {
@@ -733,8 +1015,28 @@ Script.complete()
         fill.classList.remove("done"); totalEl.classList.remove("done");
         rem.textContent = (goal - total).toLocaleString("de-DE"); rem.classList.remove("done");
       }
-      document.getElementById("heroGoalDisplay").textContent = goal.toLocaleString("de-DE");
-      document.getElementById("heroOf").textContent = "of " + goal.toLocaleString("de-DE") + " kcal";
+      var gd = document.getElementById("heroGoalDisplay"); if(gd) gd.textContent = goal.toLocaleString("de-DE");
+      var hof = document.getElementById("heroOf"); if(hof) hof.textContent = "of " + goal.toLocaleString("de-DE") + " kcal";
+      // Update pace bar
+      (function() {
+        var h = new Date().getHours() + new Date().getMinutes()/60;
+        var dayStart = 7, dayEnd = 23;
+        var elapsed = Math.max(0, Math.min(h - dayStart, dayEnd - dayStart));
+        var pacePct = Math.round(elapsed / (dayEnd - dayStart) * 100);
+        var paceTarget = Math.round(goal * elapsed / (dayEnd - dayStart));
+        var bar = document.getElementById("paceBar");
+        var paceValEl = document.getElementById("paceVal");
+        var paceLblEl = document.getElementById("paceLabel");
+        var eatPct = Math.round(total / goal * 100);
+        if (bar) bar.style.width = pacePct + "%";
+        if (bar) bar.style.background = eatPct >= pacePct ? "var(--accent)" : "var(--orange)";
+        if (paceValEl) paceValEl.textContent = "Soll: " + paceTarget.toLocaleString("de-DE");
+        if (paceLblEl) {
+          var meals = ["","Frühstück","Brunch","Mittagessen","Snack","Abendessen","Abend"];
+          var slot = h < 9 ? "Frühstück" : h < 11 ? "Brunch" : h < 14 ? "Mittagessen" : h < 17 ? "Snack" : h < 20 ? "Abendessen" : "Spätmahlzeit";
+          paceLblEl.textContent = slot;
+        }
+      })();
     }
 
     // ── Emoji map ──
@@ -826,12 +1128,11 @@ Script.complete()
     // ── Submit manual ──
     async function submitManual() {
       var cal = parseInt(document.getElementById("manualCal").value);
-      var desc = document.getElementById("manualDesc").value.trim() || "Manueller Eintrag";
+      var desc = (document.getElementById("foodLookup") && document.getElementById("foodLookup").value.trim()) || "Manueller Eintrag";
       if (!cal || cal <= 0) { showToast("Bitte Kalorien eingeben", true); return; }
       var btn = document.getElementById("manualBtn");
       addOptimisticEntry(cal, desc);
       document.getElementById("manualCal").value = "";
-      document.getElementById("manualDesc").value = "";
       setBtn(btn, true, "...");
       fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc})})
         .then(function(r){ return r.json(); })
@@ -854,7 +1155,9 @@ Script.complete()
         var d = await r.json();
         if (d.calories && d.calories > 0) {
           document.getElementById("lookupCal").value = d.calories;
-          document.getElementById("lookupDesc").textContent = d.description || food;
+          // Keep food name from input, use description as subtitle
+          var foodName = document.getElementById("foodLookup").value.trim();
+          document.getElementById("lookupDesc").textContent = d.description || foodName;
           document.getElementById("lookupResult").style.display = "block";
           document.getElementById("manualEntry").style.display = "none";
         } else {
@@ -865,12 +1168,11 @@ Script.complete()
     }
     function saveLookupResult() {
       var cal = parseInt(document.getElementById("lookupCal").value);
-      var desc = document.getElementById("lookupDesc").textContent || document.getElementById("foodLookup").value.trim() || "Eintrag";
+      var desc = document.getElementById("foodLookup").value.trim() || document.getElementById("lookupDesc").textContent || "Eintrag";
       if (!cal || cal <= 0) { showToast("Kalorien prüfen", true); return; }
       addOptimisticEntry(cal, desc);
       document.getElementById("lookupResult").style.display = "none";
       document.getElementById("manualEntry").style.display = "block";
-      document.getElementById("foodLookup").value = "";
       fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc})})
         .then(function(r){return r.json();})
         .then(function(d){if(d.total!==undefined)updateRing(d.total);if(d.entries!==undefined)renderLog(d.entries);})
@@ -958,8 +1260,8 @@ Script.complete()
     function cancelError()   { document.getElementById("photoError").classList.remove("show"); document.getElementById("photoBtn").style.display = "block"; }
     function resetPhotoFlow(){ pendingPhotoData = null; document.getElementById("photoConfirm").classList.remove("show"); document.getElementById("photoError").classList.remove("show"); removePhoto(); }
 
-    (function(){ var fl=document.getElementById("foodLookup"); if(fl)fl.addEventListener("keydown",function(e){if(e.key==="Enter")lookupFood();}); })();
-    (function(){ var a=document.getElementById("manualCal"),b=document.getElementById("manualDesc"); if(a)a.addEventListener("keydown",function(e){if(e.key==="Enter")submitManual();}); if(b)b.addEventListener("keydown",function(e){if(e.key==="Enter")submitManual();}); })();
+    (function(){ var fl=document.getElementById("foodLookup"); if(fl)fl.addEventListener("keydown",function(e){ if(e.key==="Enter"){ var mc=document.getElementById("manualCal"); if(mc)mc.focus(); } }); })();
+    (function(){ var a=document.getElementById("manualCal"); if(a)a.addEventListener("keydown",function(e){if(e.key==="Enter")submitManual();}); })();
 
     // ── Weight ──
     async function loadWeight() {
