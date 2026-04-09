@@ -186,6 +186,8 @@
           <svg width="110" height="110" viewBox="0 0 110 110">
             <circle class="ring-bg" cx="55" cy="55" r="48" style="stroke-width:10"/>
             <circle class="ring-fill" id="ringFill" cx="55" cy="55" r="48" style="stroke-width:10;stroke-dasharray:301;stroke-dashoffset:301"/>
+            <!-- Pace marker: small tick at target position -->
+            <circle id="paceTick" cx="55" cy="7" r="5" fill="#e85d00" opacity="0.9" style="transform-origin:55px 55px;transform:rotate(0deg);transition:transform 0.6s ease;display:none"/>
           </svg>
           <div class="ring-pct" id="ringPct" style="font-size:15px;">0%</div>
         </div>
@@ -198,8 +200,11 @@
               <span style="font-size:10px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;">Pace</span>
               <span id="paceVal" style="font-size:10px;color:var(--muted);"></span>
             </div>
-            <div style="height:4px;background:var(--border);border-radius:99px;overflow:hidden;">
-              <div id="paceBar" style="height:100%;border-radius:99px;background:var(--orange);width:0%;transition:width 0.6s ease;"></div>
+            <div style="height:6px;background:var(--border);border-radius:99px;position:relative;overflow:visible;">
+              <!-- Actual progress fill (green/orange) -->
+              <div id="paceBar" style="height:100%;border-radius:99px;background:var(--orange);width:0%;transition:width 0.6s ease;position:relative;z-index:1;"></div>
+              <!-- Pace target marker line -->
+              <div id="paceMarker" style="position:absolute;top:-3px;width:3px;height:12px;background:#e85d00;border-radius:2px;left:0%;transition:left 0.6s ease;z-index:2;opacity:0.9;"></div>
             </div>
           </div>
           <!-- Noch -->
@@ -250,6 +255,9 @@
           <button onclick="document.getElementById('galleryInput').click()">&#128444; Aus Galerie w&#228;hlen</button>
         </div>
       </div>
+
+      <!-- Photo submit button — shown when image selected -->
+      <button class="btn" id="photoBtn" onclick="submitPhoto()" style="display:none;margin-top:0;margin-bottom:10px">&#128247; Kalorien sch&#228;tzen</button>
 
       <!-- Lookup result: shown after 🔍 fills in calories -->
       <div id="lookupResult" style="display:none;margin-top:10px;padding:14px;background:var(--card2);border-radius:12px;border:1px solid var(--border);">
@@ -452,6 +460,8 @@
           <svg width="110" height="110" viewBox="0 0 110 110">
             <circle class="ring-bg" cx="55" cy="55" r="48" style="stroke-width:10"/>
             <circle class="ring-fill" id="ringFill" cx="55" cy="55" r="48" style="stroke-width:10;stroke-dasharray:301;stroke-dashoffset:301"/>
+            <!-- Pace marker: small tick at target position -->
+            <circle id="paceTick" cx="55" cy="7" r="5" fill="#e85d00" opacity="0.9" style="transform-origin:55px 55px;transform:rotate(0deg);transition:transform 0.6s ease;display:none"/>
           </svg>
           <div class="ring-pct" id="ringPct" style="font-size:15px;">0%</div>
         </div>
@@ -464,8 +474,11 @@
               <span style="font-size:10px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;">Pace</span>
               <span id="paceVal" style="font-size:10px;color:var(--muted);"></span>
             </div>
-            <div style="height:4px;background:var(--border);border-radius:99px;overflow:hidden;">
-              <div id="paceBar" style="height:100%;border-radius:99px;background:var(--orange);width:0%;transition:width 0.6s ease;"></div>
+            <div style="height:6px;background:var(--border);border-radius:99px;position:relative;overflow:visible;">
+              <!-- Actual progress fill (green/orange) -->
+              <div id="paceBar" style="height:100%;border-radius:99px;background:var(--orange);width:0%;transition:width 0.6s ease;position:relative;z-index:1;"></div>
+              <!-- Pace target marker line -->
+              <div id="paceMarker" style="position:absolute;top:-3px;width:3px;height:12px;background:#e85d00;border-radius:2px;left:0%;transition:left 0.6s ease;z-index:2;opacity:0.9;"></div>
             </div>
           </div>
           <!-- Noch -->
@@ -531,7 +544,6 @@
       <div class="dot-pulse"><span></span><span></span><span></span></div>
       Claude analysiert das Bild...
     </div>
-    <button class="btn" id="photoBtn" onclick="submitPhoto()" style="display:none;margin-bottom:14px">Kalorien sch&#228;tzen</button>
 
     <div class="photo-confirm" id="photoConfirm">
       <div class="confirm-label">Erkannte Kalorien &#8212; bitte pr&#252;fen</div>
@@ -1203,7 +1215,7 @@ Script.complete()
           b64 = resized.split(",")[1];
           document.getElementById("previewImg").src = resized;
           document.getElementById("previewWrap").classList.add("show");
-          document.getElementById("entryForm").style.display = "none";
+          document.getElementById("manualEntry").style.display = "none";
           document.getElementById("photoBtn").style.display = "block";
         };
         img.src = e.target.result;
@@ -1213,10 +1225,10 @@ Script.complete()
     function removePhoto() {
       b64 = null;
       document.getElementById("previewWrap").classList.remove("show");
-      document.getElementById("entryForm").style.display = "block";
+      document.getElementById("manualEntry").style.display = "block";
       document.getElementById("photoBtn").style.display = "none";
-      document.getElementById("fileInput").value = "";
-      document.getElementById("galleryInput").value = "";
+      var fi = document.getElementById("fileInput"); if(fi) fi.value = "";
+      var gi = document.getElementById("galleryInput"); if(gi) gi.value = "";
     }
     async function submitPhoto() {
       if (!b64) return;
