@@ -1,5 +1,5 @@
 // Calorie Widget - Health Tracker
-var CAL_URL = "https://meshminds.app.n8n.cloud/webhook/227a21d7-85ea-4212-932b-21fc2245ccdb"
+var CAL_URL = "https://meshminds.app.n8n.cloud/webhook/log-calories"
 var SITE_URL = "https://daemien-calories.vercel.app/#calories"
 var GOAL = 2700
 var DAY_START = 7    // 07:00

@@ -273,8 +273,8 @@
   <button class="install-trigger" onclick="toggleInstall()" title="Widgets installieren">&#8984;</button>
 
   <script>
-    var N8N_CAL    = 'https://meshminds.app.n8n.cloud/webhook/227a21d7-85ea-4212-932b-21fc2245ccdb'
-    var N8N_WEIGHT = 'https://meshminds.app.n8n.cloud/webhook/34673c88-0335-4e98-96f6-1fa96d74a10c'
+    var N8N_CAL    = 'https://meshminds.app.n8n.cloud/webhook/log-calories'
+    var N8N_WEIGHT = 'https://meshminds.app.n8n.cloud/webhook/log-weight'
     var GOAL = 2700
 
     function toggleInstall() {
@@ -283,7 +283,7 @@
 
     var WIDGET_CODES = {
       CalorieWidget: `// Calorie Widget - Health Tracker
-var CAL_URL = "https://meshminds.app.n8n.cloud/webhook/227a21d7-85ea-4212-932b-21fc2245ccdb"
+var CAL_URL = "https://meshminds.app.n8n.cloud/webhook/log-calories"
 var SITE_URL = "https://daemien-calories.vercel.app/#calories"
 var GOAL = 2700
 var DAY_START = 7
@@ -448,7 +448,7 @@ if (config.runsInWidget) { Script.setWidget(widget) } else { widget.presentSmall
 Script.complete()`,
 
       WeightWidget: `// Weight Widget - Health Tracker
-var WT_URL = "https://meshminds.app.n8n.cloud/webhook/34673c88-0335-4e98-96f6-1fa96d74a10c"
+var WT_URL = "https://meshminds.app.n8n.cloud/webhook/log-weight"
 var SITE_URL = "https://daemien-calories.vercel.app/#weight"
 var C_BG = new Color("#0a0a0a")
 var C_UP = new Color("#ff6b35")
