@@ -8,55 +8,28 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0a0a0a;
-      --surface: #111111;
-      --border: #1e1e1e;
-      --accent: #c8f55a;
-      --accent2: #ff6b35;
-      --text: #f0f0f0;
-      --muted: #555;
-      --success: #4ade80;
-      --up: #ff6b35;
-      --down: #4ade80;
+      --bg: #0a0a0a; --surface: #111111; --border: #1e1e1e;
+      --accent: #c8f55a; --accent2: #ff6b35; --text: #f0f0f0;
+      --muted: #555; --success: #4ade80; --up: #ff6b35; --down: #4ade80;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Mono', monospace;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace;
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center;
       padding: 24px 16px 48px;
     }
-
     .page { display: none; width: 100%; max-width: 420px; flex-direction: column; align-items: center; }
     .page.active { display: flex; }
-
-    header {
-      width: 100%;
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-      margin-bottom: 32px;
-      padding-top: 8px;
-    }
-
+    header { width: 100%; display: flex; align-items: baseline; gap: 12px; margin-bottom: 32px; padding-top: 8px; }
     .logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--accent); }
     .logo span { color: var(--text); }
     .date-label { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
-
     .nav-link {
       margin-left: auto; font-size: 12px; color: var(--muted); text-decoration: none;
       border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px;
       transition: all 0.2s; cursor: pointer; background: none; font-family: 'DM Mono', monospace;
     }
     .nav-link:hover { border-color: var(--accent); color: var(--accent); }
-
-    /* RING */
     .goal-ring-wrap {
       width: 100%; display: flex; align-items: center; gap: 24px;
       background: var(--surface); border: 1px solid var(--border);
@@ -75,34 +48,25 @@
     .ring-unit { font-size: 13px; color: var(--muted); margin-top: 2px; }
     .ring-remaining { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.6; }
     .ring-remaining strong { color: var(--text); }
-
-    /* TABS */
     .tabs {
-      width: 100%; display: flex; gap: 4px;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 4px; margin-bottom: 20px;
+      width: 100%; display: flex; gap: 4px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 12px; padding: 4px; margin-bottom: 20px;
     }
     .tab {
-      flex: 1; padding: 10px; border-radius: 8px; border: none;
-      background: transparent; color: var(--muted); font-family: 'DM Mono', monospace;
-      font-size: 12px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.03em;
+      flex: 1; padding: 10px; border-radius: 8px; border: none; background: transparent;
+      color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; transition: all 0.2s;
     }
     .tab.active { background: var(--accent); color: #000; font-weight: 500; }
-
     .panel { width: 100%; display: none; flex-direction: column; gap: 12px; }
     .panel.active { display: flex; }
-
     .field { display: flex; flex-direction: column; gap: 6px; }
     label { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
-
     input[type="number"], input[type="text"] {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; color: var(--text); font-family: 'DM Mono', monospace;
-      font-size: 16px; padding: 14px 16px; width: 100%; outline: none;
-      transition: border-color 0.2s; -webkit-appearance: none;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); font-family: 'DM Mono', monospace; font-size: 16px;
+      padding: 14px 16px; width: 100%; outline: none; transition: border-color 0.2s; -webkit-appearance: none;
     }
     input:focus { border-color: var(--accent); }
-
     .upload-zone {
       border: 2px dashed var(--border); border-radius: 12px; padding: 32px 20px;
       text-align: center; cursor: pointer; transition: all 0.2s; position: relative;
@@ -112,7 +76,6 @@
     .upload-icon { font-size: 32px; margin-bottom: 8px; }
     .upload-text { font-size: 13px; color: var(--muted); }
     .upload-text strong { color: var(--accent); }
-
     .preview-wrap { position: relative; border-radius: 12px; overflow: hidden; display: none; }
     .preview-wrap.show { display: block; }
     .preview-wrap img { width: 100%; max-height: 220px; object-fit: cover; display: block; border-radius: 12px; }
@@ -121,15 +84,12 @@
       border: 1px solid var(--border); color: var(--text); border-radius: 8px;
       padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: 'DM Mono', monospace;
     }
-
     .btn {
       background: var(--accent); color: #000; border: none; border-radius: 12px;
       padding: 16px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
-      cursor: pointer; width: 100%; letter-spacing: 0.02em; transition: all 0.2s;
-      position: relative; overflow: hidden;
+      cursor: pointer; width: 100%; letter-spacing: 0.02em; transition: all 0.2s; position: relative; overflow: hidden;
     }
     .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
-    .btn:active { transform: translateY(0); }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     .btn.loading::after {
       content: ''; position: absolute; inset: 0;
@@ -137,11 +97,9 @@
       animation: shimmer 1.2s infinite;
     }
     @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-
     .analyzing {
       display: none; align-items: center; gap: 10px; background: var(--surface);
-      border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px;
-      font-size: 12px; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; font-size: 12px; color: var(--muted);
     }
     .analyzing.show { display: flex; }
     .dot-pulse { display: flex; gap: 4px; }
@@ -149,8 +107,6 @@
     .dot-pulse span:nth-child(2) { animation-delay: 0.2s; }
     .dot-pulse span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes dpulse { 0%,80%,100%{ opacity:.2; transform:scale(.8); } 40%{ opacity:1; transform:scale(1); } }
-
-    /* WEIGHT */
     .trend-card {
       width: 100%; background: var(--surface); border: 1px solid var(--border);
       border-radius: 16px; padding: 24px; margin-bottom: 20px;
@@ -161,12 +117,9 @@
     .trend-unit { font-size: 18px; color: var(--muted); margin-bottom: 8px; }
     .trend-change { margin-left: auto; text-align: right; }
     .trend-pct { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; }
-    .trend-pct.up { color: var(--up); }
-    .trend-pct.down { color: var(--down); }
-    .trend-pct.stable { color: var(--muted); }
+    .trend-pct.up { color: var(--up); } .trend-pct.down { color: var(--down); } .trend-pct.stable { color: var(--muted); }
     .trend-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
     .sparkline { width: 100%; height: 48px; margin-top: 4px; }
-
     .weight-input {
       background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
       color: var(--text); font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700;
@@ -174,29 +127,49 @@
       -webkit-appearance: none; letter-spacing: -1px;
     }
     .weight-input:focus { border-color: var(--accent); }
-
     .toast {
-      position: fixed; bottom: 32px; left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: var(--surface); border: 1px solid var(--accent);
-      color: var(--text); padding: 14px 24px; border-radius: 12px;
-      font-size: 13px; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      z-index: 100; white-space: nowrap;
+      position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--surface); border: 1px solid var(--accent); color: var(--text);
+      padding: 14px 24px; border-radius: 12px; font-size: 13px;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 100; white-space: nowrap;
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.error { border-color: var(--accent2); }
+    .install-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+      z-index: 200; align-items: center; justify-content: center; padding: 24px;
+    }
+    .install-overlay.open { display: flex; }
+    .install-box {
+      background: #111; border: 1px solid #1e1e1e; border-radius: 20px;
+      padding: 28px 24px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .install-header { display: flex; align-items: center; justify-content: space-between; }
+    .install-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; }
+    .install-close { background: none; border: none; color: #444; font-size: 22px; cursor: pointer; line-height: 1; padding: 0; }
+    .install-note { font-size: 11px; color: #444; line-height: 1.6; }
+    .install-btn {
+      display: block; background: var(--accent); color: #000; text-decoration: none;
+      border-radius: 10px; padding: 13px 16px; text-align: center;
+      font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+    }
+    .install-trigger {
+      position: fixed; bottom: 20px; right: 20px; background: none;
+      border: 1px solid #1e1e1e; border-radius: 50%; width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 15px; color: #252525; z-index: 100;
+    }
   </style>
 </head>
 <body>
 
-  <!-- ════════ CALORIES PAGE ════════ -->
+  <!-- CALORIES PAGE -->
   <div class="page" id="page-calories">
     <header>
       <div class="logo">health<span>.</span></div>
       <div class="date-label" id="dateLabel"></div>
-      <button class="nav-link" onclick="navigate('weight')">Gewicht →</button>
+      <button class="nav-link" onclick="navigate('weight')">Gewicht &#8594;</button>
     </header>
-
     <div class="goal-ring-wrap">
       <svg width="80" height="80" viewBox="0 0 80 80">
         <circle class="ring-bg" cx="40" cy="40" r="35"/>
@@ -208,12 +181,10 @@
         <div class="ring-remaining" id="ringRemaining">Lade...</div>
       </div>
     </div>
-
     <div class="tabs">
       <button class="tab active" onclick="switchTab('manual')">Manuell</button>
       <button class="tab" onclick="switchTab('photo')">Foto</button>
     </div>
-
     <div class="panel active" id="panel-manual">
       <div class="field">
         <label>Kalorien (kcal)</label>
@@ -221,51 +192,48 @@
       </div>
       <div class="field">
         <label>Beschreibung (optional)</label>
-        <input type="text" id="manualDesc" placeholder="z.B. Pasta mit Tomatensoße">
+        <input type="text" id="manualDesc" placeholder="z.B. Pasta mit Tomatensauce">
       </div>
       <button class="btn" id="manualBtn" onclick="submitManual()">Eintragen</button>
     </div>
-
     <div class="panel" id="panel-photo">
       <div class="upload-zone" id="uploadZone">
         <input type="file" accept="image/*" capture="environment" id="fileInput" onchange="handleFile(this)">
-        <div class="upload-icon">📸</div>
-        <div class="upload-text"><strong>Foto auswählen</strong><br>oder Kamera öffnen</div>
+        <div class="upload-icon">&#128248;</div>
+        <div class="upload-text"><strong>Foto ausw&#228;hlen</strong><br>oder Kamera &#246;ffnen</div>
       </div>
       <div class="preview-wrap" id="previewWrap">
         <img id="previewImg" src="" alt="">
-        <button class="preview-remove" onclick="removePhoto()">✕</button>
+        <button class="preview-remove" onclick="removePhoto()">&#10005;</button>
       </div>
       <div class="analyzing" id="analyzing">
         <div class="dot-pulse"><span></span><span></span><span></span></div>
         Claude analysiert das Bild...
       </div>
-      <button class="btn" id="photoBtn" onclick="submitPhoto()" disabled>Kalorien schätzen & speichern</button>
+      <button class="btn" id="photoBtn" onclick="submitPhoto()" disabled>Kalorien sch&#228;tzen &amp; speichern</button>
     </div>
   </div>
 
-  <!-- ════════ WEIGHT PAGE ════════ -->
+  <!-- WEIGHT PAGE -->
   <div class="page" id="page-weight">
     <header>
       <div class="logo">weight<span>.</span></div>
-      <button class="nav-link" onclick="navigate('calories')">← Kalorien</button>
+      <button class="nav-link" onclick="navigate('calories')">&#8592; Kalorien</button>
     </header>
-
     <div class="trend-card">
       <div class="trend-label">30-Tage Trend</div>
       <div class="trend-row">
         <div>
-          <div class="trend-current" id="trendCurrent">—</div>
+          <div class="trend-current" id="trendCurrent">&#8212;</div>
           <div class="trend-unit">kg</div>
         </div>
         <div class="trend-change">
-          <div class="trend-pct stable" id="trendPct">—</div>
+          <div class="trend-pct stable" id="trendPct">&#8212;</div>
           <div class="trend-sub" id="trendSub">30 Tage</div>
         </div>
       </div>
       <svg class="sparkline" id="sparkline" viewBox="0 0 380 48" preserveAspectRatio="none"></svg>
     </div>
-
     <div style="width:100%;display:flex;flex-direction:column;gap:12px;">
       <div class="field">
         <label>Aktuelles Gewicht (kg)</label>
@@ -277,99 +245,109 @@
 
   <div class="toast" id="toast"></div>
 
-  <script>
-    // ── CONFIG — edit these two lines ──────────────────────
-    const N8N_CAL    = 'https://meshminds.app.n8n.cloud/webhook/227a21d7-85ea-4212-932b-21fc2245ccdb'
-    const N8N_WEIGHT = 'https://meshminds.app.n8n.cloud/webhook/34673c88-0335-4e98-96f6-1fa96d74a10c'
-    const GOAL = 2700
-    // ───────────────────────────────────────────────────────
+  <!-- INSTALL OVERLAY -->
+  <div class="install-overlay" id="installOverlay">
+    <div class="install-box">
+      <div class="install-header">
+        <span class="install-title">Widgets installieren</span>
+        <button class="install-close" onclick="toggleInstall()">&#215;</button>
+      </div>
+      <p class="install-note">Scriptable muss installiert sein. Tippe auf einen Button &#8212; das Widget installiert sich direkt, kein Copy-Paste.</p>
+      <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FCalorieWidget.js&name=CalorieWidget">Kalorien Widget</a>
+      <a class="install-btn" href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FWeightWidget.js&name=WeightWidget">Gewicht Widget</a>
+    </div>
+  </div>
+  <button class="install-trigger" onclick="toggleInstall()" title="Widgets installieren">&#8984;</button>
 
-    // Routing via hash: / = calories, /#weight = weight
+  <script>
+    var N8N_CAL    = 'https://meshminds.app.n8n.cloud/webhook/227a21d7-85ea-4212-932b-21fc2245ccdb'
+    var N8N_WEIGHT = 'https://meshminds.app.n8n.cloud/webhook/34673c88-0335-4e98-96f6-1fa96d74a10c'
+    var GOAL = 2700
+
+    function toggleInstall() {
+      document.getElementById('installOverlay').classList.toggle('open')
+    }
+
     function navigate(page) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+      document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active') })
       document.getElementById('page-' + page).classList.add('active')
       window.location.hash = page === 'calories' ? '' : page
       window.scrollTo(0, 0)
     }
 
     function initRoute() {
-      const hash = window.location.hash.replace('#', '') || 'calories'
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+      var hash = window.location.hash.replace('#', '') || 'calories'
+      document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active') })
       document.getElementById('page-' + (hash === 'weight' ? 'weight' : 'calories')).classList.add('active')
     }
 
     window.addEventListener('hashchange', initRoute)
     initRoute()
 
-    // Date
     document.getElementById('dateLabel').textContent = new Date().toLocaleDateString('de-DE', {
       weekday: 'short', day: 'numeric', month: 'short'
     })
 
-    // ── RING ───────────────────────────────────────────────
     function updateRing(total) {
-      const pct = Math.min(total / GOAL, 1)
-      const fill = document.getElementById('ringFill')
-      const totalEl = document.getElementById('ringTotal')
-      const rem = document.getElementById('ringRemaining')
+      var pct = Math.min(total / GOAL, 1)
+      var fill = document.getElementById('ringFill')
+      var totalEl = document.getElementById('ringTotal')
+      var rem = document.getElementById('ringRemaining')
       fill.style.strokeDashoffset = 220 - pct * 220
       totalEl.textContent = total.toLocaleString('de-DE')
       if (total >= GOAL) {
         fill.classList.add('done'); totalEl.classList.add('done')
-        rem.innerHTML = '🎯 Tagesziel erreicht!'
+        rem.textContent = 'Tagesziel erreicht!'
       } else {
         fill.classList.remove('done'); totalEl.classList.remove('done')
-        rem.innerHTML = `Noch <strong>${(GOAL - total).toLocaleString('de-DE')} kcal</strong> bis Ziel`
+        rem.innerHTML = 'Noch <strong>' + (GOAL - total).toLocaleString('de-DE') + ' kcal</strong> bis Ziel'
       }
     }
 
     async function loadToday() {
       try {
-        const r = await fetch(N8N_CAL, {
+        var r = await fetch(N8N_CAL, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ type: 'status' })
         })
-        const d = await r.json()
-        updateRing(d.total ?? 0)
-      } catch { updateRing(0); document.getElementById('ringRemaining').textContent = 'Ersten Eintrag machen' }
+        var d = await r.json()
+        updateRing(d.total || 0)
+      } catch(e) { updateRing(0); document.getElementById('ringRemaining').textContent = 'Ersten Eintrag machen' }
     }
     loadToday()
 
-    // ── TABS ───────────────────────────────────────────────
     function switchTab(tab) {
-      document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (i === 0) === (tab === 'manual')))
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+      document.querySelectorAll('.tab').forEach(function(t, i) { t.classList.toggle('active', (i === 0) === (tab === 'manual')) })
+      document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active') })
       document.getElementById('panel-' + tab).classList.add('active')
     }
 
-    // ── MANUAL ─────────────────────────────────────────────
     async function submitManual() {
-      const cal = parseInt(document.getElementById('manualCal').value)
-      const desc = document.getElementById('manualDesc').value.trim()
+      var cal = parseInt(document.getElementById('manualCal').value)
+      var desc = document.getElementById('manualDesc').value.trim()
       if (!cal || cal <= 0) { showToast('Bitte Kalorien eingeben', true); return }
-      const btn = document.getElementById('manualBtn')
+      var btn = document.getElementById('manualBtn')
       setBtn(btn, true, 'Wird gespeichert...')
       try {
-        const r = await fetch(N8N_CAL, {
+        var r = await fetch(N8N_CAL, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ type: 'manual', calories: cal, description: desc || 'Manueller Eintrag' })
         })
-        const d = await r.json()
-        showToast(`✓ ${cal} kcal gespeichert`)
+        var d = await r.json()
+        showToast(cal + ' kcal gespeichert')
         if (d.total !== undefined) updateRing(d.total)
         document.getElementById('manualCal').value = ''
         document.getElementById('manualDesc').value = ''
-      } catch { showToast('Fehler beim Speichern', true) }
+      } catch(e) { showToast('Fehler beim Speichern', true) }
       finally { setBtn(btn, false, 'Eintragen') }
     }
 
-    // ── PHOTO ──────────────────────────────────────────────
-    let b64 = null
+    var b64 = null
 
     function handleFile(input) {
-      const file = input.files[0]; if (!file) return
-      const reader = new FileReader()
-      reader.onload = e => {
+      var file = input.files[0]; if (!file) return
+      var reader = new FileReader()
+      reader.onload = function(e) {
         b64 = e.target.result.split(',')[1]
         document.getElementById('previewImg').src = e.target.result
         document.getElementById('previewWrap').classList.add('show')
@@ -389,129 +367,96 @@
 
     async function submitPhoto() {
       if (!b64) return
-      const btn = document.getElementById('photoBtn')
+      var btn = document.getElementById('photoBtn')
       setBtn(btn, true, 'Analysiere...')
       document.getElementById('analyzing').classList.add('show')
       try {
-        const r = await fetch(N8N_CAL, {
+        var r = await fetch(N8N_CAL, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ type: 'photo', image: b64 })
         })
-        const d = await r.json()
-        showToast(`✓ ${d.calories ?? '?'} kcal erkannt & gespeichert`)
+        var d = await r.json()
+        showToast((d.calories || '?') + ' kcal erkannt & gespeichert')
         if (d.total !== undefined) updateRing(d.total)
         removePhoto()
-      } catch { showToast('Fehler bei der Analyse', true) }
+      } catch(e) { showToast('Fehler bei der Analyse', true) }
       finally {
         document.getElementById('analyzing').classList.remove('show')
-        setBtn(btn, false, 'Kalorien schätzen & speichern')
+        setBtn(btn, false, 'Kalorien sch\u00e4tzen & speichern')
       }
     }
 
-    const zone = document.getElementById('uploadZone')
-    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover') })
-    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'))
-    zone.addEventListener('drop', e => {
+    var zone = document.getElementById('uploadZone')
+    zone.addEventListener('dragover', function(e) { e.preventDefault(); zone.classList.add('dragover') })
+    zone.addEventListener('dragleave', function() { zone.classList.remove('dragover') })
+    zone.addEventListener('drop', function(e) {
       e.preventDefault(); zone.classList.remove('dragover')
-      const file = e.dataTransfer.files[0]
-      if (file?.type.startsWith('image/')) {
-        const dt = new DataTransfer(); dt.items.add(file)
+      var file = e.dataTransfer.files[0]
+      if (file && file.type.startsWith('image/')) {
+        var dt = new DataTransfer(); dt.items.add(file)
         document.getElementById('fileInput').files = dt.files
         handleFile(document.getElementById('fileInput'))
       }
     })
 
-    document.getElementById('manualCal').addEventListener('keydown', e => { if (e.key === 'Enter') submitManual() })
-    document.getElementById('manualDesc').addEventListener('keydown', e => { if (e.key === 'Enter') submitManual() })
+    document.getElementById('manualCal').addEventListener('keydown', function(e) { if (e.key === 'Enter') submitManual() })
+    document.getElementById('manualDesc').addEventListener('keydown', function(e) { if (e.key === 'Enter') submitManual() })
 
-    // ── WEIGHT ─────────────────────────────────────────────
     function drawSparkline(points) {
-      const svg = document.getElementById('sparkline')
+      var svg = document.getElementById('sparkline')
       if (!points || points.length < 2) { svg.innerHTML = ''; return }
-      const min = Math.min(...points), max = Math.max(...points), range = max - min || 1
-      const W = 380, H = 44, P = 2
-      const coords = points.map((v, i) => [
-        (i / (points.length - 1)) * (W - P*2) + P,
-        H - ((v - min) / range) * (H - P*2) - P
-      ])
-      const path = coords.map((c, i) => (i === 0 ? `M${c[0]},${c[1]}` : `L${c[0]},${c[1]}`)).join(' ')
-      const color = points[points.length-1] > points[0] ? '#ff6b35' : '#4ade80'
-      const last = coords[coords.length-1]
-      svg.innerHTML = `
-        <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="${color}" stop-opacity="0.25"/>
-          <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
-        </linearGradient></defs>
-        <path d="${path} L${last[0]},${H} L${coords[0][0]},${H} Z" fill="url(#sg)"/>
-        <path d="${path}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="${last[0]}" cy="${last[1]}" r="3" fill="${color}"/>
-      `
+      var min = Math.min.apply(null, points), max = Math.max.apply(null, points), range = max - min || 1
+      var W = 380, H = 44, P = 2
+      var coords = points.map(function(v, i) {
+        return [(i / (points.length - 1)) * (W - P*2) + P, H - ((v - min) / range) * (H - P*2) - P]
+      })
+      var path = coords.map(function(c, i) { return (i === 0 ? 'M' : 'L') + c[0] + ',' + c[1] }).join(' ')
+      var color = points[points.length-1] > points[0] ? '#ff6b35' : '#4ade80'
+      var last = coords[coords.length-1]
+      svg.innerHTML = '<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="' + color + '" stop-opacity="0.25"/><stop offset="100%" stop-color="' + color + '" stop-opacity="0"/></linearGradient></defs>'
+        + '<path d="' + path + ' L' + last[0] + ',' + H + ' L' + coords[0][0] + ',' + H + ' Z" fill="url(#sg)"/>'
+        + '<path d="' + path + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+        + '<circle cx="' + last[0] + '" cy="' + last[1] + '" r="3" fill="' + color + '"/>'
     }
     drawSparkline([78.5,78.3,78.6,78.1,77.9,78.0,77.7,77.5])
 
     async function saveWeight() {
-      const val = parseFloat(document.getElementById('weightInput').value)
-      if (!val || val < 20 || val > 300) { showToast('Ungültiges Gewicht', true); return }
-      const btn = document.getElementById('saveBtn')
+      var val = parseFloat(document.getElementById('weightInput').value)
+      if (!val || val < 20 || val > 300) { showToast('Ung\u00fcltiges Gewicht', true); return }
+      var btn = document.getElementById('saveBtn')
       setBtn(btn, true, 'Wird gespeichert...')
       try {
-        const r = await fetch(N8N_WEIGHT, {
+        var r = await fetch(N8N_WEIGHT, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ weight: val })
         })
-        const d = await r.json()
+        var d = await r.json()
         document.getElementById('trendCurrent').textContent = val.toFixed(1)
-        const pct = d.changePercent ?? 0, change = d.change ?? 0, trend = d.trend ?? 'stable'
-        const pctEl = document.getElementById('trendPct')
+        var pct = d.changePercent || 0, change = d.change || 0, trend = d.trend || 'stable'
+        var pctEl = document.getElementById('trendPct')
         pctEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%'
         pctEl.className = 'trend-pct ' + trend
         document.getElementById('trendSub').textContent = (change >= 0 ? '+' : '') + change.toFixed(1) + ' kg (30 Tage)'
-        showToast(`✓ ${val} kg gespeichert`)
+        showToast(val + ' kg gespeichert')
         document.getElementById('weightInput').value = ''
-      } catch { showToast('Fehler beim Speichern', true) }
+      } catch(e) { showToast('Fehler beim Speichern', true) }
       finally { setBtn(btn, false, 'Gewicht speichern') }
     }
 
-    document.getElementById('weightInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveWeight() })
+    document.getElementById('weightInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') saveWeight() })
 
-    // ── HELPERS ────────────────────────────────────────────
     function setBtn(btn, loading, text) {
       btn.disabled = loading; btn.textContent = text
       btn.classList.toggle('loading', loading)
     }
 
-    function showToast(msg, isError = false) {
-      const t = document.getElementById('toast')
+    function showToast(msg, isError) {
+      var t = document.getElementById('toast')
       t.textContent = msg
       t.className = 'toast' + (isError ? ' error' : '')
       t.classList.add('show')
-      setTimeout(() => t.classList.remove('show'), 3000)
+      setTimeout(function() { t.classList.remove('show') }, 3000)
     }
   </script>
-      </div>
-      <p style="font-size:11px;color:#555;line-height:1.6;">Scriptable muss installiert sein. Tippe auf einen Button &#x2014; das Widget wird direkt installiert, kein Copy-Paste.</p>
-      <a href="scriptable:///add?code=%2F%2F%20Calorie%20Widget%20-%20Health%20Tracker%0Avar%20CAL_URL%20%3D%20%22https%3A%2F%2Fmeshminds.app.n8n.cloud%2Fwebhook%2F227a21d7-85ea-4212-932b-21fc2245ccdb%22%0Avar%20SITE_URL%20%3D%20%22https%3A%2F%2Fdaemien-calories.vercel.app%2F%23calories%22%0Avar%20GOAL%20%3D%202700%0Avar%20C_BG%20%3D%20new%20Color%28%22%230a0a0a%22%29%0Avar%20C_ACCENT%20%3D%20new%20Color%28%22%23c8f55a%22%29%0Avar%20C_GREEN%20%3D%20new%20Color%28%22%234ade80%22%29%0Avar%20C_MUTED%20%3D%20new%20Color%28%22%23555555%22%29%0Avar%20C_WHITE%20%3D%20new%20Color%28%22%23f0f0f0%22%29%0Aasync%20function%20getToday%28%29%20%7B%0A%20%20try%20%7B%0A%20%20%20%20var%20r%20%3D%20new%20Request%28CAL_URL%29%0A%20%20%20%20r.method%20%3D%20%22POST%22%0A%20%20%20%20r.headers%20%3D%20%7B%22Content-Type%22%3A%20%22application%2Fjson%22%7D%0A%20%20%20%20r.body%20%3D%20JSON.stringify%28%7Btype%3A%20%22status%22%7D%29%0A%20%20%20%20r.timeoutInterval%20%3D%208%0A%20%20%20%20var%20d%20%3D%20await%20r.loadJSON%28%29%0A%20%20%20%20return%20%7Btotal%3A%20d.total%7C%7C0%2C%20remaining%3A%20d.remaining%7C%7CGOAL%2C%20percentage%3A%20d.percentage%7C%7C0%2C%20goalReached%3A%20d.goalReached%7C%7Cfalse%7D%0A%20%20%7D%20catch%28e%29%20%7B%0A%20%20%20%20return%20%7Btotal%3A%200%2C%20remaining%3A%20GOAL%2C%20percentage%3A%200%2C%20goalReached%3A%20false%7D%0A%20%20%7D%0A%7D%0Aasync%20function%20build%28%29%20%7B%0A%20%20var%20data%20%3D%20await%20getToday%28%29%0A%20%20var%20pct%20%3D%20Math.min%28data.percentage%2C%20100%29%0A%20%20var%20w%20%3D%20new%20ListWidget%28%29%0A%20%20w.backgroundColor%20%3D%20C_BG%0A%20%20w.url%20%3D%20SITE_URL%0A%20%20w.setPadding%2814%2C%2014%2C%2014%2C%2014%29%0A%20%20var%20top%20%3D%20w.addStack%28%29%0A%20%20top.layoutHorizontally%28%29%0A%20%20top.centerAlignContent%28%29%0A%20%20var%20lbl%20%3D%20top.addText%28%22KCAL%22%29%0A%20%20lbl.font%20%3D%20Font.boldMonospacedSystemFont%289%29%0A%20%20lbl.textColor%20%3D%20C_MUTED%0A%20%20top.addSpacer%28%29%0A%20%20var%20dot%20%3D%20top.addText%28data.goalReached%20%3F%20%22%2A%22%20%3A%20%22o%22%29%0A%20%20dot.font%20%3D%20Font.boldSystemFont%288%29%0A%20%20dot.textColor%20%3D%20data.goalReached%20%3F%20C_GREEN%20%3A%20C_MUTED%0A%20%20w.addSpacer%286%29%0A%20%20var%20num%20%3D%20w.addText%28data.total.toLocaleString%28%22de-DE%22%29%29%0A%20%20num.font%20%3D%20Font.boldSystemFont%2830%29%0A%20%20num.textColor%20%3D%20data.goalReached%20%3F%20C_GREEN%20%3A%20C_ACCENT%0A%20%20num.minimumScaleFactor%20%3D%200.6%0A%20%20w.addSpacer%28%29%0A%20%20var%20bot%20%3D%20w.addStack%28%29%0A%20%20bot.layoutHorizontally%28%29%0A%20%20bot.centerAlignContent%28%29%0A%20%20if%20%28data.goalReached%29%20%7B%0A%20%20%20%20var%20dt%20%3D%20bot.addText%28%22Ziel%20erreicht%21%22%29%0A%20%20%20%20dt.font%20%3D%20Font.mediumSystemFont%289%29%0A%20%20%20%20dt.textColor%20%3D%20C_GREEN%0A%20%20%7D%20else%20%7B%0A%20%20%20%20var%20rt%20%3D%20bot.addText%28%22-%22%20%2B%20data.remaining.toLocaleString%28%22de-DE%22%29%29%0A%20%20%20%20rt.font%20%3D%20Font.mediumMonospacedSystemFont%2810%29%0A%20%20%20%20rt.textColor%20%3D%20C_WHITE%0A%20%20%20%20bot.addSpacer%28%29%0A%20%20%20%20var%20pt%20%3D%20bot.addText%28pct%20%2B%20%22%25%22%29%0A%20%20%20%20pt.font%20%3D%20Font.boldMonospacedSystemFont%289%29%0A%20%20%20%20pt.textColor%20%3D%20C_MUTED%0A%20%20%7D%0A%20%20return%20w%0A%7D%0Avar%20widget%20%3D%20await%20build%28%29%0Aif%20%28config.runsInWidget%29%20%7B%20Script.setWidget%28widget%29%20%7D%20else%20%7B%20widget.presentSmall%28%29%20%7D%0AScript.complete%28%29&name=CalorieWidget" style="display:block;background:#c8f55a;color:#000;text-decoration:none;border-radius:10px;padding:14px;text-align:center;font-family:Syne,sans-serif;font-size:14px;font-weight:700;">Kalorien Widget</a>
-      <a href="scriptable:///add?code=%2F%2F%20Weight%20Widget%20-%20Health%20Tracker%0Avar%20WT_URL%20%3D%20%22https%3A%2F%2Fmeshminds.app.n8n.cloud%2Fwebhook%2F34673c88-0335-4e98-96f6-1fa96d74a10c%22%0Avar%20SITE_URL%20%3D%20%22https%3A%2F%2Fdaemien-calories.vercel.app%2F%23weight%22%0Avar%20C_BG%20%3D%20new%20Color%28%22%230a0a0a%22%29%0Avar%20C_UP%20%3D%20new%20Color%28%22%23ff6b35%22%29%0Avar%20C_DOWN%20%3D%20new%20Color%28%22%234ade80%22%29%0Avar%20C_MUTED%20%3D%20new%20Color%28%22%23555555%22%29%0Avar%20C_WHITE%20%3D%20new%20Color%28%22%23f0f0f0%22%29%0Afunction%20loadCache%28%29%20%7B%0A%20%20try%20%7B%0A%20%20%20%20if%20%28Keychain.contains%28%22ht_weight%22%29%29%20return%20JSON.parse%28Keychain.get%28%22ht_weight%22%29%29%0A%20%20%7D%20catch%28e%29%20%7B%7D%0A%20%20return%20%7Bcurrent%3A%20null%2C%20change%3A%200%2C%20changePercent%3A%200%2C%20trend%3A%20%22stable%22%7D%0A%7D%0Afunction%20saveCache%28d%29%20%7B%0A%20%20try%20%7B%20Keychain.set%28%22ht_weight%22%2C%20JSON.stringify%28d%29%29%20%7D%20catch%28e%29%20%7B%7D%0A%7D%0Aasync%20function%20sendWeight%28kg%29%20%7B%0A%20%20var%20r%20%3D%20new%20Request%28WT_URL%29%0A%20%20r.method%20%3D%20%22POST%22%0A%20%20r.headers%20%3D%20%7B%22Content-Type%22%3A%20%22application%2Fjson%22%7D%0A%20%20r.body%20%3D%20JSON.stringify%28%7Bweight%3A%20kg%7D%29%0A%20%20r.timeoutInterval%20%3D%2010%0A%20%20var%20res%20%3D%20await%20r.loadJSON%28%29%0A%20%20if%20%28res.success%29%20saveCache%28%7Bcurrent%3A%20res.current%2C%20change%3A%20res.change%2C%20changePercent%3A%20res.changePercent%2C%20trend%3A%20res.trend%7D%29%0A%20%20return%20res%0A%7D%0Afunction%20makeWidget%28d%29%20%7B%0A%20%20var%20trend%20%3D%20d.trend%20%7C%7C%20%22stable%22%0A%20%20var%20tc%20%3D%20trend%20%3D%3D%3D%20%22up%22%20%3F%20C_UP%20%3A%20trend%20%3D%3D%3D%20%22down%22%20%3F%20C_DOWN%20%3A%20C_MUTED%0A%20%20var%20arrow%20%3D%20trend%20%3D%3D%3D%20%22up%22%20%3F%20%22%5E%22%20%3A%20trend%20%3D%3D%3D%20%22down%22%20%3F%20%22v%22%20%3A%20%22-%22%0A%20%20var%20w%20%3D%20new%20ListWidget%28%29%0A%20%20w.backgroundColor%20%3D%20C_BG%0A%20%20w.url%20%3D%20SITE_URL%0A%20%20w.setPadding%2814%2C%2014%2C%2014%2C%2014%29%0A%20%20var%20top%20%3D%20w.addStack%28%29%0A%20%20top.layoutHorizontally%28%29%0A%20%20top.centerAlignContent%28%29%0A%20%20var%20lbl%20%3D%20top.addText%28%22GEWICHT%22%29%0A%20%20lbl.font%20%3D%20Font.boldMonospacedSystemFont%289%29%0A%20%20lbl.textColor%20%3D%20C_MUTED%0A%20%20top.addSpacer%28%29%0A%20%20var%20arr%20%3D%20top.addText%28arrow%29%0A%20%20arr.font%20%3D%20Font.boldSystemFont%2810%29%0A%20%20arr.textColor%20%3D%20tc%0A%20%20w.addSpacer%286%29%0A%20%20var%20num%20%3D%20w.addText%28d.current%20%21%3D%20null%20%3F%20Number%28d.current%29.toFixed%281%29%20%3A%20%22--%22%29%0A%20%20num.font%20%3D%20Font.boldSystemFont%2830%29%0A%20%20num.textColor%20%3D%20C_WHITE%0A%20%20num.minimumScaleFactor%20%3D%200.6%0A%20%20var%20unit%20%3D%20w.addText%28%22kg%22%29%0A%20%20unit.font%20%3D%20Font.mediumSystemFont%2811%29%0A%20%20unit.textColor%20%3D%20C_MUTED%0A%20%20w.addSpacer%28%29%0A%20%20var%20bot%20%3D%20w.addStack%28%29%0A%20%20bot.layoutHorizontally%28%29%0A%20%20bot.centerAlignContent%28%29%0A%20%20var%20ch%20%3D%20Number%28d.change%7C%7C0%29%0A%20%20var%20pc%20%3D%20Number%28d.changePercent%7C%7C0%29%0A%20%20var%20ct%20%3D%20bot.addText%28%28ch%3E%3D0%3F%22%2B%22%3A%22%22%29%2Bch.toFixed%281%29%2B%22%20kg%22%29%0A%20%20ct.font%20%3D%20Font.mediumMonospacedSystemFont%2810%29%0A%20%20ct.textColor%20%3D%20tc%0A%20%20bot.addSpacer%28%29%0A%20%20var%20pt%20%3D%20bot.addText%28%28pc%3E%3D0%3F%22%2B%22%3A%22%22%29%2Bpc.toFixed%281%29%2B%22%25%22%29%0A%20%20pt.font%20%3D%20Font.boldMonospacedSystemFont%289%29%0A%20%20pt.textColor%20%3D%20tc%0A%20%20return%20w%0A%7D%0Aasync%20function%20askWeight%28%29%20%7B%0A%20%20var%20a%20%3D%20new%20Alert%28%29%0A%20%20a.title%20%3D%20%22Gewicht%20eingeben%22%0A%20%20a.message%20%3D%20%22kg%22%0A%20%20a.addTextField%28%2278.5%22%2C%20%22%22%29%0A%20%20a.addAction%28%22Speichern%22%29%0A%20%20a.addCancelAction%28%22Abbrechen%22%29%0A%20%20var%20i%20%3D%20await%20a.presentAlert%28%29%0A%20%20if%20%28i%20%3D%3D%3D%20-1%29%20return%20null%0A%20%20var%20v%20%3D%20parseFloat%28a.textFieldValue%280%29%29%0A%20%20if%20%28%21v%20%7C%7C%20v%20%3C%2020%20%7C%7C%20v%20%3E%20300%29%20return%20null%0A%20%20return%20v%0A%7D%0Aif%20%28config.runsInWidget%29%20%7B%0A%20%20Script.setWidget%28makeWidget%28loadCache%28%29%29%29%0A%7D%20else%20%7B%0A%20%20var%20kg%20%3D%20await%20askWeight%28%29%0A%20%20if%20%28kg%29%20%7B%20await%20sendWeight%28kg%29%3B%20await%20makeWidget%28loadCache%28%29%29.presentSmall%28%29%20%7D%0A%7D%0AScript.complete%28%29&name=WeightWidget" style="display:block;background:#c8f55a;color:#000;text-decoration:none;border-radius:10px;padding:14px;text-align:center;font-family:Syne,sans-serif;font-size:14px;font-weight:700;">Gewicht Widget</a>
-    </div>
-  </div>
-
-  <!-- Subtle install trigger — fixed bottom right -->
-  <button onclick="document.getElementById('install-overlay').style.display='flex'" style="position:fixed;bottom:20px;right:20px;background:none;border:1px solid #222;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:#333;z-index:100;" title="Widgets installieren">&#x2913;</button>
-
-
-  <!-- Install overlay -->
-  <div id="iov" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:200;align-items:center;justify-content:center;padding:24px;">
-    <div style="background:#111;border:1px solid #1e1e1e;border-radius:20px;padding:28px 24px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <span style="font-family:Syne,sans-serif;font-size:15px;font-weight:800;color:#f0f0f0;">Widgets installieren</span>
-        <button onclick="document.getElementById('iov').style.display='none'" style="background:none;border:none;color:#444;font-size:20px;cursor:pointer;line-height:1;">&#215;</button>
-      </div>
-      <p style="font-size:11px;color:#444;line-height:1.6;margin:0;">Scriptable muss installiert sein. Tippe auf einen Button &#8212; das Widget installiert sich direkt, kein Copy-Paste.</p>
-      <a href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FCalorieWidget.js&name=CalorieWidget" style="display:block;background:#c8f55a;color:#000;text-decoration:none;border-radius:10px;padding:13px 16px;font-family:Syne,sans-serif;font-size:13px;font-weight:700;text-align:center;">Kalorien Widget</a>
-      <a href="scriptable:///add?url=https%3A%2F%2Fdaemien-calories.vercel.app%2FWeightWidget.js&name=WeightWidget" style="display:block;background:#c8f55a;color:#000;text-decoration:none;border-radius:10px;padding:13px 16px;font-family:Syne,sans-serif;font-size:13px;font-weight:700;text-align:center;">Gewicht Widget</a>
-    </div>
-  </div>
-  <button onclick="var o=document.getElementById('iov');o.style.display=o.style.display==='flex'?'none':'flex'" style="position:fixed;bottom:20px;right:20px;background:none;border:1px solid #1e1e1e;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:#2a2a2a;z-index:100;" title="Widgets installieren">&#8984;</button>
-
 </body>
 </html>
