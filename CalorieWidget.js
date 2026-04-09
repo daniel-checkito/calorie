@@ -2,6 +2,8 @@
 var CAL_URL = "https://meshminds.app.n8n.cloud/webhook/227a21d7-85ea-4212-932b-21fc2245ccdb"
 var SITE_URL = "https://daemien-calories.vercel.app/#calories"
 var GOAL = 2700
+var DAY_START = 7    // 07:00
+var DAY_END   = 22   // 22:00
 
 async function getToday() {
   try {
@@ -17,20 +19,27 @@ async function getToday() {
   }
 }
 
-function getMealStatus(total) {
-  var h = new Date().getHours() + new Date().getMinutes() / 60
-  var pct = total / GOAL
-  if (h < 9.5)  return {text: "Guten Morgen", ok: true}
-  if (h < 11)   return {text: pct < 0.12 ? "Frühstück!" : "✓ Frühstück", ok: pct >= 0.12}
-  if (h < 13)   return {text: pct < 0.35 ? "Mittagessen?" : "✓ Mittag", ok: pct >= 0.3}
-  if (h < 15.5) return {text: pct < 0.50 ? "Snack?" : "✓ On Track", ok: pct >= 0.45}
-  if (h < 16.5) return {text: pct < 0.55 ? "Snack Zeit!" : "✓ Snack", ok: pct >= 0.5}
-  if (h < 20)   return {text: pct < 0.70 ? "Bleib dran!" : "✓ Super", ok: pct >= 0.65}
-  if (h < 21)   return {text: pct < 0.88 ? "Abendessen?" : "✓ Fast da!", ok: pct >= 0.85}
-  return {text: pct >= 1 ? "✓ Erreicht!" : "Guter Tag!", ok: pct >= 0.9}
+function getPace(total) {
+  var now = new Date()
+  var h = now.getHours() + now.getMinutes() / 60
+  var dayLen = DAY_END - DAY_START
+  var elapsed = Math.max(0, Math.min(h - DAY_START, dayLen))
+  var paceTarget = Math.round(GOAL * elapsed / dayLen)
+  var gap = total - paceTarget
+
+  // Meal label by time
+  var label
+  if (h < 9)    label = "Frühstück"
+  else if (h < 11)  label = "Frühstück"
+  else if (h < 14)  label = "Mittagessen"
+  else if (h < 17)  label = "Snack Zeit"
+  else if (h < 20)  label = "Abendessen"
+  else          label = "Letzter Snack"
+
+  return {paceTarget: paceTarget, gap: gap, label: label}
 }
 
-function makeDonut(pct, total, done) {
+function makeDonut(pct, done) {
   var s = 120
   var dc = new DrawContext()
   dc.size = new Size(s, s)
@@ -46,7 +55,7 @@ function makeDonut(pct, total, done) {
   dc.setStrokeColor(new Color("#1e1e1e"))
   dc.strokePath()
 
-  // Progress arc — starts at 12 o'clock, goes clockwise
+  // Progress arc — 12 o'clock, clockwise
   var filled = Math.min(pct / 100, 1)
   if (filled > 0) {
     var arc = new Path()
@@ -57,32 +66,25 @@ function makeDonut(pct, total, done) {
     dc.strokePath()
   }
 
-  // Center: calorie number
-  dc.setTextAlignedCenter()
-  dc.setTextColor(new Color(done ? "#4ade80" : "#f0f0f0"))
-  dc.setFont(Font.boldSystemFont(20))
-  dc.drawTextInRect(total.toLocaleString("de-DE"), new Rect(4, cy - 14, s - 8, 26))
-
-  // Center: "kcal" unit
-  dc.setTextColor(new Color("#555555"))
-  dc.setFont(Font.mediumSystemFont(10))
-  dc.drawTextInRect("kcal", new Rect(0, cy + 12, s, 16))
-
   return dc.getImage()
 }
 
 async function build() {
   var data = await getToday()
-  var pct = Math.min(data.percentage, 100)
+  var pct  = Math.min(data.percentage, 100)
   var done = data.goalReached
-  var meal = getMealStatus(data.total)
+  var pace = getPace(data.total)
+  var gap  = pace.gap
+  var ahead = gap >= 0
+  var gapStr = (ahead ? "+" : "") + gap.toLocaleString("de-DE")
+  var gapColor = done ? "#4ade80" : ahead ? "#4ade80" : "#c8f55a"
 
   var w = new ListWidget()
   w.backgroundColor = new Color("#0a0a0a")
   w.url = SITE_URL
   w.setPadding(12, 14, 12, 14)
 
-  // Header: label + meal status
+  // Header: KCAL + meal label
   var top = w.addStack()
   top.layoutHorizontally()
   top.centerAlignContent()
@@ -90,40 +92,75 @@ async function build() {
   lbl.font = Font.boldMonospacedSystemFont(9)
   lbl.textColor = new Color("#555555")
   top.addSpacer()
-  var mealTxt = top.addText(meal.text)
+  var mealTxt = top.addText(pace.label)
   mealTxt.font = Font.mediumSystemFont(9)
-  mealTxt.textColor = new Color(meal.ok ? "#4ade80" : "#c8f55a")
+  mealTxt.textColor = new Color("#555555")
   mealTxt.lineLimit = 1
-  mealTxt.minimumScaleFactor = 0.7
 
-  w.addSpacer(4)
+  w.addSpacer(2)
 
-  // Donut chart (centered)
-  var imgRow = w.addStack()
-  imgRow.layoutHorizontally()
-  imgRow.addSpacer()
-  var img = imgRow.addImage(makeDonut(pct, data.total, done))
-  img.imageSize = new Size(100, 100)
-  imgRow.addSpacer()
+  // Main: donut left, numbers right
+  var mid = w.addStack()
+  mid.layoutHorizontally()
+  mid.centerAlignContent()
+
+  var donutStack = mid.addStack()
+  donutStack.layoutVertically()
+  donutStack.centerAlignContent()
+  var donutImg = donutStack.addImage(makeDonut(pct, done))
+  donutImg.imageSize = new Size(72, 72)
+
+  mid.addSpacer(10)
+
+  var numStack = mid.addStack()
+  numStack.layoutVertically()
+
+  // Logged calories (large)
+  var num = numStack.addText(data.total.toLocaleString("de-DE"))
+  num.font = Font.boldSystemFont(26)
+  num.textColor = new Color(done ? "#4ade80" : "#f0f0f0")
+  num.minimumScaleFactor = 0.7
+
+  numStack.addSpacer(2)
+
+  // Divider line
+  var div = numStack.addText("────────")
+  div.font = Font.mediumMonospacedSystemFont(7)
+  div.textColor = new Color("#222222")
+
+  numStack.addSpacer(2)
+
+  // Pace target
+  var tgtRow = numStack.addStack()
+  tgtRow.layoutHorizontally()
+  tgtRow.centerAlignContent()
+  var tgtLbl = tgtRow.addText("ziel ")
+  tgtLbl.font = Font.mediumMonospacedSystemFont(8)
+  tgtLbl.textColor = new Color("#444444")
+  var tgtVal = tgtRow.addText(pace.paceTarget.toLocaleString("de-DE"))
+  tgtVal.font = Font.boldMonospacedSystemFont(8)
+  tgtVal.textColor = new Color("#666666")
+
+  numStack.addSpacer(3)
+
+  // Gap: behind / on track
+  var gapTxt = numStack.addText(done ? "Ziel erreicht!" : gapStr)
+  gapTxt.font = Font.boldSystemFont(13)
+  gapTxt.textColor = new Color(gapColor)
+  gapTxt.minimumScaleFactor = 0.7
 
   w.addSpacer()
 
-  // Bottom: remaining + percentage
-  var bot = w.addStack()
-  bot.layoutHorizontally()
-  bot.centerAlignContent()
-  if (done) {
-    var dt = bot.addText("Ziel erreicht!")
-    dt.font = Font.mediumSystemFont(9)
-    dt.textColor = new Color("#4ade80")
-  } else {
-    var rt = bot.addText("-" + data.remaining.toLocaleString("de-DE"))
-    rt.font = Font.mediumMonospacedSystemFont(10)
-    rt.textColor = new Color("#f0f0f0")
-    bot.addSpacer()
-    var pt = bot.addText(Math.round(pct) + "%")
-    pt.font = Font.boldMonospacedSystemFont(9)
-    pt.textColor = new Color("#555555")
+  // Bottom: remaining
+  if (!done) {
+    var bot = w.addStack()
+    bot.layoutHorizontally()
+    var remLbl = bot.addText("noch ")
+    remLbl.font = Font.mediumMonospacedSystemFont(9)
+    remLbl.textColor = new Color("#444444")
+    var remVal = bot.addText(data.remaining.toLocaleString("de-DE") + " kcal")
+    remVal.font = Font.boldMonospacedSystemFont(9)
+    remVal.textColor = new Color("#555555")
   }
 
   return w
