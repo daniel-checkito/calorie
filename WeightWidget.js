@@ -83,6 +83,7 @@ if (config.runsInWidget) {
   Script.setWidget(makeWidget(loadCache()))
 } else {
   var kg = await askWeight()
-  if (kg) { await sendWeight(kg); await makeWidget(loadCache()).presentSmall() }
+  if (kg) { await sendWeight(kg) }
+  await makeWidget(loadCache()).presentSmall()
 }
 Script.complete()

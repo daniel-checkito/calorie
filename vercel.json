@@ -1,8 +1,5 @@
 {
-  "version": 2,
-  "routes": [
-    { "src": "/CalorieWidget.js", "dest": "/CalorieWidget.js" },
-    { "src": "/WeightWidget.js", "dest": "/WeightWidget.js" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
