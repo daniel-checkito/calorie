@@ -562,17 +562,26 @@
 
     // ── Load today ──
     async function loadToday() {
+      var todayStr = new Date().toLocaleDateString("sv"); // "YYYY-MM-DD" in local timezone
       var cached = lsGet(CAL_CACHE_KEY);
+      var hadValidCache = false;
       if (cached) {
-        try { var c = JSON.parse(cached); updateRing(c.total || 0); renderLog(c.entries || []); } catch(e) {}
+        try {
+          var c = JSON.parse(cached);
+          if (c.date === todayStr) {
+            hadValidCache = true;
+            updateRing(c.total || 0);
+            renderLog(c.entries || []);
+          }
+        } catch(e) {}
       }
       try {
         var r = await fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"status"})});
         var d = await r.json();
-        lsSet(CAL_CACHE_KEY, JSON.stringify({total: d.total, entries: d.entries}));
+        lsSet(CAL_CACHE_KEY, JSON.stringify({date: todayStr, total: d.total, entries: d.entries}));
         updateRing(d.total || 0);
         renderLog(d.entries || []);
-      } catch(e) { if (!cached) updateRing(0); }
+      } catch(e) { if (!hadValidCache) updateRing(0); }
     }
     loadToday();
 
