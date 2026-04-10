@@ -399,6 +399,8 @@
   <script>
     // ── Settings ──
     var SETTINGS = { calGoal: 2700, wtGoal: 85 };
+    var CAL_CACHE_KEY = "ht_cal_cache";
+    var WT_CACHE_KEY  = "ht_wt_cache";
     function lsGet(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
     function lsSet(k,v) { try { localStorage.setItem(k,v); } catch(e) {} }
     (function() {
@@ -560,12 +562,17 @@
 
     // ── Load today ──
     async function loadToday() {
+      var cached = lsGet(CAL_CACHE_KEY);
+      if (cached) {
+        try { var c = JSON.parse(cached); updateRing(c.total || 0); renderLog(c.entries || []); } catch(e) {}
+      }
       try {
         var r = await fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"status"})});
         var d = await r.json();
+        lsSet(CAL_CACHE_KEY, JSON.stringify({total: d.total, entries: d.entries}));
         updateRing(d.total || 0);
         renderLog(d.entries || []);
-      } catch(e) { updateRing(0); }
+      } catch(e) { if (!cached) updateRing(0); }
     }
     loadToday();
 
@@ -623,7 +630,10 @@
         .then(function(r){ return r.json(); })
         .then(function(d){
           if (d.total !== undefined) updateRing(d.total);
-          if (d.entries !== undefined) renderLog(d.entries);
+          if (d.entries !== undefined) {
+            renderLog(d.entries);
+            lsSet(CAL_CACHE_KEY, JSON.stringify({total: d.total, entries: d.entries}));
+          }
         })
         .catch(function(){ showToast("Fehler beim Speichern", true); })
         .finally(function(){ setBtn(btn, false, "Eintragen"); });
@@ -741,7 +751,7 @@
       resetPhotoFlow();
       fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc})})
         .then(function(r){ return r.json(); })
-        .then(function(d){ if(d.total!==undefined) updateRing(d.total); if(d.entries!==undefined) renderLog(d.entries); })
+        .then(function(d){ if(d.total!==undefined) updateRing(d.total); if(d.entries!==undefined) { renderLog(d.entries); lsSet(CAL_CACHE_KEY, JSON.stringify({total: d.total, entries: d.entries})); } })
         .catch(function(){ showToast("Fehler", true); });
     }
     function cancelConfirm() { document.getElementById("photoConfirm").classList.remove("show"); document.getElementById("photoBtn").style.display = "block"; pendingPhotoData = null; }
@@ -753,10 +763,15 @@
 
     // ── Weight ──
     async function loadWeight() {
+      var cached = lsGet(WT_CACHE_KEY);
+      if (cached) {
+        try { updateWeightUI(JSON.parse(cached)); } catch(e) {}
+      }
       try {
         var r = await fetch(N8N_WEIGHT, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"status"})});
         var d = await r.json();
         if (!d.current) return;
+        lsSet(WT_CACHE_KEY, JSON.stringify(d));
         updateWeightUI(d);
       } catch(e) {}
     }
