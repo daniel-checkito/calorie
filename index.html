@@ -32,7 +32,7 @@
     .nav-link:hover,.nav-link:active{border-color:var(--accent);color:var(--accent);}
 
     /* ── Hero card ── */
-    .hero-card{background:var(--card);border-radius:20px;padding:20px;margin-bottom:12px;animation:slideUp 0.4s ease;}
+    .hero-card{background:var(--card);border-radius:20px;padding:20px;margin-bottom:12px;animation:slideUp 0.4s ease;overflow:hidden;}
     .hero-label{font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;}
     .hero-main{display:flex;align-items:center;gap:16px;}
     .ring-wrap{position:relative;flex-shrink:0;}
@@ -203,9 +203,9 @@
           </svg>
           <div class="ring-pct" id="ringPct" style="font-size:15px;">0%</div>
         </div>
-        <div style="flex:1;padding-left:4px;">
-          <div class="hero-total" id="ringTotal" style="font-size:52px;">0</div>
-          <div class="hero-of" id="heroOf" style="font-size:12px;margin-top:2px;">of 2.700 kcal</div>
+        <div style="flex:1;min-width:0;padding-left:4px;">
+          <div class="hero-total" id="ringTotal" style="font-size:clamp(36px,11vw,52px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">0</div>
+          <div class="hero-of" id="heroOf" style="font-size:12px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">of 2.700 kcal</div>
           <!-- Pace bar -->
           <div style="margin-top:14px;">
             <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
@@ -456,6 +456,59 @@
     var N8N_CAL    = "https://meshminds.app.n8n.cloud/webhook/log-calories";
     var N8N_WEIGHT = "https://meshminds.app.n8n.cloud/webhook/log-weight";
 
+    // ── Berlin timezone helpers ──
+    var TZ = "Europe/Berlin";
+    function getBerlinDateStr(d) {
+      d = d || new Date();
+      // en-CA locale formats as YYYY-MM-DD
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit"
+      }).format(d);
+    }
+    function getBerlinHourFloat(d) {
+      d = d || new Date();
+      var parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: TZ, hour: "2-digit", minute: "2-digit", hour12: false
+      }).formatToParts(d);
+      var h = 0, m = 0;
+      parts.forEach(function(p) {
+        if (p.type === "hour") h = parseInt(p.value, 10);
+        else if (p.type === "minute") m = parseInt(p.value, 10);
+      });
+      return h + m / 60;
+    }
+    function getBerlinHour(d) { return Math.floor(getBerlinHourFloat(d)); }
+    function getBerlinTimeStr(d) {
+      d = d || new Date();
+      return new Intl.DateTimeFormat("de-DE", {
+        timeZone: TZ, hour: "2-digit", minute: "2-digit", hour12: false
+      }).format(d);
+    }
+    function filterEntriesToToday(entries) {
+      var today = getBerlinDateStr();
+      return (entries || []).filter(function(e) {
+        if (!e || !e.timestamp) return false;
+        var d = new Date(e.timestamp);
+        if (isNaN(d.getTime())) return false;
+        return getBerlinDateStr(d) === today;
+      });
+    }
+    function totalFromEntries(entries) {
+      return (entries || []).reduce(function(sum, e) {
+        var c = parseInt(e.calories, 10);
+        return sum + (isNaN(c) ? 0 : c);
+      }, 0);
+    }
+    // Apply response: filter to today (Berlin), recompute total, cache, render
+    function applyCaloriesResponse(d) {
+      var todayStr = getBerlinDateStr();
+      var todayEntries = filterEntriesToToday(d && d.entries);
+      var todayTotal = totalFromEntries(todayEntries);
+      lsSet(CAL_CACHE_KEY, JSON.stringify({date: todayStr, total: todayTotal, entries: todayEntries}));
+      updateRing(todayTotal);
+      renderLog(todayEntries);
+    }
+
     function navigate(page) {
       document.querySelectorAll(".page").forEach(function(p) { p.classList.remove("active"); });
       document.getElementById("page-" + page).classList.add("active");
@@ -480,7 +533,10 @@
       if (window.location.hash === "#camera") window.location.hash = "";
     }
 
-    document.getElementById("dateLabel").textContent = new Date().toLocaleDateString("de-DE", {weekday:"short", day:"numeric", month:"short"});
+    function updateDateLabel() {
+      document.getElementById("dateLabel").textContent = new Date().toLocaleDateString("de-DE", {weekday:"short", day:"numeric", month:"short", timeZone: TZ});
+    }
+    updateDateLabel();
 
     // ── Ring ──
     function updateRing(total) {
@@ -504,7 +560,7 @@
       var hof = document.getElementById("heroOf"); if(hof) hof.textContent = "of " + goal.toLocaleString("de-DE") + " kcal";
       // Update pace bar
       (function() {
-        var h = new Date().getHours() + new Date().getMinutes()/60;
+        var h = getBerlinHourFloat();
         var dayStart = 7, dayEnd = 23;
         var elapsed = Math.max(0, Math.min(h - dayStart, dayEnd - dayStart));
         var paceFrac = elapsed / (dayEnd - dayStart);
@@ -551,7 +607,7 @@
         }
       }
       // Time-based fallback
-      var h = new Date().getHours();
+      var h = getBerlinHour();
       if (h < 9) return "☕";
       if (h < 11) return "🥐";
       if (h < 14) return "🥗";
@@ -562,7 +618,7 @@
 
     // ── Load today ──
     async function loadToday() {
-      var todayStr = new Date().toLocaleDateString("sv"); // "YYYY-MM-DD" in local timezone
+      var todayStr = getBerlinDateStr();
       var cached = lsGet(CAL_CACHE_KEY);
       var hadValidCache = false;
       if (cached) {
@@ -570,20 +626,53 @@
           var c = JSON.parse(cached);
           if (c.date === todayStr) {
             hadValidCache = true;
-            updateRing(c.total || 0);
-            renderLog(c.entries || []);
+            // Double-check: filter cached entries too in case they contain old data
+            var cachedEntries = filterEntriesToToday(c.entries || []);
+            updateRing(totalFromEntries(cachedEntries));
+            renderLog(cachedEntries);
           }
         } catch(e) {}
       }
+      if (!hadValidCache) {
+        // Fresh day — show zero while we fetch
+        updateRing(0);
+        renderLog([]);
+      }
       try {
-        var r = await fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"status"})});
+        var r = await fetch(N8N_CAL, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({type: "status", date: todayStr, tz: TZ})
+        });
         var d = await r.json();
-        lsSet(CAL_CACHE_KEY, JSON.stringify({date: todayStr, total: d.total, entries: d.entries}));
-        updateRing(d.total || 0);
-        renderLog(d.entries || []);
-      } catch(e) { if (!hadValidCache) updateRing(0); }
+        applyCaloriesResponse(d);
+      } catch(e) { if (!hadValidCache) { updateRing(0); renderLog([]); } }
     }
     loadToday();
+
+    // ── Auto-reset at midnight (Berlin) ──
+    // Check every 30s: if the Berlin date changed, reset counter and reload.
+    (function() {
+      var lastDate = getBerlinDateStr();
+      setInterval(function() {
+        var current = getBerlinDateStr();
+        if (current !== lastDate) {
+          lastDate = current;
+          updateDateLabel();
+          updateRing(0);
+          renderLog([]);
+          loadToday();
+        }
+      }, 30000);
+    })();
+
+    // Refresh when user returns to the tab (important for PWAs left open overnight)
+    document.addEventListener("visibilitychange", function() {
+      if (!document.hidden) {
+        updateDateLabel();
+        loadToday();
+      }
+    });
 
     // ── Render log ──
     function renderLog(entries) {
@@ -594,7 +683,7 @@
       }
       list.innerHTML = entries.slice().reverse().map(function(e) {
         var time = "";
-        if (e.timestamp) { var d = new Date(e.timestamp); time = d.getHours() + ":" + ("0"+d.getMinutes()).slice(-2); }
+        if (e.timestamp) { time = getBerlinTimeStr(new Date(e.timestamp)); }
         var emoji = getEmoji(e.description);
         return "<div class=\"log-entry\">"
           + "<span class=\"log-emoji\">" + emoji + "</span>"
@@ -608,8 +697,7 @@
 
     // ── Optimistic add ──
     function addOptimisticEntry(cal, desc) {
-      var now = new Date();
-      var time = now.getHours() + ":" + ("0"+now.getMinutes()).slice(-2);
+      var time = getBerlinTimeStr(new Date());
       var cur = parseInt(document.getElementById("ringTotal").textContent.replace(/\D/g,"")) || 0;
       updateRing(cur + cal);
       var list = document.getElementById("logList");
@@ -635,15 +723,9 @@
       addOptimisticEntry(cal, desc);
       document.getElementById("manualCal").value = "";
       setBtn(btn, true, "...");
-      fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc})})
+      fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc, date: getBerlinDateStr(), tz: TZ})})
         .then(function(r){ return r.json(); })
-        .then(function(d){
-          if (d.total !== undefined) updateRing(d.total);
-          if (d.entries !== undefined) {
-            renderLog(d.entries);
-            lsSet(CAL_CACHE_KEY, JSON.stringify({total: d.total, entries: d.entries}));
-          }
-        })
+        .then(function(d){ if (d.entries !== undefined) applyCaloriesResponse(d); })
         .catch(function(){ showToast("Fehler beim Speichern", true); })
         .finally(function(){ setBtn(btn, false, "Eintragen"); });
     }
@@ -680,9 +762,9 @@
       document.getElementById("manualEntry").style.display = "block";
       document.getElementById("foodLookup").value = "";
       document.getElementById("manualCal").value = "";
-      fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc})})
+      fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc, date: getBerlinDateStr(), tz: TZ})})
         .then(function(r){return r.json();})
-        .then(function(d){if(d.total!==undefined)updateRing(d.total);if(d.entries!==undefined)renderLog(d.entries);})
+        .then(function(d){ if (d.entries !== undefined) applyCaloriesResponse(d); })
         .catch(function(){showToast("Fehler",true);});
     }
     // ── Delete entry ──
@@ -758,9 +840,9 @@
       var desc = pendingPhotoData ? pendingPhotoData.description : "Foto Eintrag";
       addOptimisticEntry(cal, desc);
       resetPhotoFlow();
-      fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc})})
+      fetch(N8N_CAL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({type:"manual", calories:cal, description:desc, date: getBerlinDateStr(), tz: TZ})})
         .then(function(r){ return r.json(); })
-        .then(function(d){ if(d.total!==undefined) updateRing(d.total); if(d.entries!==undefined) { renderLog(d.entries); lsSet(CAL_CACHE_KEY, JSON.stringify({total: d.total, entries: d.entries})); } })
+        .then(function(d){ if (d.entries !== undefined) applyCaloriesResponse(d); })
         .catch(function(){ showToast("Fehler", true); });
     }
     function cancelConfirm() { document.getElementById("photoConfirm").classList.remove("show"); document.getElementById("photoBtn").style.display = "block"; pendingPhotoData = null; }
